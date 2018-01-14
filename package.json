@@ -6,7 +6,8 @@
   "license": "UNLICENSED",
   "main": "webpack.config.js",
   "scripts": {
-    "test": "todo",
+    "test": "mocha src/test/js/*.jsx --compilers js:babel-core/register",
+    "test:debug": "npm run test -- --inspect-brk",
     "build": "webpack -d",
     "watch": "webpack -d --watch",
     "start": "webpack-dev-server"
@@ -20,7 +21,11 @@
     "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
+    "chai": "^4.1.2",
     "clean-webpack-plugin": "^0.1.17",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "mocha": "^4.1.0",
     "uglifyjs-webpack-plugin": "^1.1.6",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.0"
