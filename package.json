@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "main": "webpack.config.js",
   "scripts": {
-    "test": "mocha src/test/js/*.jsx --compilers js:babel-core/register",
+    "test": "mocha src/test/js/*.jsx --require babel-core/register",
     "test:debug": "npm run test -- --inspect-brk",
     "build": "webpack -d",
     "watch": "webpack -d --watch",
