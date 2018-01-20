@@ -1,5 +1,5 @@
 # docker build -t iotdevicemanager .
-# docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-server iotdevicemanager bash
+# docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-idm iotdevicemanager bash
 FROM ubuntu:16.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -19,7 +19,6 @@ RUN apt-get install -y \
     nodejs \
     git \
     wget \
-    curl \
     tar
 
 # Tomcat
@@ -29,14 +28,18 @@ RUN cd /opt && \
     mv apache-tomcat-9.0.2 tomcat9
 
 ## Debugging tools
-RUN apt-get install -y nano
+RUN apt-get install -y \
+    nano \
+    curl
 
+# TODO ENV credentials
 RUN mkdir /home/user && \
     cd /home/user && \
     git clone https://github.com/AriPerkkio/iot-device-manager.git && \
     cd iot-device-manager
-# TODO configure credentials etc
-#    && mvn package \
-#    && mv target/iot-device-manager-*.war /opt/tomcat9/webapps/iot-device-manager.war
+    && mvn package \
+    && mv target/iot-device-manager-*.war /opt/tomcat9/webapps/iot-device-manager.war
+
+RUN /opt/tomcat9/bin/startup.sh
 
 CMD ['bash']

@@ -17,7 +17,9 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <tomcat.version>8.0.32</tomcat.version>
     </properties>
+    <packaging>war</packaging>
 
     <dependencies>
         <!-- Spring -->
@@ -36,6 +38,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- MySQL -->
@@ -60,10 +67,12 @@
     <!-- Package as an executable jar -->
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -112,5 +121,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

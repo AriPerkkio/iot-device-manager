@@ -1,6 +1,13 @@
 CREATE DATABASE IF NOT EXISTS iotdevicemanager;
 USE iotdevicemanager;
 
+CREATE TABLE IF NOT EXISTS configuration(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR (100),
+    json_configuration MEDIUMBLOB
+);
+
 CREATE TABLE IF NOT EXISTS device (
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
