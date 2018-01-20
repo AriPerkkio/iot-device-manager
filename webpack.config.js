@@ -17,6 +17,9 @@ const config = {
     path: BUILD_DIR,
     filename: TARGET_NAME
   },
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
   module : {
     loaders : [
       {
@@ -31,6 +34,7 @@ const config = {
     new UglifyJsPlugin()
   ],
   devServer: {
+    historyApiFallback: true,
     port: 8081,
     contentBase: path.join(INDEX_HTML_DIR),
     overlay: {
