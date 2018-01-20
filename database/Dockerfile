@@ -4,7 +4,7 @@
 FROM mysql/mysql-server
 
 # TODO shared credentials
-ENV MYSQL_ROOT_PASSWORD=<pass>
+ENV MYSQL_ROOT_PASSWORD=passu
 ENV MYSQL_DATABASE=iotdevicemanager
 ENV MYSQL_ROOT_HOST=%
 

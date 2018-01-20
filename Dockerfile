@@ -1,4 +1,4 @@
-# docker build -t iotdevicemanager .
+# docker build -t iotdevicemanager . 
 # docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-idm iotdevicemanager bash
 FROM ubuntu:16.04
 
@@ -6,14 +6,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ENV JRE_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
 
-RUN apt-get update && \
-  apt-get dist-upgrade -y
+## Debugging tools
+RUN apt-get update && apt-get install -y \
+    nano \
+    curl
 
 # Add dependencies
 RUN curl -sL https://deb.nodesource.com/setup_9.x | bash -
 
 # Build tools
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     openjdk-8-jdk \
     maven \
     nodejs \
@@ -27,19 +29,17 @@ RUN cd /opt && \
     tar xzf apache-tomcat-9.0.2.tar.gz && \
     mv apache-tomcat-9.0.2 tomcat9
 
-## Debugging tools
-RUN apt-get install -y \
-    nano \
-    curl
-
 # TODO ENV credentials
 RUN mkdir /home/user && \
     cd /home/user && \
     git clone https://github.com/AriPerkkio/iot-device-manager.git && \
-    cd iot-device-manager
-    && mvn package \
-    && mv target/iot-device-manager-*.war /opt/tomcat9/webapps/iot-device-manager.war
+    cd iot-device-manager && \
+    npm install && \
+    npm run build && \
+    mvn package && \
+    mv target/iot-device-manager-*.war /opt/tomcat9/webapps/iot-device-manager.war
 
-RUN /opt/tomcat9/bin/startup.sh
+# TODO
+# CMD ['/opt/tomcat9/bin/startup.sh']
 
 CMD ['bash']
