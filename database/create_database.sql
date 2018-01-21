@@ -1,4 +1,6 @@
+# During development:
 DROP DATABASE iotdevicemanager;
+
 CREATE DATABASE IF NOT EXISTS iotdevicemanager;
 USE iotdevicemanager;
 
@@ -42,7 +44,7 @@ CREATE TABLE IF NOT EXISTS device (
 CREATE TABLE IF NOT EXISTS location (
     device_id INT NOT NULL,
     coordinates VARCHAR(20) NOT NULL,
-    time DATE NOT NULL,
+    time DATETIME NOT NULL,
     FOREIGN KEY (device_id) REFERENCES device(id)
 );
 

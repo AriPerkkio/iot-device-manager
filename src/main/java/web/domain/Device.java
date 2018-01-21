@@ -13,9 +13,9 @@ public class Device {
 
     private String name;
 
-    private Integer deviceType;
+    private Integer deviceTypeId;
 
-    private Integer groupId;
+    private Integer deviceGroupId;
 
     private Integer configurationId;
 
@@ -37,20 +37,20 @@ public class Device {
         this.name = name;
     }
 
-    public Integer getDeviceType() {
-        return deviceType;
+    public Integer getDeviceTypeId() {
+        return deviceTypeId;
     }
 
-    public void setDeviceType(Integer deviceType) {
-        this.deviceType = deviceType;
+    public void setDeviceTypeId(Integer deviceTypeId) {
+        this.deviceTypeId = deviceTypeId;
     }
 
-    public Integer getGroupId() {
-        return groupId;
+    public Integer getDeviceGroupId() {
+        return deviceGroupId;
     }
 
-    public void setGroupId(Integer groupId) {
-        this.groupId = groupId;
+    public void setDeviceGroupId(Integer deviceGroupId) {
+        this.deviceGroupId = deviceGroupId;
     }
 
     public Integer getConfigurationId() {
