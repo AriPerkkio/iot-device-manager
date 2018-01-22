@@ -36,13 +36,7 @@ VALUES (
     (SELECT id FROM device_icon WHERE path="lp_devices/80211bng.png")
 );
 
-INSERT INTO device (
-    name,
-    device_type_id,
-    device_group_id,
-    configuration_id
-)
-VALUES (
+CALL add_device (
     "LP-Device #1",
     (SELECT id FROM device_type WHERE name="WiFi bgn"),
     (SELECT id FROM device_group WHERE name="LP-DEVICES"),

@@ -1,8 +1,14 @@
 package web.repository;
 
-import org.springframework.data.repository.CrudRepository;
 import web.domain.Device;
 
-public interface DeviceRepository extends CrudRepository<Device, Long> {
+import java.util.Collection;
+
+public interface DeviceRepository {
+
+    // TODO add rest of the filters
+    Collection<Device> getDevices(String name);
+
+    Device addDevice(Device device);
 
 }

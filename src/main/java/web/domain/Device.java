@@ -1,11 +1,23 @@
 package web.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+
+@NamedStoredProcedureQueries({
+    @NamedStoredProcedureQuery(name = "get_devices", procedureName = "get_devices",
+        resultClasses = Device.class,
+        parameters = {
+            @StoredProcedureParameter(name = "f_name", type = String.class, mode = ParameterMode.IN) }),
+    @NamedStoredProcedureQuery(name = "add_device", procedureName = "add_device",
+        resultClasses = Device.class,
+        parameters = {
+            @StoredProcedureParameter(name = "p_name", type = String.class, mode = ParameterMode.IN),
+            @StoredProcedureParameter(name = "p_device_type_id", type = Integer.class, mode = ParameterMode.IN),
+            @StoredProcedureParameter(name = "p_device_group_id", type = Integer.class, mode = ParameterMode.IN),
+            @StoredProcedureParameter(name = "p_configuration_id", type = Integer.class, mode = ParameterMode.IN) })
+})
 
 @Entity
+@Table(name = "device")
 public class Device {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
