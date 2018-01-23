@@ -17,30 +17,21 @@ public class DeviceRepositoryImpl implements DeviceRepository {
 
     @Override
     public Collection<Device> getDevices(String filterName) {
-        final String name = filterName != null ? filterName : "";
-
         StoredProcedureQuery getDeviceQuery =
             entityManager.createNamedStoredProcedureQuery("get_devices")
-                .setParameter("f_name", name);
+                .setParameter("f_name", filterName);
 
         return getDeviceQuery.getResultList();
     }
 
     @Override
     public Device addDevice(Device device) {
-
-        // TODO Util method for getting "default null value" for each data type
-        final String name = device.getName();
-        final Integer deviceTypeId = device.getDeviceTypeId();
-        final Integer deviceGroupId = device.getDeviceGroupId() != null ? device.getDeviceGroupId() : 0;
-        final Integer configurationId = device.getConfigurationId() != null ? device.getConfigurationId() : 0;
-
         StoredProcedureQuery addDeviceQuery =
             entityManager.createNamedStoredProcedureQuery("add_device")
-                .setParameter("p_name", name)
-                .setParameter("p_device_type_id", deviceTypeId)
-                .setParameter("p_device_group_id", deviceGroupId)
-                .setParameter("p_configuration_id", configurationId);
+                .setParameter("p_name", device.getName())
+                .setParameter("p_device_type_id", device.getDeviceTypeId())
+                .setParameter("p_device_group_id", device.getDeviceGroupId())
+                .setParameter("p_configuration_id", device.getConfigurationId());
 
         return (Device) addDeviceQuery.getSingleResult();
     }

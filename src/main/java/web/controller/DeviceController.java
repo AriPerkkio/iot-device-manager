@@ -16,6 +16,9 @@ public class DeviceController {
         this.deviceRepository = deviceRepository;
     }
 
+
+    // TODO Validate RequestParams and body, regex for string properties (characters allowed in URLs only)
+
     @RequestMapping(value = "/devices", method = RequestMethod.GET)
     public Collection<Device> getDevices(@RequestParam(name="name", required = false) String name) {
         return deviceRepository.getDevices(name);

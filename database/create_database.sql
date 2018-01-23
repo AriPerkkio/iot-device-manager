@@ -80,19 +80,19 @@ CREATE PROCEDURE get_devices (
 BEGIN
 
     /** TODO Filter using f_* inputs **/
-/**
-    SET @filters = "";
     SET @query = "SELECT id, name, device_type_id, device_group_id, configuration_id, authentication_key FROM device";
+    SET @where_clause = " WHERE 1=1";
 
-    IF f_name != "" THEN
-        SET @filters = CONCAT(@filters, " WHERE name=", f_name);
+    IF f_name IS NOT NULL THEN
+        SET @where_clause = CONCAT(@where_clause, ' AND name="', f_name, '"');
     END IF;
 
-    PREPARE stmt FROM @filters;
+    SET @query = CONCAT(@query, @where_clause);
+
+    PREPARE stmt FROM @query;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
-**/
-    SELECT id, name, device_type_id, device_group_id, configuration_id, authentication_key FROM device;
+
 END
 $$
 DELIMITER ;
