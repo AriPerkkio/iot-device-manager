@@ -25,9 +25,9 @@ RUN apt-get update && apt-get install -y \
 
 # Tomcat
 RUN cd /opt && \
-    wget http://www.nic.funet.fi/pub/mirrors/apache.org/tomcat/tomcat-9/v9.0.2/bin/apache-tomcat-9.0.2.tar.gz && \
-    tar xzf apache-tomcat-9.0.2.tar.gz && \
-    mv apache-tomcat-9.0.2 tomcat9
+    wget http://www.nic.funet.fi/pub/mirrors/apache.org/tomcat/tomcat-9/v9.0.4/bin/apache-tomcat-9.0.4.tar.gz && \
+    tar xzf apache-tomcat-9.0.4.tar.gz && \
+    mv apache-tomcat-9.0.4 tomcat9
 
 # TODO ENV credentials
 RUN mkdir /home/user && \
