@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS device_group (
 
 CREATE TABLE IF NOT EXISTS device_icon (
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    path VARCHAR(100)
+    path VARCHAR(100) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS device_type (
@@ -33,14 +33,15 @@ CREATE TABLE IF NOT EXISTS device_type (
 
 CREATE TABLE IF NOT EXISTS device (
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
+    name VARCHAR(50) UNIQUE NOT NULL,
     device_type_id INT NOT NULL,
     device_group_id INT,
     configuration_id INT,
-    authentication_key VARCHAR(32) NOT NULL, /* TODO INDEX authentication_key */
+    authentication_key VARCHAR(32) UNIQUE NOT NULL,
     FOREIGN KEY (device_type_id) REFERENCES device_type(id),
     FOREIGN KEY (device_group_id) REFERENCES device_group(id),
-    FOREIGN KEY (configuration_id) REFERENCES configuration(id)
+    FOREIGN KEY (configuration_id) REFERENCES configuration(id),
+    INDEX(authentication_key)
 );
 
 CREATE TABLE IF NOT EXISTS location (
@@ -58,7 +59,14 @@ CREATE TRIGGER device_insert
     BEFORE INSERT ON device
     FOR EACH ROW
 BEGIN
-    SET NEW.authentication_key = MD5(LAST_INSERT_ID());
+    /* Selectin max id is safer than LAST_INSERT_ID() */
+    SET @id = (SELECT MAX(id) FROM device) + 1;
+
+    IF @id IS NULL THEN
+        SET @id = 0;
+    END IF;
+
+    SET NEW.authentication_key = MD5(@id);
 END$$
 DELIMITER ;
 
@@ -66,25 +74,39 @@ DELIMITER ;
 
 /** DEVICE **/
 
+/* Get devices using passed parameters as "AND clause"-filter. NULL parameters are ignored. */
 DROP PROCEDURE IF EXISTS get_devices;
 DELIMITER $$
 CREATE PROCEDURE get_devices (
-    f_name VARCHAR(50))
-/*
-    id INT,
+    f_name VARCHAR(50),
     f_device_type_id INT,
     f_device_group_id INT,
     f_configuration_id INT,
     f_authentication_key VARCHAR(32))
-*/
 BEGIN
 
-    /** TODO Filter using f_* inputs **/
     SET @query = "SELECT id, name, device_type_id, device_group_id, configuration_id, authentication_key FROM device";
+
     SET @where_clause = " WHERE 1=1";
 
     IF f_name IS NOT NULL THEN
         SET @where_clause = CONCAT(@where_clause, ' AND name="', f_name, '"');
+    END IF;
+
+    IF f_device_type_id IS NOT NULL THEN
+        SET @where_clause = CONCAT(@where_clause, ' AND device_type_id="', f_device_type_id, '"');
+    END IF;
+
+    IF f_device_group_id IS NOT NULL THEN
+        SET @where_clause = CONCAT(@where_clause, ' AND device_group_id="', f_device_group_id, '"');
+    END IF;
+
+    IF f_configuration_id IS NOT NULL THEN
+        SET @where_clause = CONCAT(@where_clause, ' AND configuration_id="', f_configuration_id, '"');
+    END IF;
+
+    IF f_authentication_key IS NOT NULL THEN
+        SET @where_clause = CONCAT(@where_clause, ' AND authentication_key="', f_authentication_key, '"');
     END IF;
 
     SET @query = CONCAT(@query, @where_clause);

@@ -1,31 +1,39 @@
 package web.controller;
 
 import org.springframework.web.bind.annotation.*;
-import web.domain.Device;
+import web.domain.entity.Device;
+import web.domain.response.ResponseWrapper;
 import web.repository.DeviceRepository;
-
-import java.util.Collection;
+import web.service.DeviceService;
 
 @RestController
 @RequestMapping("/rest")
 public class DeviceController {
 
-    private final DeviceRepository deviceRepository;
+    private final DeviceService deviceService;
 
-    DeviceController(DeviceRepository deviceRepository) {
-        this.deviceRepository = deviceRepository;
+    DeviceController(DeviceRepository deviceRepository, DeviceService deviceService) {
+        this.deviceService = deviceService;
     }
 
+    @RequestMapping(value = "/device", method = RequestMethod.GET)
+    public ResponseWrapper getDevice(
+            @RequestParam(name="name", required = false) String name,
+            @RequestParam(name="authenticationKey", required = false) String authenticationKey) {
 
-    // TODO Validate RequestParams and body, regex for string properties (characters allowed in URLs only)
+        return deviceService.getDevice(name, authenticationKey);
+    }
 
     @RequestMapping(value = "/devices", method = RequestMethod.GET)
-    public Collection<Device> getDevices(@RequestParam(name="name", required = false) String name) {
-        return deviceRepository.getDevices(name);
+    public ResponseWrapper getDevices(
+            @RequestParam(name="deviceTypeId", required = false) Integer deviceTypeId,
+            @RequestParam(name="deviceGroupId", required = false) Integer deviceGroupId,
+            @RequestParam(name="configurationId", required = false) Integer configurationId) {
+        return deviceService.getDevices(deviceTypeId, deviceGroupId, configurationId);
     }
 
     @RequestMapping(value = "/device", method = RequestMethod.POST)
-    public Device addDevice(@RequestBody Device device) {
-        return deviceRepository.addDevice(device);
+    public ResponseWrapper addDevice(@RequestBody Device device) {
+        return deviceService.addDevice(device);
     }
 }

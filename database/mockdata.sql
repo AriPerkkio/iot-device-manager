@@ -37,7 +37,7 @@ VALUES (
 );
 
 CALL add_device (
-    "LP-Device #1",
+    "LP-Device 1",
     (SELECT id FROM device_type WHERE name="WiFi bgn"),
     (SELECT id FROM device_group WHERE name="LP-DEVICES"),
     (SELECT id FROM configuration WHERE name="startup configuration")
@@ -49,7 +49,7 @@ INSERT INTO location (
     time
 )
 VALUES (
-    (SELECT id FROM device where name="LP-Device #1"),
+    (SELECT id FROM device where name="LP-Device 1"),
     "52.0800409,5.1273094",
     NOW()
 );

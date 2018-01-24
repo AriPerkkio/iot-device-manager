@@ -1,4 +1,4 @@
-package web.domain;
+package web.domain.entity;
 
 import javax.persistence.*;
 
@@ -6,7 +6,11 @@ import javax.persistence.*;
     @NamedStoredProcedureQuery(name = "get_devices", procedureName = "get_devices",
         resultClasses = Device.class,
         parameters = {
-            @StoredProcedureParameter(name = "f_name", type = String.class, mode = ParameterMode.IN) }),
+            @StoredProcedureParameter(name = "f_name", type = String.class, mode = ParameterMode.IN),
+            @StoredProcedureParameter(name = "f_device_type_id", type = Integer.class, mode = ParameterMode.IN),
+            @StoredProcedureParameter(name = "f_device_group_id", type = Integer.class, mode = ParameterMode.IN),
+            @StoredProcedureParameter(name = "f_configuration_id", type = Integer.class, mode = ParameterMode.IN),
+            @StoredProcedureParameter(name = "f_authentication_key", type = String.class, mode = ParameterMode.IN) }),
     @NamedStoredProcedureQuery(name = "add_device", procedureName = "add_device",
         resultClasses = Device.class,
         parameters = {
