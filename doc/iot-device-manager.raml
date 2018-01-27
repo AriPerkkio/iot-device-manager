@@ -1,15 +1,25 @@
 #%RAML 1.0
 title: iot-device-manager
 mediaType: application/json
+baseUri: http://localhost:8080/rest
 types:
-  responseWrapper:
-    description: Wrapper used to transfer payload and errors in generic way
+  payload: (device | device[])
+  errors: string[]
+  device:
     properties:
-      payload:
-        description: Contains payload as an object or multiple objects as array
-      errors:
-        type: array
-        description: An array containing string errors
+      id: integer
+      name: string
+      deviceTypeId: integer
+      deviceGroupId: integer
+      configurationId: integer
+      authenticationKey: string
+    example:
+      id: 1
+      name: low-power-dev-1
+      deviceTypeId: 1
+      deviceGroupId: 1
+      configurationId: 1
+      authenticationKey: cfcd208495d565ef66e7dff9f98764da
 
 /device:
   get:
@@ -17,16 +27,103 @@ types:
     queryParameters:
       name:
         description: Device name used as filter. Required if authenticationKey is not present.
+        required: false
         type: string
         maxLength: 50
-        pattern: [A-Za-z0-9_-]
+        pattern: "[A-Za-z0-9_-]"
       authenticationKey:
         description: Device authenticationKey used as filter. Required if name is not present.
+        required: false
         type: string
         minLength: 32
         maxLength: 32
     responses:
       200:
-        body: responseWrapper
-        
-        
+        body:
+          application/json:
+            properties:
+              payload: device
+              errors: null
+  post:
+    description: Add new device with given parameters
+    body:
+      application/json:
+        properties:
+          name:
+            type: string
+            maxLength: 50
+            pattern: "[A-Za-z0-9_-]"
+          deviceTypeId: integer
+          deviceGroupId:
+            type: integer
+            required: false
+          configurationId:
+            type: integer
+            required: false
+    responses:
+      200:
+        body:
+          application/json:
+            properties:
+              payload:
+                description: Device inserted into database
+                type: device
+              errors: null
+  put:
+    description: Update given attributes of device
+    queryParameters:
+      name:
+        description: Device name used as filter. Required if authenticationKey is not present.
+        required: false
+        type: string
+        maxLength: 50
+        pattern: "[A-Za-z0-9_-]"
+      authenticationKey:
+        description: Device authenticationKey used as filter. Required if name is not present.
+        required: false
+        type: string
+        minLength: 32
+        maxLength: 32
+    body:
+      application/json:
+        description: Attributes to update
+        properties:
+          name:
+            required: false
+            type: string
+          deviceTypeId:
+            required: false
+            type: integer
+          deviceGroupId:
+            required: false
+            type: integer
+          configurationId:
+            required: false
+            type: integer
+    responses:
+      200:
+        body:
+          application/json:
+            properties:
+              payload:
+                description: Device with updated attributes
+                type: device
+              errors: null
+  delete:
+    description: Remove device matching authentication key
+    queryParameters:
+      name:
+        description: Device name used as filter. Required if authenticationKey is not present.
+        required: false
+        type: string
+        maxLength: 50
+        pattern: "[A-Za-z0-9_-]"
+      authenticationKey:
+        description: Device authenticationKey used as filter. Required if name is not present.
+        required: false
+        type: string
+        minLength: 32
+        maxLength: 32
+    responses:
+      200:
+        description: Device successfully removed
