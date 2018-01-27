@@ -1,0 +1,32 @@
+#%RAML 1.0
+title: iot-device-manager
+mediaType: application/json
+types:
+  responseWrapper:
+    description: Wrapper used to transfer payload and errors in generic way
+    properties:
+      payload:
+        description: Contains payload as an object or multiple objects as array
+      errors:
+        type: array
+        description: An array containing string errors
+
+/device:
+  get:
+    description: Get device matching parameters
+    queryParameters:
+      name:
+        description: Device name used as filter. Required if authenticationKey is not present.
+        type: string
+        maxLength: 50
+        pattern: [A-Za-z0-9_-]
+      authenticationKey:
+        description: Device authenticationKey used as filter. Required if name is not present.
+        type: string
+        minLength: 32
+        maxLength: 32
+    responses:
+      200:
+        body: responseWrapper
+        
+        
