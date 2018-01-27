@@ -8,14 +8,14 @@ USE iotdevicemanager;
 
 CREATE TABLE IF NOT EXISTS configuration (
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
+    name VARCHAR(50) UNIQUE NOT NULL,
     description VARCHAR(100),
     json_configuration MEDIUMBLOB
 );
 
 CREATE TABLE IF NOT EXISTS device_group (
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
+    name VARCHAR(50) UNIQUE NOT NULL,
     description VARCHAR(100)
 );
 
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS device_icon (
 
 CREATE TABLE IF NOT EXISTS device_type (
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    name VARCHAR(50),
+    name VARCHAR(50) UNIQUE NOT NULL,
     device_icon_id INT,
     FOREIGN KEY (device_icon_id) REFERENCES device_icon(id)
 );
@@ -154,3 +154,11 @@ BEGIN
 END
 $$
 DELIMITER ;
+
+/* TODO environment credentials */
+DROP USER IF EXISTS 'iot-device-manager-client'@'%';
+CREATE USER 'iot-device-manager-client'@'%' identified by 'client';
+
+GRANT SELECT ON mysql.proc TO 'iot-device-manager-client'@'%';
+GRANT EXECUTE ON PROCEDURE get_devices TO 'iot-device-manager-client'@'%';
+GRANT EXECUTE ON PROCEDURE add_device TO 'iot-device-manager-client'@'%';

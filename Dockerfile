@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     tar
 
+# TODO archived version
 # Tomcat
 RUN cd /opt && \
     wget http://www.nic.funet.fi/pub/mirrors/apache.org/tomcat/tomcat-9/v9.0.4/bin/apache-tomcat-9.0.4.tar.gz && \

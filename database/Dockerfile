@@ -4,10 +4,9 @@
 # docker exec -it mysql-idm bash -c "mysql -uroot -p < /home/mockdata.sql"
 FROM mysql/mysql-server
 
-# TODO shared credentials
+# TODO one-time root password
 ENV MYSQL_ROOT_PASSWORD=passu
 ENV MYSQL_DATABASE=iotdevicemanager
-ENV MYSQL_ROOT_HOST=%
 
 ADD create_database.sql /home/
 ADD mockdata.sql /home/
