@@ -5,6 +5,16 @@ import javax.persistence.*;
 @Entity
 @Table(name = "device_icon")
 public class DeviceIcon {
+
+    public DeviceIcon() {
+        // Default constructor
+    }
+
+    public DeviceIcon(Integer id, String path) {
+        this.id = id;
+        this.path = path;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
