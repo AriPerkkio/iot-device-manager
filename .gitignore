@@ -9,9 +9,14 @@ src/main/resources/static/
 .idea
 *.iml
 
-#VS Code
+# VS Code
 .vscode/
 
 # Node, npm
 node_modules/
 package-lock.json
+
+# Robot framework
+**/test/report.html
+**/test/log.html
+**/test/output.xml
