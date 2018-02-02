@@ -61,7 +61,8 @@ BEGIN
         p_coordinates,
         @time
     );
-    
+
+    COMMIT;
     CALL get_locations(p_device_id, @time, NULL, NULL);
 END
 $$
@@ -105,6 +106,7 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
+        COMMIT;
     END IF;
 
     SELECT (@params_ok IS NOT NULL);

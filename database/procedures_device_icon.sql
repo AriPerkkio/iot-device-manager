@@ -34,6 +34,7 @@ CREATE PROCEDURE add_device_icon (
     IN p_path VARCHAR(100))
 BEGIN
     INSERT INTO device_icon(path) VALUES (p_path);
+    COMMIT;
     CALL get_device_icons(NULL, p_path);
 END
 $$
@@ -63,6 +64,7 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
+        COMMIT;
     END IF;
 
     SELECT (@params_ok IS NOT NULL);
@@ -96,6 +98,7 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt USING @path;
         DEALLOCATE PREPARE stmt;
+        COMMIT;
         CALL get_device_icons(NULL, @path);
     END IF;
 END

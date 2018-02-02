@@ -70,6 +70,7 @@ BEGIN
         p_configuration_id
     );
 
+    COMMIT;
     CALL get_devices(NULL, p_name, p_device_type_id, p_device_group_id, p_configuration_id, NULL);
 END
 $$
@@ -87,17 +88,17 @@ BEGIN
     SET @params_ok = NULL;
 
     IF f_id IS NOT NULL THEN
-        SET @query = CONCAT(@query, ' AND id ="', f_id, '"');
+        SET @where_clause = CONCAT(@where_clause, ' AND id ="', f_id, '"');
         SET @params_ok = 1;
     END IF;
 
     IF f_name IS NOT NULL THEN
-        SET @query = CONCAT(@query, ' AND name ="', f_name, '"');
+        SET @where_clause = CONCAT(@where_clause, ' AND name ="', f_name, '"');
         SET @params_ok = 1;
     END IF;
     
     IF f_authentication_key IS NOT NULL THEN
-        SET @query = CONCAT(@query, ' AND authentication_key ="', f_authentication_key, '"');
+        SET @where_clause = CONCAT(@where_clause, ' AND authentication_key ="', f_authentication_key, '"');
         SET @params_ok = 1;
     END IF;
 
@@ -108,7 +109,8 @@ BEGIN
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
     END IF;
-
+    
+    COMMIT;
     SELECT (@params_ok IS NOT NULL);
 END
 $$
@@ -159,6 +161,7 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt USING @name, @device_type_id, @device_group_id, @configuration_id;
         DEALLOCATE PREPARE stmt;
+        COMMIT;
         CALL get_devices(NULL, p_name, p_device_type_id, p_device_group_id, p_configuration_id, NULL);
     END IF;
 END

@@ -47,6 +47,7 @@ BEGIN
         p_json_configuration
     );
 
+    COMMIT;
     CALL get_configurations(NULL, p_name);
 END
 $$
@@ -78,6 +79,7 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
+        COMMIT;
     END IF;
 
     SELECT (@params_ok IS NOT NULL);
@@ -119,6 +121,7 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt USING @name, @description, @json_configuration;
         DEALLOCATE PREPARE stmt;
+        COMMIT;
         CALL get_configurations(NULL, @name);
     END IF;
 END
