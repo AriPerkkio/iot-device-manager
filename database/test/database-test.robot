@@ -1,39 +1,12 @@
 *** Settings ***
-Library     DatabaseLibrary
-Library     Collections
+Resource    resources.robot
 
 *** Variables ***
-${Port}            3306
-${Username}        root
-${DatabaseHost}    127.0.0.1
-${Password}        passu
-@{QueryResults}
-${PROCEDURE CHECK QUERY}    SELECT routine_name FROM information_schema.routines WHERE routine_type = "PROCEDURE" and routine_schema="iotdevicemanager"
-${device_name}         robot-device
-${device_type_id}      1
-${device_group_id}     1
-${configuration_id}    1
-
-*** Keywords ***
-Setup Connection
-    Log    Setting up connection
-    Connect to Database    pymysql    iotdevicemanager    ${Username}    ${Password}    ${DatabaseHost}    ${Port}
-
-Terminate Connection
-    Log    Terminating connection
-    Disconnect From Database
-
-Initialize Tables
-    Query    CALL delete_device(NULL, "${device_name}", NULL)
-
-# ref: https://groups.google.com/forum/#!topic/robotframework-users/BeF_kJA2ELo
-Get Values of Column
-    [Arguments]    ${column}=0    @{records}    # Extract column values from from records and return as a list
-    Log Many    @{records}
-    @{column_value_list}=    Create List
-    : FOR    ${value}    IN    @{records}
-    \    Append To List    ${column_value_list}    ${value[${column}]}
-    [Return]    @{column_value_list}
+${device_name}          robot-device
+${device_name renamed}  robot-device-renamed
+${device_type_id}       1
+${device_group_id}      1
+${configuration_id}     1
 
 *** Test Cases ***
 Verify Tables Exist
@@ -76,18 +49,37 @@ Verify Procedures Exist
     Should Contain X Times    ${results}    update_device_type      1
     Terminate Connection
 
-Verify Device Stored Procedures
+Verify Device Stored Procedures Work As Expected
     Setup Connection
-    Initialize Tables
-    
+
+    # Make sure test devices are not in database when starting
+    Delete Device  NULL  "${device_name}"  NULL
+    Delete Device  NULL  "${device_name renamed}"  NULL
+
     Log    Verify add_device returns newly inserted device
-    @{QueryResults} =    Query    CALL add_device("${device_name}", "${device_type_id}", "${device_group_id}", "${configuration_id}")
-    @{results}=    Get Values of Column    1    @{QueryResults}
-    Should Contain X Times    ${results}    ${device_name}    1
+    ${add_device result} =    Add Device  "${device_name}"  ${device_type_id}  ${device_group_id}  ${configuration_id}
+    Dictionary Should Contain Item  ${add_device result}  name              ${device_name}
+    Dictionary Should Contain Item  ${add_device result}  device_type_id    ${device_type_id}
+    Dictionary Should Contain Item  ${add_device result}  device_group_id   ${device_group_id}
+    Dictionary Should Contain Item  ${add_device result}  configuration_id  ${configuration_id}
+
+    Log    Verify update_device returns updated device
+    ${update_device result} =    Update Device    NULL  "${device_name}"  NULL  "${device_name renamed}"  ${device_type_id}  ${device_group_id}  ${configuration_id}
+    Dictionary Should Contain Item  ${update_device result}  name              ${device_name renamed}
+    Dictionary Should Contain Item  ${update_device result}  device_type_id    ${device_type_id}
+    Dictionary Should Contain Item  ${update_device result}  device_group_id   ${device_group_id}
+    Dictionary Should Contain Item  ${update_device result}  configuration_id  ${configuration_id}
 
     Log    Verify get_devices finds inserted device
-    @{QueryResults} =    Query    CALL get_devices(NULL, "${device_name}", NULL, NULL, NULL, NULL)
-    @{results}=    Get Values of Column    1    @{QueryResults}
-    Should Contain X Times    ${results}    ${device_name}    1
+    ${get_devices result} =    Get Device  NULL  "${device_name renamed}"  ${device_type_id}  ${device_group_id}  ${configuration_id}  NULL
+    Dictionary Should Contain Item  ${get_devices result}  name              ${device_name renamed}
+    Dictionary Should Contain Item  ${get_devices result}  device_type_id    ${device_type_id}
+    Dictionary Should Contain Item  ${get_devices result}  device_group_id   ${device_group_id}
+    Dictionary Should Contain Item  ${get_devices result}  configuration_id  ${configuration_id}
+
+    Log    Verify device is not found after delete_device
+    Delete Device  NULL  "${device_name renamed}"  NULL
+    ${get_devices result} =    Get Device  NULL  "${device_name renamed}"  ${device_type_id}  ${device_group_id}  ${configuration_id}  NULL
+    Should Be Equal  ${get_devices result}  ${None}
 
     Terminate Connection
