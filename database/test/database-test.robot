@@ -2,11 +2,18 @@
 Resource    resources.robot
 
 *** Variables ***
+# Device
 ${device_name}          robot-device
 ${device_name renamed}  robot-device-renamed
 ${device_type_id}       1
 ${device_group_id}      1
 ${configuration_id}     1
+
+# Configuration
+${configuration_name}           robot-configuration
+${configuration_name renamed}   robot-configuration-renamed
+${configuration_description}    Configuration created by tests
+${json_configuration}           {IS_TEST: TRUE}
 
 *** Test Cases ***
 Verify Tables Exist
@@ -52,11 +59,11 @@ Verify Procedures Exist
 Verify Device Stored Procedures Work As Expected
     Setup Connection
 
-    # Make sure test devices are not in database when starting
+    # Make sure test devices are not in database already
     Delete Device  NULL  "${device_name}"  NULL
     Delete Device  NULL  "${device_name renamed}"  NULL
 
-    Log    Verify add_device returns newly inserted device
+    Log    Verify add_device returns inserted device
     ${add_device result} =    Add Device  "${device_name}"  ${device_type_id}  ${device_group_id}  ${configuration_id}
     Dictionary Should Contain Item  ${add_device result}  name              ${device_name}
     Dictionary Should Contain Item  ${add_device result}  device_type_id    ${device_type_id}
@@ -70,7 +77,7 @@ Verify Device Stored Procedures Work As Expected
     Dictionary Should Contain Item  ${update_device result}  device_group_id   ${device_group_id}
     Dictionary Should Contain Item  ${update_device result}  configuration_id  ${configuration_id}
 
-    Log    Verify get_devices finds inserted device
+    Log    Verify get_devices finds device
     ${get_devices result} =    Get Device  NULL  "${device_name renamed}"  ${device_type_id}  ${device_group_id}  ${configuration_id}  NULL
     Dictionary Should Contain Item  ${get_devices result}  name              ${device_name renamed}
     Dictionary Should Contain Item  ${get_devices result}  device_type_id    ${device_type_id}
@@ -83,3 +90,33 @@ Verify Device Stored Procedures Work As Expected
     Should Be Equal  ${get_devices result}  ${None}
 
     Terminate Connection
+
+Verify Configuration Stored Procedures Work As Expected
+    Setup Connection
+
+    # Make sure test configurations are not in database already
+    Delete Configuration  NULL  "${configuration_name}"
+    Delete Configuration  NULL  "${configuration_name renamed}"
+
+    Log    Verify add_configuration returns inserted configuration
+    ${add_configuration result} =    Add Configuration  "${configuration_name}"  "${configuration_description}"  "${json_configuration}"
+    Dictionary Should Contain Item  ${add_configuration result}  name                ${configuration_name}
+    Dictionary Should Contain Item  ${add_configuration result}  description         ${configuration_description}
+    Dictionary Should Contain Item  ${add_configuration result}  json_configuration  ${json_configuration}
+
+    Log    Verify update_configuration returns updated configuration
+    ${updated_configuration result} =    Update Configuration  NULL  "${configuration_name}"  "${configuration_name renamed}"  "${configuration_description}"  "${json_configuration}"
+    Dictionary Should Contain Item  ${updated_configuration result}  name                ${configuration_name renamed}
+    Dictionary Should Contain Item  ${updated_configuration result}  description         ${configuration_description}
+    Dictionary Should Contain Item  ${updated_configuration result}  json_configuration  ${json_configuration}
+
+    Log    Verify get_configurations finds configuration
+    ${get_configuration result} =    Get Configuration  NULL  "${configuration_name renamed}"
+    Dictionary Should Contain Item  ${get_configuration result}  name                ${configuration_name renamed}
+    Dictionary Should Contain Item  ${get_configuration result}  description         ${configuration_description}
+    Dictionary Should Contain Item  ${get_configuration result}  json_configuration  ${json_configuration}
+
+    Log    Verify configuration is not found after delete_configuration
+    Delete Configuration  NULL  "${configuration_name renamed}"
+    ${get_configuration result} =    Get Configuration  NULL  "${configuration_name renamed}"
+    Should Be Equal    ${get_configuration result}    ${None}

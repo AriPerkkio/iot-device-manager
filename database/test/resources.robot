@@ -28,6 +28,8 @@ Get Values of Column
     \    Append To List    ${column_value_list}    ${value[${column}]}
     [Return]    @{column_value_list}
 
+### DEVICE  ###
+
 Map Result To Device
     [Arguments]    ${result}
     ${mapped device} =  Create Dictionary  id=${result[0]}  name=${result[1]}  device_type_id=${result[2]}  device_group_id=${result[3]}  configuration_id=${result[4]}  authentication_key=${result[5]}
@@ -59,4 +61,39 @@ Update Device
 Delete Device
     [Arguments]  ${f_id}  ${f_name}  ${f_authentication_key}
     @{QueryResults} =    Query    CALL delete_device(${f_id}, ${f_name}, ${f_authentication_key})
+    [Return]    ${QueryResults[0][0]}
+
+### CONFIGURATIONS ###
+
+Map Result To Configuration
+    [Arguments]    ${result}
+    ${mapped configuration} =  Create Dictionary  id=${result[0]}  name=${result[1]}  description=${result[2]}  json_configuration=${result[3]}
+    [Return]    ${mapped configuration}
+
+Add Configuration
+    [Arguments]  ${p_name}  ${p_description}  ${p_json_configuration}
+    @{QueryResults} =    Query    CALL add_configuration(${p_name}, ${p_description}, ${p_json_configuration})
+    ${added_configuration} =    Map Result To Configuration  ${QueryResults[0]}
+    [Return]    ${added_configuration}
+
+Get Configuration
+    [Arguments]    ${f_id}  ${f_name}
+    @{QueryResults} =    Query    CALL get_configurations(${f_id}, ${f_name})
+    ${length} =    Get Length  ${QueryResults}
+
+    # Map results when resultset contains items
+    ${updated_configuration} =  Run Keyword If  ${length} != 0
+    ...  Map Result To Configuration    ${QueryResults[0]}
+
+    [Return]    ${updated_configuration}
+
+Update Configuration
+    [Arguments]    ${f_id}  ${f_name}  ${p_name}  ${p_description}  ${p_json_configuration}
+    @{QueryResults} =    Query    CALL update_configuration(${f_id}, ${f_name}, ${p_name}, ${p_description}, ${p_json_configuration})
+    ${updated_configuration} =    Map Result To Configuration  ${QueryResults[0]}
+    [Return]    ${updated_configuration}
+
+Delete Configuration
+    [Arguments]    ${f_id}  ${f_name}
+    @{QueryResults} =    Query    CALL delete_configuration(${f_id}, ${f_name})
     [Return]    ${QueryResults[0][0]}

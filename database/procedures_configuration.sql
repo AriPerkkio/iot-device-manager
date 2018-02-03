@@ -117,6 +117,8 @@ BEGIN
         SET @params_ok = 1;
     END IF;
 
+    SET @query = CONCAT(@query, @where_clause);
+
     IF @params_ok IS NOT NULL THEN
         PREPARE stmt FROM @query;
         EXECUTE stmt USING @name, @description, @json_configuration;
