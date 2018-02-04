@@ -9,6 +9,11 @@ ${device_type_id}       1
 ${device_group_id}      1
 ${configuration_id}     1
 
+# Device Group
+${device_group_name}           robot-group
+${device_group_name renamed}   robot-group-renamed
+${device_group_description}    Group created by tests
+
 # Configuration
 ${configuration_name}           robot-configuration
 ${configuration_name renamed}   robot-configuration-renamed
@@ -120,3 +125,31 @@ Verify Configuration Stored Procedures Work As Expected
     Delete Configuration  NULL  "${configuration_name renamed}"
     ${get_configuration result} =    Get Configuration  NULL  "${configuration_name renamed}"
     Should Be Equal    ${get_configuration result}    ${None}
+
+Verify Device Group Stored Procedures Work As Expected
+    Setup Connection
+
+    # Make sure test groups are not in database already
+    Delete Device Group  NULL  "${device_group_name}"
+    Delete Device Group  NULL  "${device_group_name renamed}"
+
+    Log    Verify add_device_group returns inserted device group
+    ${add_device_group result} =    Add Device Group  "${device_group_name}"  "${device_group_description}"
+    Dictionary Should Contain Item  ${add_device_group result}  name         ${device_group_name}
+    Dictionary Should Contain Item  ${add_device_group result}  description  ${device_group_description}
+
+    Log    Verify update_configuration returns updated configuration
+    ${updated_device_group result} =  Update Device Group  NULL  "${device_group_name}"  "${device_group_name renamed}"  "${device_group_description}"
+    Dictionary Should Contain Item  ${updated_device_group result}  name         ${device_group_name renamed}
+    Dictionary Should Contain Item  ${updated_device_group result}  description  ${device_group_description}
+
+    Log    Verify get_device_groups finds device group
+    ${get_device_groups results} =    Get Device Group  NULL  "${device_group_name renamed}"
+    Dictionary Should Contain Item  ${updated_device_group result}  name         ${device_group_name renamed}
+    Dictionary Should Contain Item  ${updated_device_group result}  description  ${device_group_description}
+
+    Log   Verify device group is not found after delete_device_group
+    Delete Device Group  NULL  "${device_group_name renamed}"
+    ${get_device_groups results} =    Get Device Group  NULL  "${device_group_name renamed}"
+    Should Be Equal    ${get_device_groups results}    ${None}
+

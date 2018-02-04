@@ -82,10 +82,10 @@ Get Configuration
     ${length} =    Get Length  ${QueryResults}
 
     # Map results when resultset contains items
-    ${updated_configuration} =  Run Keyword If  ${length} != 0
+    ${fetched_configuration} =  Run Keyword If  ${length} != 0
     ...  Map Result To Configuration    ${QueryResults[0]}
 
-    [Return]    ${updated_configuration}
+    [Return]    ${fetched_configuration}
 
 Update Configuration
     [Arguments]    ${f_id}  ${f_name}  ${p_name}  ${p_description}  ${p_json_configuration}
@@ -96,4 +96,39 @@ Update Configuration
 Delete Configuration
     [Arguments]    ${f_id}  ${f_name}
     @{QueryResults} =    Query    CALL delete_configuration(${f_id}, ${f_name})
+    [Return]    ${QueryResults[0][0]}
+
+### DEVICE GROUP ###
+
+Map Result To Device Group
+    [Arguments]    ${result}
+    ${mapped device_group} =  Create Dictionary  id=${result[0]}  name=${result[1]}  description=${result[2]}
+    [Return]    ${mapped device_group}
+
+Add Device Group
+    [Arguments]  ${p_name}  ${p_description}
+    @{QueryResults} =    Query    CALL add_device_group(${p_name}, ${p_description})
+    ${added_device_group} =    Map Result To Device Group  ${QueryResults[0]}
+    [Return]    ${added_device_group}
+
+Get Device Group
+    [Arguments]    ${f_id}  ${f_name}
+    @{QueryResults} =    Query    CALL get_device_groups(${f_id}, ${f_name})
+    ${length} =    Get Length  ${QueryResults}
+
+    # Map results when resultset contains items
+    ${fetched_device_group} =  Run Keyword If  ${length} != 0
+    ...  Map Result To Device Group    ${QueryResults[0]}
+
+    [Return]    ${fetched_device_group}
+
+Update Device Group
+    [Arguments]    ${f_id}  ${f_name}  ${p_name}  ${p_description}
+    @{QueryResults} =    Query    CALL update_device_group(${f_id}, ${f_name}, ${p_name}, ${p_description})
+    ${updated_device_group} =    Map Result To Device Group  ${QueryResults[0]}
+    [Return]    ${updated_device_group}
+
+Delete Device Group
+    [Arguments]    ${f_id}  ${f_name}
+    @{QueryResults} =    Query    CALL delete_device_group(${f_id}, ${f_name})
     [Return]    ${QueryResults[0][0]}
