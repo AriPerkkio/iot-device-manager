@@ -223,3 +223,34 @@ Delete Device Icon
     @{QueryResults} =    Query    CALL delete_device_icon(${f_id}, ${f_path})
     [Return]    ${QueryResults[0][0]}
 
+### LOCATION ###
+
+Map Result To Location
+    [Arguments]    ${result}
+    ${mapped location} =  Create Dictionary
+    ...  id=${result[0]}
+    ...  coordinates=${result[1]}
+    ...  time=${result[2]}
+    [Return]    ${mapped location}
+
+Add Location
+    [Arguments]    ${p_device_id}  ${p_coordinates}  ${p_time}
+    @{QueryResults} =    Query    CALL add_location(${p_device_id}, ${p_coordinates}, ${p_time})
+    ${added_location} =    Map Result To Location  ${QueryResults[0]}
+    [Return]    ${added_location}
+
+Get Location
+    [Arguments]    ${f_device_id}  ${f_exact_time}  ${f_start_time}  ${f_end_time}
+    @{QueryResults} =    Query    CALL get_locations(${f_device_id}, ${f_exact_time}, ${f_start_time}, ${f_end_time})
+    ${length} =    Get Length  ${QueryResults}
+
+    # Map results when resultset contains items
+    ${fetched_location} =  Run Keyword If  ${length} != 0
+    ...  Map Result To Location    ${QueryResults[0]}
+
+    [Return]    ${fetched_location}
+
+Delete Location
+    [Arguments]    ${f_device_id}  ${f_exact_time}  ${f_start_time}  ${f_end_time}
+    @{QueryResults} =    Query    CALL delete_locations(${f_device_id}, ${f_exact_time}, ${f_start_time}, ${f_end_time})
+    [Return]    ${QueryResults[0][0]}

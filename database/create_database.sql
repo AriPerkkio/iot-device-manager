@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS device_type (
 CREATE TABLE IF NOT EXISTS device (
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     name VARCHAR(50) UNIQUE NOT NULL,
-    device_type_id INT NOT NULL,
+    device_type_id INT,
     device_group_id INT,
     configuration_id INT,
     authentication_key VARCHAR(32) UNIQUE NOT NULL,

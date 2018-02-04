@@ -5,9 +5,6 @@ Resource    resources.robot
 # Device
 ${device_name}          robot-device
 ${device_name renamed}  robot-device-renamed
-${device_type_id}       1
-${device_group_id}      1
-${configuration_id}     1
 
 # Device Group
 ${device_group_name}           robot-group
@@ -21,6 +18,12 @@ ${device_type_name renamed}     robot-type-renamed
 # Device Icon
 ${device_icon_path}           /icons/robot-icon.png
 ${device_icon_path renamed}   /icons/robot-renamed-icon.png
+
+# Location
+${coordinates}    52.0800409,5.1273094
+${f_start_time}   2000-01-01 00:00:10
+${time}           2000-01-01 00:00:20
+${f_end_time}     2000-01-01 00:00:30
 
 # Configuration
 ${configuration_name}           robot-configuration
@@ -77,29 +80,32 @@ Verify Device Stored Procedures Work As Expected
     Delete Device  NULL  "${device_name renamed}"  NULL
 
     Log    Verify add_device returns inserted device
-    ${add_device result} =    Add Device  "${device_name}"  ${device_type_id}  ${device_group_id}  ${configuration_id}
-    Dictionary Should Contain Item  ${add_device result}  name              ${device_name}
-    Dictionary Should Contain Item  ${add_device result}  device_type_id    ${device_type_id}
-    Dictionary Should Contain Item  ${add_device result}  device_group_id   ${device_group_id}
-    Dictionary Should Contain Item  ${add_device result}  configuration_id  ${configuration_id}
+    ${add_device result} =    Add Device  "${device_name}"  NULL  NULL  NULL
+    Dictionary Should Contain Item  ${add_device result}  name  ${device_name}
+    Dictionary Should Contain key   ${add_device result}  id
+    Dictionary Should Contain key   ${add_device result}  device_type_id
+    Dictionary Should Contain key   ${add_device result}  device_group_id
+    Dictionary Should Contain key   ${add_device result}  configuration_id
 
     Log    Verify update_device returns updated device
-    ${update_device result} =    Update Device    NULL  "${device_name}"  NULL  "${device_name renamed}"  ${device_type_id}  ${device_group_id}  ${configuration_id}
-    Dictionary Should Contain Item  ${update_device result}  name              ${device_name renamed}
-    Dictionary Should Contain Item  ${update_device result}  device_type_id    ${device_type_id}
-    Dictionary Should Contain Item  ${update_device result}  device_group_id   ${device_group_id}
-    Dictionary Should Contain Item  ${update_device result}  configuration_id  ${configuration_id}
+    ${update_device result} =    Update Device    NULL  "${device_name}"  NULL  "${device_name renamed}"  NULL  NULL  NULL
+    Dictionary Should Contain Item  ${update_device result}  name  ${device_name renamed}
+    Dictionary Should Contain key   ${update_device result}  id
+    Dictionary Should Contain Key   ${update_device result}  device_type_id
+    Dictionary Should Contain Key   ${update_device result}  device_group_id
+    Dictionary Should Contain Key   ${update_device result}  configuration_id
 
     Log    Verify get_devices finds device
-    ${get_devices result} =    Get Device  NULL  "${device_name renamed}"  ${device_type_id}  ${device_group_id}  ${configuration_id}  NULL
-    Dictionary Should Contain Item  ${get_devices result}  name              ${device_name renamed}
-    Dictionary Should Contain Item  ${get_devices result}  device_type_id    ${device_type_id}
-    Dictionary Should Contain Item  ${get_devices result}  device_group_id   ${device_group_id}
-    Dictionary Should Contain Item  ${get_devices result}  configuration_id  ${configuration_id}
+    ${get_devices result} =    Get Device  NULL  "${device_name renamed}"  NULL  NULL  NULL  NULL
+    Dictionary Should Contain Item  ${get_devices result}  name  ${device_name renamed}
+    Dictionary Should Contain Key   ${get_devices result}  id
+    Dictionary Should Contain Key   ${get_devices result}  device_type_id
+    Dictionary Should Contain Key   ${get_devices result}  device_group_id
+    Dictionary Should Contain Key   ${get_devices result}  configuration_id
 
     Log    Verify device is not found after delete_device
     Delete Device  NULL  "${device_name renamed}"  NULL
-    ${get_devices result} =    Get Device  NULL  "${device_name renamed}"  ${device_type_id}  ${device_group_id}  ${configuration_id}  NULL
+    ${get_devices result} =    Get Device  NULL  "${device_name renamed}"  NULL  NULL  NULL  NULL
     Should Be Equal  ${get_devices result}  ${None}
 
     Terminate Connection
@@ -143,16 +149,19 @@ Verify Device Group Stored Procedures Work As Expected
 
     Log    Verify add_device_group returns inserted device group
     ${add_device_group result} =    Add Device Group  "${device_group_name}"  "${device_group_description}"
+    Dictionary Should Contain Key   ${add_device_group result}  id
     Dictionary Should Contain Item  ${add_device_group result}  name         ${device_group_name}
     Dictionary Should Contain Item  ${add_device_group result}  description  ${device_group_description}
 
     Log    Verify update_configuration returns updated configuration
     ${updated_device_group result} =  Update Device Group  NULL  "${device_group_name}"  "${device_group_name renamed}"  "${device_group_description}"
+    Dictionary Should Contain Key   ${updated_device_group result}  id
     Dictionary Should Contain Item  ${updated_device_group result}  name         ${device_group_name renamed}
     Dictionary Should Contain Item  ${updated_device_group result}  description  ${device_group_description}
 
     Log    Verify get_device_groups finds device group
     ${get_device_groups results} =    Get Device Group  NULL  "${device_group_name renamed}"
+    Dictionary Should Contain Key   ${updated_device_group result}  id
     Dictionary Should Contain Item  ${updated_device_group result}  name         ${device_group_name renamed}
     Dictionary Should Contain Item  ${updated_device_group result}  description  ${device_group_description}
 
@@ -171,16 +180,19 @@ Verify Device Type Stored Procedures Work As Expected
     Log    Verify add_device_type returns inserted device type
     ${add_device_type result} =    Add Device Type  "${device_type_name}"  NULL
     Dictionary Should Contain Item  ${add_device_type result}  name            ${device_type_name}
+    Dictionary Should Contain Key   ${add_device_type result}  id
     Dictionary Should Contain Key   ${add_device_type result}  device_icon_id
 
     Log    Verify update_device_type returns updated type
     ${updated_device_type result} =  Update Device Type  NULL  "${device_type_name}"  "${device_type_name renamed}"  NULL
     Dictionary Should Contain Item  ${updated_device_type result}  name            ${device_type_name renamed}
+    Dictionary Should Contain Key   ${updated_device_type result}  id
     Dictionary Should Contain Key   ${updated_device_type result}  device_icon_id
 
     Log    Verify get_device_types finds device type
     ${get_device_types results} =    Get Device Type  NULL  "${device_type_name renamed}"  NULL
     Dictionary Should Contain Item  ${updated_device_type result}  name            ${device_type_name renamed}
+    Dictionary Should Contain Key   ${updated_device_type result}  id
     Dictionary Should Contain Key   ${updated_device_type result}  device_icon_id
 
     Log   Verify device type is not found after delete_device_type
@@ -197,14 +209,17 @@ Verify Device Icon Stored Procedures Work As Expected
 
     Log    Verify add_device_icon returns inserted device icon
     ${add_device_icon result} =    Add Device Icon  "${device_icon_path}"
+    Dictionary Should Contain Key   ${add_device_icon result}  id
     Dictionary Should Contain Item  ${add_device_icon result}  path  ${device_icon_path}
 
     Log    Verify update_device_icon returns updated icon
     ${updated_device_icon result} =  Update Device Icon  NULL  "${device_icon_path}"  "${device_icon_path renamed}"
+    Dictionary Should Contain Key   ${updated_device_icon result}  id
     Dictionary Should Contain Item  ${updated_device_icon result}  path  ${device_icon_path renamed}
 
     Log    Verify get_device_icons finds device icon
     ${get_device_icons results} =    Get Device Icon  NULL  "${device_icon_path renamed}"
+    Dictionary Should Contain Key   ${updated_device_icon result}  id
     Dictionary Should Contain Item  ${updated_device_icon result}  path  ${device_icon_path renamed}
 
     Log   Verify device icon is not found after delete_device_icon
@@ -212,3 +227,35 @@ Verify Device Icon Stored Procedures Work As Expected
     ${get_device_icons results} =    Get Device icon  NULL  "${device_icon_path renamed}"
     Should Be Equal    ${get_device_icons results}    ${None}
 
+Verify Location Stored Procedures Work As Expected
+    Setup Connection
+
+    # Create device used for location tests
+    ${add_device result} =    Add Device  "${device_name}"  NULL  NULL  NULL
+    ${device_id} =    Get From Dictionary    ${add_device result}  id
+
+    Log    Verify add_location returns inserted location
+    ${add_location result} =    Add Location  ${device_id}  "${coordinates}"  "${time}"
+    Dictionary Should Contain Key   ${add_location result}  id
+    Dictionary Should Contain Item  ${add_location result}  coordinates  ${coordinates}
+    Dictionary Should Contain Item  ${add_location result}  time         ${time}
+
+    Log    Verify get_locations finds location using exact time
+    ${get_location result} =    Get Location  ${device_id}  "${time}"  NULL  NULL
+    Dictionary Should Contain Key   ${get_location result}  id
+    Dictionary Should Contain Item  ${get_location result}  coordinates  ${coordinates}
+    Dictionary Should Contain Item  ${get_location result}  time         ${time}
+
+    Log    Verify get_locations finds location using time range
+    ${get_location result} =    Get Location  ${device_id}  NULL  "${f_start_time}"  "${f_end_time}"
+    Dictionary Should Contain Key   ${get_location result}  id
+    Dictionary Should Contain Item  ${get_location result}  coordinates  ${coordinates}
+    Dictionary Should Contain Item  ${get_location result}  time         ${time}
+
+    Log    Verify location is not found after delete_locations
+    Delete Location  ${device_id}  NULL  NULL  NULL
+    ${get_location result} =    Get Location  ${device_id}  NULL  NULL  NULL
+    Should Be Equal    ${get_location result}  ${None}
+
+    Delete Device  ${device_id}  NULL  NULL
+    Terminate Connection
