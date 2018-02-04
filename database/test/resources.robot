@@ -185,3 +185,41 @@ Delete Device Type
     [Arguments]    ${f_id}  ${f_name}  ${f_device_icon_id}
     @{QueryResults} =    Query    CALL delete_device_type(${f_id}, ${f_name}, ${f_device_icon_id})
     [Return]    ${QueryResults[0][0]}
+
+### DEVICE ICON ###
+
+Map Result To Device Icon
+    [Arguments]    ${result}
+    ${mapped device_icon} =  Create Dictionary
+    ...  id=${result[0]}
+    ...  path=${result[1]}
+    [Return]    ${mapped device_icon}
+
+Add Device Icon
+    [Arguments]  ${p_path}
+    @{QueryResults} =    Query    CALL add_device_icon(${p_path})
+    ${added_device_icon} =    Map Result To Device Icon  ${QueryResults[0]}
+    [Return]    ${added_device_icon}
+
+Get Device Icon
+    [Arguments]    ${f_id}  ${f_path}
+    @{QueryResults} =    Query    CALL get_device_icons(${f_id}, ${f_path})
+    ${length} =    Get Length  ${QueryResults}
+
+    # Map results when resultset contains items
+    ${fetched_device_icon} =  Run Keyword If  ${length} != 0
+    ...  Map Result To Device Icon    ${QueryResults[0]}
+
+    [Return]    ${fetched_device_icon}
+
+Update Device Icon
+    [Arguments]    ${f_id}  ${f_path}  ${p_path}
+    @{QueryResults} =    Query    CALL update_device_icon(${f_id}, ${f_path}, ${p_path})
+    ${updated_device_icon} =    Map Result To Device Icon  ${QueryResults[0]}
+    [Return]    ${updated_device_icon}
+
+Delete Device Icon
+    [Arguments]    ${f_id}  ${f_path}
+    @{QueryResults} =    Query    CALL delete_device_icon(${f_id}, ${f_path})
+    [Return]    ${QueryResults[0][0]}
+

@@ -17,7 +17,10 @@ ${device_group_description}    Group created by tests
 # Devie Type
 ${device_type_name}             robot-type
 ${device_type_name renamed}     robot-type-renamed
-${device_type_icon_id}          1
+
+# Device Icon
+${device_icon_path}           /icons/robot-icon.png
+${device_icon_path renamed}   /icons/robot-renamed-icon.png
 
 # Configuration
 ${configuration_name}           robot-configuration
@@ -166,22 +169,46 @@ Verify Device Type Stored Procedures Work As Expected
     Delete Device Type  NULL  "${device_type_name renamed}"  NULL
 
     Log    Verify add_device_type returns inserted device type
-    ${add_device_type result} =    Add Device Type  "${device_type_name}"  ${device_type_icon_id}
+    ${add_device_type result} =    Add Device Type  "${device_type_name}"  NULL
     Dictionary Should Contain Item  ${add_device_type result}  name            ${device_type_name}
-    Dictionary Should Contain Item  ${add_device_type result}  device_icon_id  ${device_type_icon_id}
+    Dictionary Should Contain Key   ${add_device_type result}  device_icon_id
 
-    Log    Verify update_configuration returns updated configuration
-    ${updated_device_type result} =  Update Device Type  NULL  "${device_type_name}"  "${device_type_name renamed}"  ${device_type_icon_id}
+    Log    Verify update_device_type returns updated type
+    ${updated_device_type result} =  Update Device Type  NULL  "${device_type_name}"  "${device_type_name renamed}"  NULL
     Dictionary Should Contain Item  ${updated_device_type result}  name            ${device_type_name renamed}
-    Dictionary Should Contain Item  ${updated_device_type result}  device_icon_id  ${device_type_icon_id}
+    Dictionary Should Contain Key   ${updated_device_type result}  device_icon_id
 
     Log    Verify get_device_types finds device type
-    ${get_device_types results} =    Get Device Type  NULL  "${device_type_name renamed}"  ${device_type_icon_id}
+    ${get_device_types results} =    Get Device Type  NULL  "${device_type_name renamed}"  NULL
     Dictionary Should Contain Item  ${updated_device_type result}  name            ${device_type_name renamed}
-    Dictionary Should Contain Item  ${updated_device_type result}  device_icon_id  ${device_type_icon_id}
+    Dictionary Should Contain Key   ${updated_device_type result}  device_icon_id
 
     Log   Verify device type is not found after delete_device_type
-    Delete Device Type  NULL  "${device_type_name renamed}"  ${device_type_icon_id}
+    Delete Device Type  NULL  "${device_type_name renamed}"  NULL
     ${get_device_types results} =    Get Device type  NULL  "${device_type_name renamed}"  NULL
     Should Be Equal    ${get_device_types results}    ${None}
+
+Verify Device Icon Stored Procedures Work As Expected
+    Setup Connection
+
+    # Make sure test icons are not in database already
+    Delete Device Icon  NULL  "${device_icon_path}"
+    Delete Device Icon  NULL  "${device_icon_path renamed}"
+
+    Log    Verify add_device_icon returns inserted device icon
+    ${add_device_icon result} =    Add Device Icon  "${device_icon_path}"
+    Dictionary Should Contain Item  ${add_device_icon result}  path  ${device_icon_path}
+
+    Log    Verify update_device_icon returns updated icon
+    ${updated_device_icon result} =  Update Device Icon  NULL  "${device_icon_path}"  "${device_icon_path renamed}"
+    Dictionary Should Contain Item  ${updated_device_icon result}  path  ${device_icon_path renamed}
+
+    Log    Verify get_device_icons finds device icon
+    ${get_device_icons results} =    Get Device Icon  NULL  "${device_icon_path renamed}"
+    Dictionary Should Contain Item  ${updated_device_icon result}  path  ${device_icon_path renamed}
+
+    Log   Verify device icon is not found after delete_device_icon
+    Delete Device Icon  NULL  "${device_icon_path renamed}"
+    ${get_device_icons results} =    Get Device icon  NULL  "${device_icon_path renamed}"
+    Should Be Equal    ${get_device_icons results}    ${None}
 
