@@ -32,7 +32,14 @@ Get Values of Column
 
 Map Result To Device
     [Arguments]    ${result}
-    ${mapped device} =  Create Dictionary  id=${result[0]}  name=${result[1]}  device_type_id=${result[2]}  device_group_id=${result[3]}  configuration_id=${result[4]}  authentication_key=${result[5]}
+    ${mapped device} =  Create Dictionary
+    ...  id=${result[0]}
+    ...  name=${result[1]}
+    ...  device_type_id=${result[2]}
+    ...  device_group_id=${result[3]}
+    ...  configuration_id=${result[4]}
+    ...  authentication_key=${result[5]}
+
     [Return]    ${mapped device}
 
 Add Device
@@ -67,7 +74,12 @@ Delete Device
 
 Map Result To Configuration
     [Arguments]    ${result}
-    ${mapped configuration} =  Create Dictionary  id=${result[0]}  name=${result[1]}  description=${result[2]}  json_configuration=${result[3]}
+    ${mapped configuration} =  Create Dictionary
+    ...  id=${result[0]}
+    ...  name=${result[1]}
+    ...  description=${result[2]}
+    ...  json_configuration=${result[3]}
+
     [Return]    ${mapped configuration}
 
 Add Configuration
@@ -102,7 +114,10 @@ Delete Configuration
 
 Map Result To Device Group
     [Arguments]    ${result}
-    ${mapped device_group} =  Create Dictionary  id=${result[0]}  name=${result[1]}  description=${result[2]}
+    ${mapped device_group} =  Create Dictionary
+    ...  id=${result[0]}
+    ...  name=${result[1]}
+    ...  description=${result[2]}
     [Return]    ${mapped device_group}
 
 Add Device Group
@@ -131,4 +146,42 @@ Update Device Group
 Delete Device Group
     [Arguments]    ${f_id}  ${f_name}
     @{QueryResults} =    Query    CALL delete_device_group(${f_id}, ${f_name})
+    [Return]    ${QueryResults[0][0]}
+
+### DEVICE TYPE ###
+
+Map Result To Device Type
+    [Arguments]    ${result}
+    ${mapped device_type} =  Create Dictionary
+    ...  id=${result[0]}
+    ...  name=${result[1]}
+    ...  device_icon_id=${result[2]}
+    [Return]    ${mapped device_type}
+
+Add Device Type
+    [Arguments]  ${p_name}  ${p_device_icon_id}
+    @{QueryResults} =    Query    CALL add_device_type(${p_name}, ${p_device_icon_id})
+    ${added_device_type} =    Map Result To Device Type  ${QueryResults[0]}
+    [Return]    ${added_device_type}
+
+Get Device Type
+    [Arguments]    ${f_id}  ${f_name}  ${f_device_icon_id}
+    @{QueryResults} =    Query    CALL get_device_types(${f_id}, ${f_name}, ${f_device_icon_id})
+    ${length} =    Get Length  ${QueryResults}
+
+    # Map results when resultset contains items
+    ${fetched_device_type} =  Run Keyword If  ${length} != 0
+    ...  Map Result To Device Type    ${QueryResults[0]}
+
+    [Return]    ${fetched_device_type}
+
+Update Device Type
+    [Arguments]    ${f_id}  ${f_name}  ${p_name}  ${p_device_icon_id}
+    @{QueryResults} =    Query    CALL update_device_type(${f_id}, ${f_name}, ${p_name}, ${p_device_icon_id})
+    ${updated_device_type} =    Map Result To Device Type  ${QueryResults[0]}
+    [Return]    ${updated_device_type}
+
+Delete Device Type
+    [Arguments]    ${f_id}  ${f_name}  ${f_device_icon_id}
+    @{QueryResults} =    Query    CALL delete_device_type(${f_id}, ${f_name}, ${f_device_icon_id})
     [Return]    ${QueryResults[0][0]}

@@ -14,6 +14,11 @@ ${device_group_name}           robot-group
 ${device_group_name renamed}   robot-group-renamed
 ${device_group_description}    Group created by tests
 
+# Devie Type
+${device_type_name}             robot-type
+${device_type_name renamed}     robot-type-renamed
+${device_type_icon_id}          1
+
 # Configuration
 ${configuration_name}           robot-configuration
 ${configuration_name renamed}   robot-configuration-renamed
@@ -152,4 +157,31 @@ Verify Device Group Stored Procedures Work As Expected
     Delete Device Group  NULL  "${device_group_name renamed}"
     ${get_device_groups results} =    Get Device Group  NULL  "${device_group_name renamed}"
     Should Be Equal    ${get_device_groups results}    ${None}
+
+Verify Device Type Stored Procedures Work As Expected
+    Setup Connection
+
+    # Make sure test types are not in database already
+    Delete Device Type  NULL  "${device_type_name}"  NULL
+    Delete Device Type  NULL  "${device_type_name renamed}"  NULL
+
+    Log    Verify add_device_type returns inserted device type
+    ${add_device_type result} =    Add Device Type  "${device_type_name}"  ${device_type_icon_id}
+    Dictionary Should Contain Item  ${add_device_type result}  name            ${device_type_name}
+    Dictionary Should Contain Item  ${add_device_type result}  device_icon_id  ${device_type_icon_id}
+
+    Log    Verify update_configuration returns updated configuration
+    ${updated_device_type result} =  Update Device Type  NULL  "${device_type_name}"  "${device_type_name renamed}"  ${device_type_icon_id}
+    Dictionary Should Contain Item  ${updated_device_type result}  name            ${device_type_name renamed}
+    Dictionary Should Contain Item  ${updated_device_type result}  device_icon_id  ${device_type_icon_id}
+
+    Log    Verify get_device_types finds device type
+    ${get_device_types results} =    Get Device Type  NULL  "${device_type_name renamed}"  ${device_type_icon_id}
+    Dictionary Should Contain Item  ${updated_device_type result}  name            ${device_type_name renamed}
+    Dictionary Should Contain Item  ${updated_device_type result}  device_icon_id  ${device_type_icon_id}
+
+    Log   Verify device type is not found after delete_device_type
+    Delete Device Type  NULL  "${device_type_name renamed}"  ${device_type_icon_id}
+    ${get_device_types results} =    Get Device type  NULL  "${device_type_name renamed}"  NULL
+    Should Be Equal    ${get_device_types results}    ${None}
 

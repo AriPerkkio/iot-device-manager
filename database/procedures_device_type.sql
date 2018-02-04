@@ -61,7 +61,7 @@ CREATE PROCEDURE delete_device_type (
     IN f_name VARCHAR(50),
     IN f_device_icon_id INT)
 BEGIN
-    SET @query = "DELETE FROM device_group";
+    SET @query = "DELETE FROM device_type";
     SET @where_clause = " WHERE 1=1";
     SET @params_ok = NULL;
 
@@ -84,7 +84,7 @@ BEGIN
 
     IF @params_ok IS NOT NULL THEN
         PREPARE stmt FROM @query;
-        EXECUTE stmt USING @name;
+        EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
         COMMIT;
     END IF;
@@ -102,7 +102,7 @@ CREATE PROCEDURE update_device_type (
     IN p_name VARCHAR(50),
     IN p_device_icon_id INT)
 BEGIN
-    SET @query = "UPDATE device_group SET
+    SET @query = "UPDATE device_type SET
         name = ?,
         device_icon_id = ?";
     SET @where_clause = " WHERE 1=1";
@@ -127,7 +127,7 @@ BEGIN
         EXECUTE stmt USING @name, @device_icon_id;
         DEALLOCATE PREPARE stmt;
         COMMIT;
-        CALL get_device_groups(NULL, @name);
+        CALL get_device_types(NULL, @name, @device_icon_id);
     END IF;
 END
 $$
