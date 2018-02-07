@@ -9,9 +9,10 @@
   "scripts": {
     "test": "NODE_ENV=test mocha src/test/js/*.jsx --require babel-core/register --require ignore-styles",
     "test:debug": "npm run test -- --inspect-brk",
-    "build": "NODE_ENV=production webpack -d",
+    "build": "NODE_ENV=production webpack -d && npm run api-doc",
     "watch": "NODE_ENV=development webpack -d --watch",
-    "start": "NODE_ENV=development webpack-dev-server"
+    "start": "NODE_ENV=development webpack-dev-server",
+    "api-doc": "raml2html doc/iot-device-manager.raml > src/main/resources/static/api-doc.html"
   },
   "dependencies": {
     "history": "^4.7.2",
@@ -36,6 +37,7 @@
     "ignore-styles": "^5.0.1",
     "mocha": "^4.1.0",
     "node-sass": "^4.7.2",
+    "raml2html": "^6.6.0",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.1",
     "uglifyjs-webpack-plugin": "^1.1.6",

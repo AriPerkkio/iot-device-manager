@@ -46,7 +46,7 @@ const config = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin([BUILD_DIR + '/bundle.js', BUILD_DIR + '/main.css']),
+    new CleanWebpackPlugin([BUILD_DIR + '/*.*']),
     new UglifyJsPlugin({ sourceMap: true }),
     extractSass
   ],
