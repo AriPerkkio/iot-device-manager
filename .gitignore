@@ -20,3 +20,6 @@ package-lock.json
 **/test/report.html
 **/test/log.html
 **/test/output.xml
+
+# Raml2html
+api-doc.html

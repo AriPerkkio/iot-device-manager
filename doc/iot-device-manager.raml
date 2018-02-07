@@ -2,6 +2,44 @@
 title: iot-device-manager
 mediaType: application/json
 baseUri: http://localhost:8080/rest
+types:
+  Device:
+    type: object
+    properties:
+      id:
+        description: Device id
+        type: number
+      name:
+        description: Device name
+        type: string
+        maxLength: 50
+        pattern: "[A-Za-z0-9_-]{1,50}"
+      deviceTypeId:
+        description: Device type id used as filter
+        type: number
+      deviceGroupId:
+        description: Device group id used as filter
+        type: number
+      configurationId:
+        description: Device configuration id used as filter
+        type: number
+      authenticationKey:
+        description: Device authenticationKey used as filter. Required if name is not present.
+        type: string
+        minLength: 32
+        maxLength: 32
+  errorResponse:
+    type: object
+    properties:
+      errors: string[]
+  devicesResponse:
+    type: object
+    properties:
+      payload: Device[]
+  deviceResponse:
+    type: object
+    properties:
+      payload: Device
 
 /device:
   get:
@@ -17,15 +55,15 @@ baseUri: http://localhost:8080/rest
         type: string
         maxLength: 50
         pattern: "[A-Za-z0-9_-]"
-      device_type_id:
+      deviceTypeId:
         description: Device type id used as filter
         type: number
         required: false
-      device_group_id:
+      deviceGroupId:
         description: Device group id used as filter
         type: number
         required: false
-      configuration_id:
+      configurationId:
         description: Device configuration id used as filter
         type: number
         required: false
@@ -40,35 +78,36 @@ baseUri: http://localhost:8080/rest
         description: Devices succesfully found
         body:
           application/json:
+            type: devicesResponse
             example: {
               payload: [
                 {
                   id: 1,
                   name: "test-device",
-                  device_type_id: 1,
-                  device_group_id: 1,
-                  configuration_id: 1,
-                  authentication_key: "as7y7das0923jnawoij2n22jj2nekj2n"
+                  deviceTypeId: 1,
+                  deviceGroupId: 1,
+                  configurationId: 1,
+                  authenticationKey: "as7y7das0923jnawoij2n22jj2nekj2n"
                 }
-              ],
-              errors: []
+              ]
             }
       400:
         description: Request contains errors, e.g. invalid parameters
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
-                "Invalid parameter: device_type_id with value: test"
+                "Invalid parameter: deviceTypeId with value: 'test'",
+                "Invalid parameter length: name (max length 50)"
               ]
             }
       404:
         description: No devices found matching given parameters
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
                 "Devices not found"
               ]
@@ -77,8 +116,8 @@ baseUri: http://localhost:8080/rest
         description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
                 "Internal error"
               ]
@@ -103,50 +142,48 @@ baseUri: http://localhost:8080/rest
             required: false
     responses:
       201:
-        description: Device succesfully added
+        description: Device succesfully added. Returns inserted device including generated id and authentication key
         body:
           application/json:
+            type: deviceResponse
             example: {
-              payload: [
-                {
-                  id: 1,
-                  name: "test-device",
-                  device_type_id: 1,
-                  device_group_id: 1,
-                  configuration_id: 1,
-                  authentication_key: "as7y7das0923jnawoij2n22jj2nekj2n"
-                }
-              ],
-              errors: []
+              payload: {
+                id: 1,
+                name: "test-device",
+                deviceTypeId: 1,
+                deviceGroupId: 1,
+                configurationId: 1,
+                authenticationKey: "as7y7das0923jnawoij2n22jj2nekj2n"
+              }
             }
       400:
         description: Request contains errors, e.g. invalid parameters
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
-                "Invalid parameter: device_type_id with value: test"
+                "Invalid parameter: deviceTypeId with value: 'test'"
               ]
             }
       409:
         description: Device name already used for another device
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
-                "Device name already in use. Name must be unique."
+                "Device name already in use. Name must be unique"
               ]
             }
       500:
         description: Internal errors occured, e.g. foreign key not matching. Technical descriptions are not leaked to client.
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
-                "Unable to add device. No configuration found with configuration_id 1"
+                "Unable to add device. No configuration found with configurationId 1"
               ]
             }
   put:
@@ -186,38 +223,36 @@ baseUri: http://localhost:8080/rest
             type: integer
     responses:
       200:
-        description: Device succesfully updated
+        description: Device succesfully updated. Returns updated device
         body:
           application/json:
+            type: deviceResponse
             example: {
-              payload: [
-                {
-                  id: 1,
-                  name: "test-device",
-                  device_type_id: 1,
-                  device_group_id: 1,
-                  configuration_id: 1,
-                  authentication_key: "as7y7das0923jnawoij2n22jj2nekj2n"
-                }
-              ],
-              errors: []
+              payload: {
+                id: 1,
+                name: "test-device",
+                deviceTypeId: 1,
+                deviceGroupId: 1,
+                configurationId: 1,
+                authenticationKey: "as7y7das0923jnawoij2n22jj2nekj2n"
+              }
             }
       400:
         description: Request contains errors, e.g. invalid parameters, missing parameters
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
-                "Invalid parameter: device_type_id with value: test"
+                "Invalid parameter: deviceTypeId with value: test"
               ]
             }
       404:
         description: Device matching parameters not found
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
                 "Device with device_id 1 not found"
               ]
@@ -226,8 +261,8 @@ baseUri: http://localhost:8080/rest
         description: Device name already used for another device
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
                 "Device name already in use. Name must be unique."
               ]
@@ -236,24 +271,28 @@ baseUri: http://localhost:8080/rest
         description: Internal errors occured, e.g. foreign key not matching. Technical descriptions are not leaked to client.
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
-                "Unable to update device. No configuration found with configuration_id 1"
+                "Unable to update device. No configuration found with configurationId 1"
               ]
             }
 
   delete:
     description: Remove device matching authentication key
     queryParameters:
+      id:
+        description: Device id used as filter. Required if other request parameters are not present.
+        required: false
+        type: number
       name:
-        description: Device name used as filter. Required if authenticationKey is not present.
+        description: Device name used as filter. Required if other request parameters are not present.
         required: false
         type: string
         maxLength: 50
         pattern: "[A-Za-z0-9_-]"
       authenticationKey:
-        description: Device authenticationKey used as filter. Required if name is not present.
+        description: Device authenticationKey used as filter. Required if other request parameters are not present.
         required: false
         type: string
         minLength: 32
@@ -261,13 +300,79 @@ baseUri: http://localhost:8080/rest
     responses:
       204:
         description: Device successfully removed
+      400:
+        description: Request contains errors, e.g. invalid parameters
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Invalid parameter: id with value: 'test'",
+                "Invalid parameter length: name (max length 50)"
+              ]
+            }
       404:
         description: Device matching parameters not found
         body:
           application/json:
+            type: errorResponse
             example: {
-              payload: null,
               errors: [
                 "Device with device_id 1 not found"
               ]
             }
+
+/device_group:
+  get:
+    description: Get device groups matching parameters
+    queryParameters: 
+      id:
+        description: Device group id used as filter
+        type: number
+        required: false
+      name:
+        description: Device group name used as filter
+        required: false
+        type: string
+        maxLength: 50
+        pattern: "[A-Za-z0-9_-]"
+    responses:
+      200:
+        description: Device groups succesfully found
+        body:
+          application/json:
+            example: {
+              payload: [
+                {
+                  id: 1,
+                  name: "test-device-group",
+                  description: "Description for test devices"
+                }
+              ]
+            }
+  post:
+  put:
+  delete:
+
+/device_icon:
+  get:
+  post:
+  put:
+  delete:
+
+/device_type:
+  get:
+  post:
+  put:
+  delete:
+
+/location:
+  get:
+  put:
+  delete:
+
+/configuration:
+  get:
+  post:
+  put:
+  delete:
