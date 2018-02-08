@@ -10,16 +10,16 @@ public class DeviceIcon {
         // Default constructor
     }
 
-    public DeviceIcon(Integer id, String path) {
+    public DeviceIcon(Integer id, String name) {
         this.id = id;
-        this.path = path;
+        this.name = name;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String path;
+    private String name;
 
     public Integer getId() {
         return id;
@@ -29,11 +29,11 @@ public class DeviceIcon {
         this.id = id;
     }
 
-    public String getPath() {
-        return path;
+    public String getName() {
+        return name;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setName(String name) {
+        this.name = name;
     }
 }

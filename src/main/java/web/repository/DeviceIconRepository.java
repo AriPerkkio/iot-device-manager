@@ -4,7 +4,7 @@ import web.domain.entity.DeviceIcon;
 
 public interface DeviceIconRepository {
 
-    DeviceIcon addDeviceIcon(String path);
+    DeviceIcon addDeviceIcon(String name);
 
-    boolean deviceIconExists(String path);
+    boolean deviceIconExists(String name);
 }

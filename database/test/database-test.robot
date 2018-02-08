@@ -16,8 +16,8 @@ ${device_type_name}             robot-type
 ${device_type_name renamed}     robot-type-renamed
 
 # Device Icon
-${device_icon_path}           /icons/robot-icon.png
-${device_icon_path renamed}   /icons/robot-renamed-icon.png
+${device_icon_name}           robot-icon.png
+${device_icon_name renamed}   robot-renamed-icon.png
 
 # Location
 ${coordinates}    52.0800409,5.1273094
@@ -204,27 +204,27 @@ Verify Device Icon Stored Procedures Work As Expected
     Setup Connection
 
     # Make sure test icons are not in database already
-    Delete Device Icon  NULL  "${device_icon_path}"
-    Delete Device Icon  NULL  "${device_icon_path renamed}"
+    Delete Device Icon  NULL  "${device_icon_name}"
+    Delete Device Icon  NULL  "${device_icon_name renamed}"
 
     Log    Verify add_device_icon returns inserted device icon
-    ${add_device_icon result} =    Add Device Icon  "${device_icon_path}"
+    ${add_device_icon result} =    Add Device Icon  "${device_icon_name}"
     Dictionary Should Contain Key   ${add_device_icon result}  id
-    Dictionary Should Contain Item  ${add_device_icon result}  path  ${device_icon_path}
+    Dictionary Should Contain Item  ${add_device_icon result}  name  ${device_icon_name}
 
     Log    Verify update_device_icon returns updated icon
-    ${updated_device_icon result} =  Update Device Icon  NULL  "${device_icon_path}"  "${device_icon_path renamed}"
+    ${updated_device_icon result} =  Update Device Icon  NULL  "${device_icon_name}"  "${device_icon_name renamed}"
     Dictionary Should Contain Key   ${updated_device_icon result}  id
-    Dictionary Should Contain Item  ${updated_device_icon result}  path  ${device_icon_path renamed}
+    Dictionary Should Contain Item  ${updated_device_icon result}  name  ${device_icon_name renamed}
 
     Log    Verify get_device_icons finds device icon
-    ${get_device_icons results} =    Get Device Icon  NULL  "${device_icon_path renamed}"
+    ${get_device_icons results} =    Get Device Icon  NULL  "${device_icon_name renamed}"
     Dictionary Should Contain Key   ${updated_device_icon result}  id
-    Dictionary Should Contain Item  ${updated_device_icon result}  path  ${device_icon_path renamed}
+    Dictionary Should Contain Item  ${updated_device_icon result}  name  ${device_icon_name renamed}
 
     Log   Verify device icon is not found after delete_device_icon
-    Delete Device Icon  NULL  "${device_icon_path renamed}"
-    ${get_device_icons results} =    Get Device icon  NULL  "${device_icon_path renamed}"
+    Delete Device Icon  NULL  "${device_icon_name renamed}"
+    ${get_device_icons results} =    Get Device icon  NULL  "${device_icon_name renamed}"
     Should Be Equal    ${get_device_icons results}    ${None}
 
 Verify Location Stored Procedures Work As Expected

@@ -14,13 +14,13 @@ public class DeviceIconRepositoryImpl implements DeviceIconRepository {
     private EntityManager entityManager;
 
     @Override
-    public DeviceIcon addDeviceIcon(String path) {
+    public DeviceIcon addDeviceIcon(String name) {
         // TODO
-        return new DeviceIcon(1, path);
+        return new DeviceIcon(1, name);
     }
 
     @Override
-    public boolean deviceIconExists(String path) {
+    public boolean deviceIconExists(String name) {
         // TODO
         return false;
     }

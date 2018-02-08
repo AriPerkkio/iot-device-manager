@@ -6,17 +6,17 @@ DROP PROCEDURE IF EXISTS get_device_icons;
 DELIMITER $$
 CREATE PROCEDURE get_device_icons (
     IN f_id INT,
-    IN f_path VARCHAR(100))
+    IN f_name VARCHAR(25))
 BEGIN
-    SET @query = "SELECT id, path FROM device_icon";
+    SET @query = "SELECT id, name FROM device_icon";
     SET @where_clause = " WHERE 1=1";
 
     IF f_id IS NOT NULL THEN
         SET @where_clause = CONCAT(@where_clause, ' AND id="', f_id, '"');
     END IF;
 
-    IF f_path IS NOT NULL THEN
-        SET @where_clause = CONCAT(@where_clause, ' AND path="', f_path, '"');
+    IF f_name IS NOT NULL THEN
+        SET @where_clause = CONCAT(@where_clause, ' AND name="', f_name, '"');
     END IF;
 
     SET @query = CONCAT(@query, @where_clause);
@@ -31,11 +31,11 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS add_device_icon;
 DELIMITER $$
 CREATE PROCEDURE add_device_icon (
-    IN p_path VARCHAR(100))
+    IN p_name VARCHAR(25))
 BEGIN
-    INSERT INTO device_icon(path) VALUES (p_path);
+    INSERT INTO device_icon(name) VALUES (p_name);
     COMMIT;
-    CALL get_device_icons(NULL, p_path);
+    CALL get_device_icons(NULL, p_name);
 END
 $$
 DELIMITER ;
@@ -44,7 +44,7 @@ DROP PROCEDURE IF EXISTS delete_device_icon;
 DELIMITER $$
 CREATE PROCEDURE delete_device_icon (
     IN f_id INT,
-    IN f_path VARCHAR(100))
+    IN f_name VARCHAR(25))
 BEGIN
     SET @query = "DELETE FROM device_icon";
     SET @where_clause = " WHERE 1=1";
@@ -55,8 +55,8 @@ BEGIN
         SET @params_ok = 1;
     END IF;
 
-    IF f_path IS NOT NULL THEN
-        SET @where_clause = CONCAT(@where_clause, ' AND path = "', f_path, '"');
+    IF f_name IS NOT NULL THEN
+        SET @where_clause = CONCAT(@where_clause, ' AND name = "', f_name, '"');
         SET @params_ok = 1;
     END IF;
 
@@ -76,30 +76,30 @@ DROP PROCEDURE IF EXISTS update_device_icon;
 DELIMITER $$
 CREATE PROCEDURE update_device_icon (
     IN f_id INT,
-    IN f_path VARCHAR(50),
-    IN p_path VARCHAR(50))
+    IN f_name VARCHAR(25),
+    IN p_name VARCHAR(25))
 BEGIN
-    SET @query = "UPDATE device_icon SET path = ? ";
+    SET @query = "UPDATE device_icon SET name = ? ";
     SET @where_clause = " WHERE 1=1";
     SET @params_ok = NULL;
-    SET @path = p_path;
+    SET @name = p_name;
 
     IF f_id IS NOT NULL THEN
         SET @where_clause = CONCAT(@where_clause, ' AND id = "', f_id, '"');
         SET @params_ok = 1;
     END IF;
 
-    IF f_path IS NOT NULL THEN
-        SET @where_clause = CONCAT(@where_clause, ' AND path = "', f_path, '"');
+    IF f_name IS NOT NULL THEN
+        SET @where_clause = CONCAT(@where_clause, ' AND name = "', f_name, '"');
         SET @params_ok = 1;
     END IF;
 
     IF @params_ok IS NOT NULL THEN
         PREPARE stmt FROM @query;
-        EXECUTE stmt USING @path;
+        EXECUTE stmt USING @name;
         DEALLOCATE PREPARE stmt;
         COMMIT;
-        CALL get_device_icons(NULL, @path);
+        CALL get_device_icons(NULL, @name);
     END IF;
 END
 $$
