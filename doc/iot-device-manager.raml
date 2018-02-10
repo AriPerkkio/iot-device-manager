@@ -29,6 +29,7 @@ types:
         minLength: 32
         maxLength: 32
   DeviceGroup:
+    type: object
     properties:
       id:
         description: Device group id
@@ -42,30 +43,63 @@ types:
         description: Device group description
         type: string
         maxLength: 100
-        pattern: "[A-Za-z0-9_ .,-]{1,50}"
+        pattern: "[A-Za-z0-9_ .,-]{1,100}"
   DeviceIcon:
+    type: object
     properties:
-    id:
-      description: Device icon id
-      type: number
-    name:
-      description: Device icon name
-      type: string
-      maxLength: 25
-      pattern: "^[A-Za-z0-9-_]{1,25}.(png)$"
+      id:
+        description: Device icon id
+        type: number
+      name:
+        description: Device icon name
+        type: string
+        maxLength: 25
+        pattern: "^[A-Za-z0-9-_]{1,25}.(png)$"
   DeviceType:
+    type: object
     properties:
-    id:
-      description: Device type id
-      type: number
-    name:
+      id:
+        description: Device type id
+        type: number
+      name:
         description: Device type name
         type: string
         maxLength: 50
         pattern: "[A-Za-z0-9_ .,-]{1,50}"
-    deviceIconId:
-      description: Device icon id
-      type: number
+      deviceIconId:
+        description: Device icon id
+        type: number
+  Location:
+    type: object
+    properties:
+      device_id:
+        description: Device id
+        type: number
+      coordinates:
+        description: Coordinates of location
+        type: string
+      time:
+        description: Time of location update
+        type: string
+  Configuration:
+    type: object
+    properties:
+      id:
+        description: Configuration id
+        type: number
+      name:
+        description: Configuration's name
+        type: string
+        maxLength: 50
+        pattern: "[A-Za-z0-9_ .,-]{1,50}"
+      description:
+        description: Configuration's description
+        type: string
+        maxLength: 100
+        pattern: "[A-Za-z0-9_ .,-]{1,100}"
+      json_configuration:
+        description: Configuration's content as JSON
+        type: string
   errorResponse:
     type: object
     properties:
@@ -101,6 +135,18 @@ types:
     type: object
     properties:
       payload: DeviceType[]
+  locationsResponse:
+    type: object
+    properties:
+      payload: Location[]
+  configurationResponse:
+    type: object
+    properties:
+      payload: Configuration
+  configurationsResponse:
+    type: object
+    properties:
+      payload: Configuration[]
 
 /device:
   get:
@@ -1119,11 +1165,216 @@ types:
 
 /location:
   get:
+    description: Get locations matching parameters
+    queryParameters:
+      deviceId:
+        description: Device id used as filter
+        type: number
+        required: false
+      exactTime:
+        description: Exact time used as filter
+        type: string
+        required: false
+      startTime:
+        description: Start time used as filter
+        type: string
+        required: false
+      endTime:
+        description: End time used as filter
+        type: string
+        required: false
+    responses:
+      200:
+        description: Locations succesfully found
+        body:
+          application/json:
+            type: locationsResponse
+            example: {
+              payload: [
+                {
+                  deviceId: 1,
+                  coordinates: "52.0800409,5.1273094",
+                  time: "2000-01-01 00:00:10"
+                }
+              ]
+            }
+      400:
+        description: Request contains errors, e.g. invalid parameters
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Invalid parameter: deviceId with value: 'test'"
+              ]
+            }
+      404:
+        description: No locations found matching given parameters
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Locations not found"
+              ]
+            }
+      500:
+        description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Internal error"
+              ]
+            }
   put:
+    description: Add location with given parameters
+    body:
+      application/json:
+        properties:
+          deviceId:
+            description: Device id
+            type: number
+          coordinates:
+            description: Coordinates of location
+            type: string
+          time:
+            description: Time of location update. Current time is used if not defined.
+            type: string
+            required: false
+    responses:
+      201:
+        description: Location succesfully added. Returns inserted location
+        body:
+          application/json:
+            type: locationResponse
+            example: {
+              payload: {
+                deviceId: 1,
+                coordinates: "52.0800409,5.1273094",
+                time: "2000-01-01 00:00:10"
+              }
+            }
+      400:
+        description: Request contains errors, e.g. invalid parameters
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Invalid parameter: deviceId with value: 'test'"
+              ]
+            }
+      500:
+        description: Internal errors occured. Technical descriptions are not leaked to client.
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Internal error"
+              ]
+            }
   delete:
+    description: Delete locations matching parameters
+    queryParameters:
+      deviceId:
+        description: Device id used as filter
+        type: number
+        required: false
+      exactTime:
+        description: Exact time used as filter
+        type: string
+        required: false
+      startTime:
+        description: Start time used as filter
+        type: string
+        required: false
+      endTime:
+        description: End time used as filter
+        type: string
+        required: false
+    responses:
+      204:
+        description: Locations successfully removed
+      400:
+        description: Request contains errors, e.g. invalid parameters
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Invalid parameter: deviceId with value: 'test'"
+              ]
+            }
+      500:
+        description: Internal errors occured. Technical descriptions are not leaked to client.
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Internal error"
+              ]
+            }
 
 /configuration:
   get:
+    description: Get configurations matching parameters
+    queryParameters:
+      id:
+        description: Configuration id
+        type: number
+      name:
+        description: Configuration's name
+        type: string
+    responses:
+      200:
+        description: Configurations succesfully found
+        body:
+          application/json:
+            type: configurationsResponse
+            example: {
+              payload: [
+                {
+                  deviceId: 1,
+                  coordinates: "52.0800409,5.1273094",
+                  time: "2000-01-01 00:00:10"
+                }
+              ]
+            }
+      400:
+        description: Request contains errors, e.g. invalid parameters
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Invalid parameter: deviceId with value: 'test'"
+              ]
+            }
+      404:
+        description: No locations found matching given parameters
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Locations not found"
+              ]
+            }
+      500:
+        description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+        body:
+          application/json:
+            type: errorResponse
+            example: {
+              errors: [
+                "Internal error"
+              ]
+            }
+
   post:
   put:
   delete:
