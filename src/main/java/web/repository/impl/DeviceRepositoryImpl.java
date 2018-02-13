@@ -16,37 +16,19 @@ public class DeviceRepositoryImpl implements DeviceRepository {
     private EntityManager entityManager;
 
     @Override
-    public Collection<Device> getDevices(Integer deviceTypeId, Integer deviceGroupId, Integer configurationId) {
+    public Collection<Device> getDevices(Integer id, String name, Integer deviceTypeId, Integer deviceGroupId,
+                                         Integer configurationId, String authenticationKey) {
         StoredProcedureQuery getDevicesQuery =
             entityManager.createNamedStoredProcedureQuery("get_devices")
-                .setParameter("f_name", null)
+                .setParameter("f_id", id)
+                .setParameter("f_name", name)
                 .setParameter("f_device_type_id", deviceTypeId)
                 .setParameter("f_device_group_id", deviceGroupId)
                 .setParameter("f_configuration_id", configurationId)
-                .setParameter("f_authentication_key", null);
+                .setParameter("f_authentication_key", authenticationKey);
 
         return getDevicesQuery.getResultList();
     }
-
-    @Override
-    public Device getDevice(String name, String authenticationKey) {
-
-        if(name == null && authenticationKey == null) {
-            throw new IllegalArgumentException("Either name or authenticationKey required.");
-        }
-
-        StoredProcedureQuery getDeviceQuery =
-                entityManager.createNamedStoredProcedureQuery("get_devices")
-                        .setParameter("f_name", name)
-                        .setParameter("f_device_type_id", null)
-                        .setParameter("f_device_group_id", null)
-                        .setParameter("f_configuration_id", null)
-                        .setParameter("f_authentication_key", authenticationKey);
-
-        return (Device) getDeviceQuery.getSingleResult();
-    }
-
-
 
     @Override
     public Device addDevice(Device device) {

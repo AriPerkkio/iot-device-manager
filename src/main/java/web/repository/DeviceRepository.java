@@ -6,9 +6,8 @@ import java.util.Collection;
 
 public interface DeviceRepository {
 
-    Collection<Device> getDevices(Integer deviceTypeId, Integer deviceGroupId, Integer configurationId);
-
-    Device getDevice(String name, String authenticationKey);
+    Collection<Device> getDevices(Integer id, String name, Integer deviceTypeId, Integer deviceGroupId,
+                                  Integer configurationId, String authenticationKey);
 
     Device addDevice(Device device);
 

@@ -17,19 +17,14 @@ public class DeviceController {
     }
 
     @RequestMapping(value = "/device", method = RequestMethod.GET)
-    public ResponseWrapper getDevice(
-            @RequestParam(name="name", required = false) String name,
-            @RequestParam(name="authenticationKey", required = false) String authenticationKey) {
-
-        return deviceService.getDevice(name, authenticationKey);
-    }
-
-    @RequestMapping(value = "/devices", method = RequestMethod.GET)
     public ResponseWrapper getDevices(
+            @RequestParam(name="id", required = false) Integer id,
+            @RequestParam(name="name", required = false) String name,
             @RequestParam(name="deviceTypeId", required = false) Integer deviceTypeId,
             @RequestParam(name="deviceGroupId", required = false) Integer deviceGroupId,
-            @RequestParam(name="configurationId", required = false) Integer configurationId) {
-        return deviceService.getDevices(deviceTypeId, deviceGroupId, configurationId);
+            @RequestParam(name="configurationId", required = false) Integer configurationId,
+            @RequestParam(name="authenticationKey", required = false) String authenticationKey) {
+        return deviceService.getDevices(id, name, deviceTypeId, deviceGroupId, configurationId, authenticationKey);
     }
 
     @RequestMapping(value = "/device", method = RequestMethod.POST)

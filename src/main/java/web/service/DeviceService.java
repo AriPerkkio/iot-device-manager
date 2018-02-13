@@ -5,9 +5,8 @@ import web.domain.response.ResponseWrapper;
 
 public interface DeviceService {
 
-    ResponseWrapper getDevices(Integer deviceTypeId, Integer deviceGroupId, Integer configurationId);
-
-    ResponseWrapper getDevice(String name, String authenticationKey);
+    ResponseWrapper getDevices(Integer id, String name, Integer deviceTypeId, Integer deviceGroupId,
+                               Integer configurationId, String authenticationKey);
 
     ResponseWrapper addDevice(Device device);
 }

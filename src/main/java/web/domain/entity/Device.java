@@ -6,6 +6,7 @@ import javax.persistence.*;
     @NamedStoredProcedureQuery(name = "get_devices", procedureName = "get_devices",
         resultClasses = Device.class,
         parameters = {
+            @StoredProcedureParameter(name = "f_id", type = Integer.class, mode = ParameterMode.IN),
             @StoredProcedureParameter(name = "f_name", type = String.class, mode = ParameterMode.IN),
             @StoredProcedureParameter(name = "f_device_type_id", type = Integer.class, mode = ParameterMode.IN),
             @StoredProcedureParameter(name = "f_device_group_id", type = Integer.class, mode = ParameterMode.IN),

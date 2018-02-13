@@ -18,30 +18,19 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public ResponseWrapper getDevices(Integer deviceTypeId, Integer deviceGroupId, Integer configurationId) {
+    public ResponseWrapper getDevices(Integer id, String name, Integer deviceTypeId, Integer deviceGroupId,
+                                      Integer configurationId, String authenticationKey) {
         ResponseWrapper response = new ResponseWrapper();
 
         try {
-            response.setPayload(deviceRepository.getDevices(deviceTypeId, deviceGroupId, configurationId));
+            response.setPayload(deviceRepository.getDevices(id, name, deviceTypeId, deviceGroupId, configurationId,
+                    authenticationKey));
         } catch(Exception e) {
             response.setErrors(Collections.singleton(e.toString()));
         }
 
         return response;
 
-    }
-
-    @Override
-    public ResponseWrapper getDevice(String name, String authenticationKey) {
-        ResponseWrapper response = new ResponseWrapper();
-
-        try {
-            response.setPayload(deviceRepository.getDevice(name, authenticationKey));
-        } catch(Exception e) {
-            response.setErrors(Collections.singleton(e.toString()));
-        }
-
-        return response;
     }
 
     @Override
