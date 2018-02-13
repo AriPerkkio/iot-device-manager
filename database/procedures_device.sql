@@ -17,7 +17,7 @@ BEGIN
     SET @where_clause = " WHERE 1=1";
 
     IF f_id IS NOT NULL THEN
-        SET @where_clause = CONCAT(@where_clause, ' AND id="', f_name, '"');
+        SET @where_clause = CONCAT(@where_clause, ' AND id="', f_id, '"');
     END IF;
 
     IF f_name IS NOT NULL THEN
