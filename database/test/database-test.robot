@@ -1,5 +1,7 @@
 *** Settings ***
-Resource    resources.robot
+Resource         resources.robot
+Test Setup       Setup Database
+Test Teardown    Teardown Database
 
 *** Variables ***
 # Device

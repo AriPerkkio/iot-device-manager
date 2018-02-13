@@ -1,6 +1,7 @@
 *** Settings ***
 Library     DatabaseLibrary
 Library     Collections
+Library     OperatingSystem
 
 *** Variables ***
 ${Port}            3306
@@ -11,6 +12,23 @@ ${Password}        passu
 ${PROCEDURE CHECK QUERY}    SELECT routine_name FROM information_schema.routines WHERE routine_type = "PROCEDURE" and routine_schema="iotdevicemanager"
 
 *** Keywords ***
+Setup Database
+    # pymsql is unable to run SQL files which contain DELIMITER keyword
+    # Work-around is to use OperatingSystem's Run
+    Run    mysql -u ${Username} -p${Password} < ../create_database.sql
+    Run    mysql -u ${Username} -p${Password} < ../procedures_configuration.sql
+    Run    mysql -u ${Username} -p${Password} < ../procedures_device_group.sql
+    Run    mysql -u ${Username} -p${Password} < ../procedures_device_icon.sql
+    Run    mysql -u ${Username} -p${Password} < ../procedures_device.sql
+    Run    mysql -u ${Username} -p${Password} < ../procedures_device_type.sql
+    Run    mysql -u ${Username} -p${Password} < ../procedures_location.sql
+    Run    mysql -u ${Username} -p${Password} < ../mockdata.sql
+
+Teardown Database
+    Setup Connection
+    Execute Sql String    DROP DATABASE IF EXISTS iotdevicemanager;
+    Terminate Connection
+
 Setup Connection
     Log    Setting up connection
     Connect to Database    pymysql    iotdevicemanager    ${Username}    ${Password}    ${DatabaseHost}    ${Port}

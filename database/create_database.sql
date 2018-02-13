@@ -1,6 +1,3 @@
-# During development drop db:
-DROP DATABASE iotdevicemanager;
-
 CREATE DATABASE IF NOT EXISTS iotdevicemanager;
 USE iotdevicemanager;
 
@@ -67,7 +64,7 @@ BEGIN
         SET @id = 0;
     END IF;
 
-    SET NEW.authentication_key = MD5(@id);
+    SET NEW.authentication_key = MD5(@id + NOW());
 END$$
 DELIMITER ;
 
