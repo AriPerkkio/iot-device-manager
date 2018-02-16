@@ -1,0 +1,47 @@
+{
+  "collection" : {
+    "version" : "1.0",
+    "href" : "http://localhost:8080/api/device",
+    "items": [
+      {
+        "href": "http://localhost:8080/api/device?name=example-device",
+        "data": [
+          { "name": "id", "value": "1", "prompt": "Identifier"},
+          { "name": "name", "value": "example-device", "prompt": "Device name"},
+          { "name": "deviceTypeId", "value": "2", "prompt": "Device Type Identifier"},
+          { "name": "deviceGroupId", "value": "3", "prompt": "Device Group Identifier"},
+          { "name": "configurationId", "value": "4", "prompt": "Configuration Identifier"},
+          { "name": "authenticationKey", "value": "as7y7das0923jnawoij2n22jj2nekj2n", "prompt": "Device Authentication Key"}
+        ]
+      }
+    ],
+    "links": [
+      { "rel": "type", "href":"http://localhost:8080/api/device-type?id=2", "prompt": "Device Type"},
+      { "rel": "group", "href":"http://localhost:8080/api/device-group?id=3", "prompt": "Device Group"},
+      { "rel": "configuration", "href":"http://localhost:8080/api/device-group?id=3", "prompt": "Configuration"},
+      { "rel": "location", "href":"http://localhost:8080/api/location?deviceId=1", "prompt": "Locations"}
+    ],
+    "template": {
+      "data": [
+        { "name": "name", "value": "", "prompt": "Device name", "regexp": "[A-Za-z0-9_ .,-]{1,50}"},
+        { "name": "deviceTypeId", "value": "", "prompt": "Device Type Identifier"},
+        { "name": "deviceGroupId", "value": "", "prompt": "Device Group Identifier"},
+        { "name": "configurationId", "value": "", "prompt": "Configuration Identifier"}
+      ]
+    },
+    "queries": [
+      {
+        "rel": "search",
+        "href":"http://localhost:8080/api/device",
+        "prompt":"Search",
+        "data": [
+          { "name": "id", "value": "" },
+          { "name": "name", "value": "" },
+          { "name": "deviceTypeId", "value": "" },
+          { "name": "deviceGroupId", "value": "" },
+          { "name": "configurationId", "value": "" },
+          { "name": "authenticationKey", "value": "" }
+      ]}
+    ]
+  }
+}

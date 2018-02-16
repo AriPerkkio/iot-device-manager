@@ -1,0 +1,38 @@
+{
+  "collection" : {
+    "version" : "1.0",
+    "href" : "http://localhost:8080/api/device-type",
+    "items": [
+      {
+        "href": "http://localhost:8080/api/device-type?name=example-type",
+        "data": [
+          { "name": "id", "value": "1", "prompt": "Identifier" },
+          { "name": "name", "value": "example-type", "prompt": "Type name" },
+          { "name": "deviceIconId", "value": "2", "prompt": "Device Icon Identifier" }
+        ]
+      }
+    ],
+    "links": [
+      { "rel": "devices", "href": "http://localhost:8080/api/device?deviceTypeId=1", "prompt": "Devices" },
+      { "rel": "icon", "href":"http://localhost:8080/api/device-icon?id=2", "prompt": "Device Icon" }
+    ],
+    "template": {
+      "data": [
+        { "name": "name", "value": "", "prompt": "Type name", "regexp": "[A-Za-z0-9_ .,-]{1,50}"},
+        { "name": "deviceTypeId", "value": "", "prompt": "Device Type Identifier"}
+      ]
+    },
+    "queries": [
+      {
+        "rel": "search",
+        "href":"http://localhost:8080/api/device-type",
+        "prompt":"Search",
+        "data": [
+          { "name": "id", "value": "" },
+          { "name": "name", "value": "" },
+          { "name": "deviceIconId", "value": ""}
+        ]
+      }
+    ]
+  }
+}

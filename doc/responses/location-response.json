@@ -1,0 +1,39 @@
+{
+  "collection" : {
+    "version" : "1.0",
+    "href" : "http://localhost:8080/api/location",
+    "items": [
+      {
+        "href": "http://localhost:8080/api/location?deviceId=1",
+        "data": [
+          { "name": "deviceId", "value": "1", "prompt": "Device Identifier" },
+          { "name": "coordinates", "value": "52.0800409,5.1273094", "prompt": "Coordinates" },
+          { "name": "time", "value": "2000-01-01 00:00:10", "prompt": "Timestamp" }
+        ]
+      }
+    ],
+    "links": [
+      { "rel": "device", "href": "http://localhost:8080/api/device?deviceId=1", "prompt": "Device" }
+    ],
+    "template": {
+      "data": [
+        { "name": "deviceId", "value": "", "prompt": "Device Identifier"},
+        { "name": "coordinates", "value": "", "prompt": "Coordinates"},
+        { "name": "time", "value": "", "prompt": "Timestamp"}
+      ]
+    },
+    "queries": [
+      {
+        "rel": "search",
+        "href":"http://localhost:8080/api/location",
+        "prompt":"Search",
+        "data": [
+          { "name": "deviceId", "value": "" },
+          { "name": "exactTime", "value": "" },
+          { "name": "startTime", "value": "" },
+          { "name": "endTime", "value": "" }
+        ]
+      }
+    ]
+  }
+}

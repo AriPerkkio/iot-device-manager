@@ -1,0 +1,291 @@
+get:
+  description: Get configurations matching parameters
+  queryParameters:
+    id:
+      description: Configuration id
+      type: number
+      required: false
+    name:
+      description: Configuration's name
+      type: string
+      required: false
+      maxLength: 50
+      pattern: "[A-Za-z0-9_ .,-]{1,50}"
+  responses:
+    200:
+      description: Configurations succesfully found
+      body:
+        application/vnd.collection+json:
+          type: Configuration
+          example: !include ../responses/configuration-response.json
+    400:
+      description: Request contains errors, e.g. invalid parameters
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Parameter validation error",
+                "code": "1001",
+                "message": "id must be a number"
+              }
+            }
+          }
+    404:
+      description: No configurations found matching given parameters
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "No items found",
+                "code": "1002",
+                "message": "No items found with given parameters"
+              }
+            }
+          }
+    500:
+      description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Internal error",
+                "code": "1003",
+                "message": "Server encountered internal error"
+              }
+            }
+          }
+post:
+  description: Add new configuration type with given parameters
+  body:
+    application/json:
+      properties:
+        name:
+          description: Configuration's name
+          type: string
+          maxLength: 50
+          pattern: "[A-Za-z0-9_ .,-]{1,50}"
+        description:
+          description: Configuration's description
+          type: string
+          maxLength: 100
+          pattern: "[A-Za-z0-9_ .,-]{1,100}"
+        jsonConfiguration:
+          description: Configuration's content as JSON
+          type: string
+  responses:
+    201:
+      description: Configuration succesfully added. Returns inserted configuration including generated id
+      body:
+        application/vnd.collection+json:
+          type: Configuration
+          example: !include ../responses/configuration-response.json
+    400:
+      description: Request contains errors, e.g. invalid parameters
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Parameter validation error",
+                "code": "1001",
+                "message": "id must be a number"
+              }
+            }
+          }
+    409:
+      description: Configuration name already used for another device type
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Parameter conflict",
+                "code": "1004",
+                "message": "Parameter must be unique: name"
+              }
+            }
+          }
+    500:
+      description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Internal error",
+                "code": "1003",
+                "message": "Server encountered internal error"
+              }
+            }
+          }
+put:
+  description: Update given attributes of configuration
+  queryParameters:
+    id:
+      description: Configuration id used as filter. Required if other request parameters are not present.
+      type: number
+      required: false
+    name:
+      description: Configuration name used as filter. Required if other request parameters are not present.
+      required: false
+      type: string
+      maxLength: 50
+      pattern: "[A-Za-z0-9_ .,-]{1,50}"
+  body:
+    application/json:
+      description: Attributes to update
+      properties:
+        name:
+          description: Configuration's name
+          type: string
+          maxLength: 50
+          pattern: "[A-Za-z0-9_ .,-]{1,50}"
+        description:
+          description: Configuration's description
+          type: string
+          maxLength: 100
+          pattern: "[A-Za-z0-9_ .,-]{1,100}"
+        jsonConfiguration:
+          description: Configuration's content as JSON
+          type: string
+  responses:
+    200:
+      description: Configuration succesfully updated. Returns updated configuration
+      body:
+        application/vnd.collection+json:
+          type: Configuration
+          example: !include ../responses/configuration-response.json
+    400:
+      description: Request contains errors, e.g. invalid parameters
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Parameter validation error",
+                "code": "1001",
+                "message": "id must be a number"
+              }
+            }
+          }
+    404:
+      description: No configurations found matching given parameters
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "No items found",
+                "code": "1002",
+                "message": "No items found with given parameters"
+              }
+            }
+          }
+    409:
+      description: Configuration name already used for another device type
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Parameter conflict",
+                "code": "1004",
+                "message": "Parameter must be unique: name"
+              }
+            }
+          }
+    500:
+      description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Internal error",
+                "code": "1003",
+                "message": "Server encountered internal error"
+              }
+            }
+          }
+delete:
+  description: Remove device type matching parameters
+  queryParameters:
+    id:
+      description: Configuration id. Required if other request parameters are not present.
+      type: number
+    name:
+      description: Configuration's name. Required if other request parameters are not present.
+      type: string
+      maxLength: 50
+      pattern: "[A-Za-z0-9_ .,-]{1,50}"
+  responses:
+    204:
+      description: Configuration successfully removed
+    400:
+      description: Request contains errors, e.g. invalid parameters
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Parameter validation error",
+                "code": "1001",
+                "message": "id must be a number"
+              }
+            }
+          }
+    404:
+      description: No configurations found matching given parameters
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "No items found",
+                "code": "1002",
+                "message": "No items found with given parameters"
+              }
+            }
+          }
+    500:
+      description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+      body:
+        application/vnd.collection+json:
+          example: {
+            "collection": {
+              "version": "1.0",
+              "href" : "http://localhost:8080/api/configuration",
+              "error": {
+                "title": "Internal error",
+                "code": "1003",
+                "message": "Server encountered internal error"
+              }
+            }
+          }
