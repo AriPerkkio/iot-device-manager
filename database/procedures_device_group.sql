@@ -1,7 +1,5 @@
 /***** DEVICE GROUP *****/
 
-USE iotdevicemanager;
-
 DROP PROCEDURE IF EXISTS get_device_groups;
 DELIMITER $$
 CREATE PROCEDURE get_device_groups (
@@ -45,7 +43,6 @@ BEGIN
         p_description
     );
 
-    COMMIT;
     CALL get_device_groups(NULL, p_name);
 END
 $$
@@ -77,7 +74,6 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
-        COMMIT;
     END IF;
 
     SELECT (@params_ok IS NOT NULL);
@@ -117,7 +113,6 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt USING @name, @description;
         DEALLOCATE PREPARE stmt;
-        COMMIT;
         CALL get_device_groups(NULL, p_name);
     END IF;
 END

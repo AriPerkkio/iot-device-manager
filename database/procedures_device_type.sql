@@ -1,7 +1,5 @@
 /***** DEVICE TYPE *****/
 
-USE iotdevicemanager;
-
 DROP PROCEDURE IF EXISTS get_device_types;
 DELIMITER $$
 CREATE PROCEDURE get_device_types (
@@ -48,7 +46,6 @@ BEGIN
         p_device_icon_id
     );
 
-    COMMIT;
     CALL get_device_types(NULL, p_name, p_device_icon_id);
 END
 $$
@@ -86,7 +83,6 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
-        COMMIT;
     END IF;
 
     SELECT (@params_ok IS NOT NULL);
@@ -126,7 +122,6 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt USING @name, @device_icon_id;
         DEALLOCATE PREPARE stmt;
-        COMMIT;
         CALL get_device_types(NULL, @name, @device_icon_id);
     END IF;
 END

@@ -1,7 +1,5 @@
 /***** DEVICE ICON *****/
 
-USE iotdevicemanager;
-
 DROP PROCEDURE IF EXISTS get_device_icons;
 DELIMITER $$
 CREATE PROCEDURE get_device_icons (
@@ -34,7 +32,6 @@ CREATE PROCEDURE add_device_icon (
     IN p_name VARCHAR(25))
 BEGIN
     INSERT INTO device_icon(name) VALUES (p_name);
-    COMMIT;
     CALL get_device_icons(NULL, p_name);
 END
 $$
@@ -64,7 +61,6 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
-        COMMIT;
     END IF;
 
     SELECT (@params_ok IS NOT NULL);
@@ -98,7 +94,6 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt USING @name;
         DEALLOCATE PREPARE stmt;
-        COMMIT;
         CALL get_device_icons(NULL, @name);
     END IF;
 END

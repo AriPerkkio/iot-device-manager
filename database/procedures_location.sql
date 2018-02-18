@@ -1,7 +1,5 @@
 /***** LOCATION *****/
 
-USE iotdevicemanager;
-
 DROP PROCEDURE IF EXISTS get_locations;
 DELIMITER $$
 CREATE PROCEDURE get_locations (
@@ -10,7 +8,7 @@ CREATE PROCEDURE get_locations (
     IN f_start_time DATETIME,
     IN f_end_time DATETIME)
 BEGIN
-    SET @query = "SELECT device_id, coordinates, time FROM location";
+    SET @query = "SELECT device_id, longitude, latitude, time FROM location";
     SET @where_clause = " WHERE 1=1";
 
     IF f_device_id IS NOT NULL THEN
@@ -42,7 +40,8 @@ DROP PROCEDURE IF EXISTS add_location;
 DELIMITER $$
 CREATE PROCEDURE add_location (
     IN p_device_id INT,
-    IN p_coordinates VARCHAR(20),
+    IN p_latitude DECIMAL,
+    IN p_longitude DECIMAL,
     IN p_time DATETIME)
 BEGIN
     SET @time = p_time;
@@ -53,16 +52,17 @@ BEGIN
 
     INSERT INTO location(
         device_id,
-        coordinates,
+        latitude,
+        longitude,
         time
     )
     VALUES(
         p_device_id,
-        p_coordinates,
+        p_latitude,
+        p_longitude,
         @time
     );
 
-    COMMIT;
     CALL get_locations(p_device_id, @time, NULL, NULL);
 END
 $$
@@ -106,7 +106,6 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
-        COMMIT;
     END IF;
 
     SELECT (@params_ok IS NOT NULL);

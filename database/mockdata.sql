@@ -1,9 +1,7 @@
-USE iotdevicemanager;
-
 CALL add_configuration(
     "startup configuration",
     "Initial startup configuration for lp-devices",
-    "{ \"AUTOSTART_ON_BOOT\": \"TRUE\", \"TXPOWER_LEVEL\": \"LOW\" }"
+    '{"AUTOSTART_ON_BOOT": "TRUE", "TXPOWER_LEVEL": "LOW"}'
 );
 
 CALL add_device_group(
@@ -29,6 +27,7 @@ CALL add_device (
 
 CALL add_location(
     1,
-    "52.0800409,5.1273094",
+    52.0800409,
+    5.1273094,
     NULL
 );

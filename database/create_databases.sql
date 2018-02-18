@@ -1,0 +1,2 @@
+CREATE DATABASE IF NOT EXISTS iotdevicemanager;
+CREATE DATABASE IF NOT EXISTS testiotdevicemanager;

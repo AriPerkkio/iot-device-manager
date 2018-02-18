@@ -1,13 +1,10 @@
-CREATE DATABASE IF NOT EXISTS iotdevicemanager;
-USE iotdevicemanager;
-
 /***** TABLES *****/
 
 CREATE TABLE IF NOT EXISTS configuration (
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     name VARCHAR(50) UNIQUE NOT NULL,
     description VARCHAR(100),
-    json_configuration MEDIUMBLOB
+    content JSON
 );
 
 CREATE TABLE IF NOT EXISTS device_group (
@@ -43,7 +40,8 @@ CREATE TABLE IF NOT EXISTS device (
 
 CREATE TABLE IF NOT EXISTS location (
     device_id INT NOT NULL,
-    coordinates VARCHAR(20) NOT NULL,
+    latitude DECIMAL NOT NULL,
+    longitude DECIMAL NOT NULL,
     time DATETIME NOT NULL,
     FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE
 );
@@ -68,8 +66,9 @@ BEGIN
 END$$
 DELIMITER ;
 
+/***** USER *****/
+
 /* TODO environment credentials */
-DROP USER IF EXISTS 'iot-device-manager-client'@'%';
-CREATE USER 'iot-device-manager-client'@'%' identified by 'client';
+CREATE USER IF NOT EXISTS 'iot-device-manager-client'@'%' identified by 'client';
 
 GRANT SELECT ON mysql.proc TO 'iot-device-manager-client'@'%';

@@ -1,7 +1,5 @@
 /***** DEVICE *****/
 
-USE iotdevicemanager;
-
 DROP PROCEDURE IF EXISTS get_devices;
 DELIMITER $$
 CREATE PROCEDURE get_devices (
@@ -12,7 +10,7 @@ CREATE PROCEDURE get_devices (
     IN f_configuration_id INT,
     IN f_authentication_key VARCHAR(32))
 BEGIN
-    SET @query = "SELECT id, name, device_type_id, device_group_id, 
+    SET @query = "SELECT id, name, device_type_id, device_group_id,
         configuration_id, authentication_key FROM device";
     SET @where_clause = " WHERE 1=1";
 
@@ -70,7 +68,6 @@ BEGIN
         p_configuration_id
     );
 
-    COMMIT;
     CALL get_devices(NULL, p_name, p_device_type_id, p_device_group_id, p_configuration_id, NULL);
 END
 $$
@@ -96,7 +93,7 @@ BEGIN
         SET @where_clause = CONCAT(@where_clause, ' AND name ="', f_name, '"');
         SET @params_ok = 1;
     END IF;
-    
+
     IF f_authentication_key IS NOT NULL THEN
         SET @where_clause = CONCAT(@where_clause, ' AND authentication_key ="', f_authentication_key, '"');
         SET @params_ok = 1;
@@ -109,8 +106,7 @@ BEGIN
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
     END IF;
-    
-    COMMIT;
+
     SELECT (@params_ok IS NOT NULL);
 END
 $$
@@ -161,7 +157,6 @@ BEGIN
         PREPARE stmt FROM @query;
         EXECUTE stmt USING @name, @device_type_id, @device_group_id, @configuration_id;
         DEALLOCATE PREPARE stmt;
-        COMMIT;
         CALL get_devices(NULL, p_name, p_device_type_id, p_device_group_id, p_configuration_id, NULL);
     END IF;
 END
