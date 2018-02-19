@@ -46,6 +46,13 @@ CREATE TABLE IF NOT EXISTS location (
     FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS measurement (
+    device_id INT NOT NULL,
+    content JSON NOT NULL,
+    time DATETIME NOT NULL,
+    FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE
+);
+
 /***** TRIGGERS *****/
 
 /* Add authentication key when inserting new device, Key is md5 of id. */
