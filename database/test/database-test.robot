@@ -22,7 +22,8 @@ ${device_icon_name}           robot-icon.png
 ${device_icon_name renamed}   robot-renamed-icon.png
 
 # Location
-${coordinates}    52.0800409,5.1273094
+${latitude}    52
+${longitude}   5
 ${f_start_time}   2000-01-01 00:00:10
 ${time}           2000-01-01 00:00:20
 ${f_end_time}     2000-01-01 00:00:30
@@ -31,7 +32,7 @@ ${f_end_time}     2000-01-01 00:00:30
 ${configuration_name}           robot-configuration
 ${configuration_name renamed}   robot-configuration-renamed
 ${configuration_description}    Configuration created by tests
-${json_configuration}           {IS_TEST: TRUE}
+${content}           {"IS_TEST": "TRUE"}
 
 *** Test Cases ***
 Verify Tables Exist
@@ -120,22 +121,22 @@ Verify Configuration Stored Procedures Work As Expected
     Delete Configuration  NULL  "${configuration_name renamed}"
 
     Log    Verify add_configuration returns inserted configuration
-    ${add_configuration result} =    Add Configuration  "${configuration_name}"  "${configuration_description}"  "${json_configuration}"
+    ${add_configuration result} =    Add Configuration  "${configuration_name}"  "${configuration_description}"  '${content}'
     Dictionary Should Contain Item  ${add_configuration result}  name                ${configuration_name}
     Dictionary Should Contain Item  ${add_configuration result}  description         ${configuration_description}
-    Dictionary Should Contain Item  ${add_configuration result}  json_configuration  ${json_configuration}
+    Dictionary Should Contain Item  ${add_configuration result}  content  ${content}
 
     Log    Verify update_configuration returns updated configuration
-    ${updated_configuration result} =    Update Configuration  NULL  "${configuration_name}"  "${configuration_name renamed}"  "${configuration_description}"  "${json_configuration}"
+    ${updated_configuration result} =    Update Configuration  NULL  "${configuration_name}"  "${configuration_name renamed}"  "${configuration_description}"  '${content}'
     Dictionary Should Contain Item  ${updated_configuration result}  name                ${configuration_name renamed}
     Dictionary Should Contain Item  ${updated_configuration result}  description         ${configuration_description}
-    Dictionary Should Contain Item  ${updated_configuration result}  json_configuration  ${json_configuration}
+    Dictionary Should Contain Item  ${updated_configuration result}  content  ${content}
 
     Log    Verify get_configurations finds configuration
     ${get_configuration result} =    Get Configuration  NULL  "${configuration_name renamed}"
     Dictionary Should Contain Item  ${get_configuration result}  name                ${configuration_name renamed}
     Dictionary Should Contain Item  ${get_configuration result}  description         ${configuration_description}
-    Dictionary Should Contain Item  ${get_configuration result}  json_configuration  ${json_configuration}
+    Dictionary Should Contain Item  ${get_configuration result}  content  ${content}
 
     Log    Verify configuration is not found after delete_configuration
     Delete Configuration  NULL  "${configuration_name renamed}"
@@ -237,21 +238,24 @@ Verify Location Stored Procedures Work As Expected
     ${device_id} =    Get From Dictionary    ${add_device result}  id
 
     Log    Verify add_location returns inserted location
-    ${add_location result} =    Add Location  ${device_id}  "${coordinates}"  "${time}"
+    ${add_location result} =    Add Location  ${device_id}  "${latitude}"  "${longitude}"  "${time}"
     Dictionary Should Contain Key   ${add_location result}  id
-    Dictionary Should Contain Item  ${add_location result}  coordinates  ${coordinates}
+    Dictionary Should Contain Item  ${add_location result}  latitude     ${latitude}
+    Dictionary Should Contain Item  ${add_location result}  longitude    ${longitude}
     Dictionary Should Contain Item  ${add_location result}  time         ${time}
 
     Log    Verify get_locations finds location using exact time
     ${get_location result} =    Get Location  ${device_id}  "${time}"  NULL  NULL
     Dictionary Should Contain Key   ${get_location result}  id
-    Dictionary Should Contain Item  ${get_location result}  coordinates  ${coordinates}
+    Dictionary Should Contain Item  ${add_location result}  latitude     ${latitude}
+    Dictionary Should Contain Item  ${add_location result}  longitude    ${longitude}
     Dictionary Should Contain Item  ${get_location result}  time         ${time}
 
     Log    Verify get_locations finds location using time range
     ${get_location result} =    Get Location  ${device_id}  NULL  "${f_start_time}"  "${f_end_time}"
     Dictionary Should Contain Key   ${get_location result}  id
-    Dictionary Should Contain Item  ${get_location result}  coordinates  ${coordinates}
+    Dictionary Should Contain Item  ${add_location result}  latitude     ${latitude}
+    Dictionary Should Contain Item  ${add_location result}  longitude    ${longitude}
     Dictionary Should Contain Item  ${get_location result}  time         ${time}
 
     Log    Verify location is not found after delete_locations

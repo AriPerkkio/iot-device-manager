@@ -9,29 +9,31 @@ ${Username}        root
 ${DatabaseHost}    127.0.0.1
 ${Password}        passu
 @{QueryResults}
-${PROCEDURE CHECK QUERY}    SELECT routine_name FROM information_schema.routines WHERE routine_type = "PROCEDURE" and routine_schema="iotdevicemanager"
+${PROCEDURE CHECK QUERY}    SELECT routine_name FROM information_schema.routines WHERE routine_type = "PROCEDURE" and routine_schema="testiotdevicemanager"
 
 *** Keywords ***
 Setup Database
     # pymsql is unable to run SQL files which contain DELIMITER keyword
     # Work-around is to use OperatingSystem's Run
-    Run    mysql -u ${Username} -p${Password} < ../create_database.sql
-    Run    mysql -u ${Username} -p${Password} < ../procedures_configuration.sql
-    Run    mysql -u ${Username} -p${Password} < ../procedures_device_group.sql
-    Run    mysql -u ${Username} -p${Password} < ../procedures_device_icon.sql
-    Run    mysql -u ${Username} -p${Password} < ../procedures_device.sql
-    Run    mysql -u ${Username} -p${Password} < ../procedures_device_type.sql
-    Run    mysql -u ${Username} -p${Password} < ../procedures_location.sql
-    Run    mysql -u ${Username} -p${Password} < ../mockdata.sql
+    Run    mysql -u ${Username} -p${Password} < ../create_databases.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../create_tables_triggers_user.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_configuration.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_device_group.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_device_icon.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_device.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_device_type.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_location.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../mockdata.sql
 
 Teardown Database
     Setup Connection
-    Execute Sql String    DROP DATABASE IF EXISTS iotdevicemanager;
+    Execute Sql String    DROP DATABASE IF EXISTS testiotdevicemanager;
     Terminate Connection
 
 Setup Connection
     Log    Setting up connection
-    Connect to Database    pymysql    iotdevicemanager    ${Username}    ${Password}    ${DatabaseHost}    ${Port}
+    Connect to Database    pymysql    testiotdevicemanager    ${Username}    ${Password}    ${DatabaseHost}    ${Port}
+    Execute Sql String    SET AUTOCOMMIT=1
 
 Terminate Connection
     Log    Terminating connection
@@ -96,13 +98,13 @@ Map Result To Configuration
     ...  id=${result[0]}
     ...  name=${result[1]}
     ...  description=${result[2]}
-    ...  json_configuration=${result[3]}
+    ...  content=${result[3]}
 
     [Return]    ${mapped configuration}
 
 Add Configuration
-    [Arguments]  ${p_name}  ${p_description}  ${p_json_configuration}
-    @{QueryResults} =    Query    CALL add_configuration(${p_name}, ${p_description}, ${p_json_configuration})
+    [Arguments]  ${p_name}  ${p_description}  ${p_content}
+    @{QueryResults} =    Query    CALL add_configuration(${p_name}, ${p_description}, ${p_content})
     ${added_configuration} =    Map Result To Configuration  ${QueryResults[0]}
     [Return]    ${added_configuration}
 
@@ -118,8 +120,8 @@ Get Configuration
     [Return]    ${fetched_configuration}
 
 Update Configuration
-    [Arguments]    ${f_id}  ${f_name}  ${p_name}  ${p_description}  ${p_json_configuration}
-    @{QueryResults} =    Query    CALL update_configuration(${f_id}, ${f_name}, ${p_name}, ${p_description}, ${p_json_configuration})
+    [Arguments]    ${f_id}  ${f_name}  ${p_name}  ${p_description}  ${p_content}
+    @{QueryResults} =    Query    CALL update_configuration(${f_id}, ${f_name}, ${p_name}, ${p_description}, ${p_content})
     ${updated_configuration} =    Map Result To Configuration  ${QueryResults[0]}
     [Return]    ${updated_configuration}
 
@@ -247,13 +249,14 @@ Map Result To Location
     [Arguments]    ${result}
     ${mapped location} =  Create Dictionary
     ...  id=${result[0]}
-    ...  coordinates=${result[1]}
-    ...  time=${result[2]}
+    ...  longitude=${result[1]}
+    ...  latitude=${result[2]}
+    ...  time=${result[3]}
     [Return]    ${mapped location}
 
 Add Location
-    [Arguments]    ${p_device_id}  ${p_coordinates}  ${p_time}
-    @{QueryResults} =    Query    CALL add_location(${p_device_id}, ${p_coordinates}, ${p_time})
+    [Arguments]    ${p_device_id}  ${p_latitude}  ${p_longitude}  ${p_time}
+    @{QueryResults} =    Query    CALL add_location(${p_device_id}, ${p_latitude}, ${p_longitude}, ${p_time})
     ${added_location} =    Map Result To Location  ${QueryResults[0]}
     [Return]    ${added_location}
 
