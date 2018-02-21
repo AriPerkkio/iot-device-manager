@@ -1,5 +1,6 @@
 package web.repository.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.core.IsCollectionContaining;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,6 +63,20 @@ public class DeviceRepositoryTest {
      */
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
+    public void testAddDeviceThrowsWhenNameTooLong() {
+        // Given
+        Device deviceWithLongName = getTestDevice();
+        deviceWithLongName.setName(StringUtils.repeat("A", 51));
+
+        // When
+        deviceRepository.addDevice(deviceWithLongName);
+    }
+
+    /**
+     * Test add_device fails when name is too long
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceThrowsWhenForeignKeyConflicts() {
         // Given
         Device deviceWithConflict = getTestDevice();
@@ -70,6 +85,7 @@ public class DeviceRepositoryTest {
         // When
         deviceRepository.addDevice(deviceWithConflict);
     }
+
 
     /**
      * Test get_devices without parameters finds inserted device
@@ -158,6 +174,22 @@ public class DeviceRepositoryTest {
         deviceRepository.addDevice(initialDevice);
         deviceRepository.addDevice(updateDevice);
         deviceRepository.updateDevice(null, updateDevice.getName(), null, initialDevice);
+    }
+
+    /**
+     * Test update device fails when name is too long
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testUpdateDeviceThrowsWhenNameTooLong() {
+        // Given
+        Device initialDevice = getTestDevice();
+        Device deviceWithLongName = getTestDevice();
+        deviceWithLongName.setName(StringUtils.repeat("A", 51));
+
+        // When
+        deviceRepository.addDevice(initialDevice);
+        deviceRepository.updateDevice(null, initialDevice.getName(), null, deviceWithLongName);
     }
 
     /**
