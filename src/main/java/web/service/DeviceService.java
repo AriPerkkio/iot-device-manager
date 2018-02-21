@@ -9,4 +9,6 @@ public interface DeviceService {
                                Integer configurationId, String authenticationKey);
 
     ResponseWrapper addDevice(Device device);
+
+    ResponseWrapper updateDevice(Integer id, String name, String authenticationKey, Device device);
 }

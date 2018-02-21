@@ -45,4 +45,17 @@ public class DeviceServiceImpl implements DeviceService {
 
         return response;
     }
+
+    @Override
+    public ResponseWrapper updateDevice(Integer id, String name, String authenticationKey, Device device) {
+        ResponseWrapper response = new ResponseWrapper();
+
+        try {
+            response.setPayload(deviceRepository.updateDevice(id, name, authenticationKey, device));
+        } catch(Exception e) {
+            response.setErrors(Collections.singleton(e.toString()));
+        }
+
+        return response;
+    }
 }

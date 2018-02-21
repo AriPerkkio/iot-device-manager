@@ -31,4 +31,13 @@ public class DeviceController {
     public ResponseWrapper addDevice(@RequestBody Device device) {
         return deviceService.addDevice(device);
     }
+
+    @RequestMapping(value = "/device", method = RequestMethod.PUT)
+    public ResponseWrapper updateDevice(
+            @RequestParam(name="id", required = false) Integer id,
+            @RequestParam(name="name", required = false) String name,
+            @RequestParam(name="authenticationKey", required = false) String authenticationKey,
+            @RequestBody Device device) {
+        return deviceService.updateDevice(id, name, authenticationKey, device);
+    }
 }
