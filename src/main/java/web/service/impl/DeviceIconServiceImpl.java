@@ -35,15 +35,16 @@ public class DeviceIconServiceImpl implements DeviceIconService {
     @Override
     public ResponseWrapper uploadDeviceIcon(MultipartFile icon, String name) {
         ResponseWrapper responseWrapper = new ResponseWrapper();
+        DeviceIcon deviceIcon = new DeviceIcon();
+        deviceIcon.setName(name);
 
         try {
-            validateFilename(name);
-            validateFilenameIsUnique(name);
+            validateFilename(deviceIcon);
+            validateFilenameIsUnique(deviceIcon);
 
-            Files.copy(icon.getInputStream(), path.resolve(name));
-            DeviceIcon deviceIcon = deviceIconRepository.addDeviceIcon(iconsLocation + name);
+            Files.copy(icon.getInputStream(), path.resolve(deviceIcon.getName()));
 
-            responseWrapper.setPayload(deviceIcon);
+            responseWrapper.setPayload(deviceIconRepository.addDeviceIcon(deviceIcon));
         } catch (Exception e) {
             responseWrapper.setErrors(Collections.singletonList(e.toString()));
         }
@@ -52,24 +53,20 @@ public class DeviceIconServiceImpl implements DeviceIconService {
     }
 
     @Override
-    public Resource getDeviceIcon(String name) {
+    public Resource getDeviceIcon(DeviceIcon deviceIcon) {
         try {
-            validateFilename(name);
-            return new UrlResource(path.resolve(name).toUri());
+            validateFilename(deviceIcon);
+            return new UrlResource(path.resolve(deviceIcon.getName()).toUri());
         } catch (Exception e) {
             throw new RuntimeException(e.toString());
         }
     }
 
-    private void validateFilename(String name) throws Exception {
-        if(!filenamePattern.matcher(name).matches()) {
-            throw new Exception("Invalid file name");
-        }
+    private void validateFilename(DeviceIcon deviceIcon) throws Exception {
+        // TODO move to validator
     }
 
-    private void validateFilenameIsUnique(String name) throws Exception {
-        if(deviceIconRepository.deviceIconExists(name)) {
-            throw new Exception("Filename already used for another icon");
-        }
+    private void validateFilenameIsUnique(DeviceIcon deviceIcon) throws Exception {
+        // TODO move to validator
     }
 }
