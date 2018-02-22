@@ -18,7 +18,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.*;
 
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class DeviceRepositoryTest {
@@ -59,7 +58,7 @@ public class DeviceRepositoryTest {
     }
 
     /**
-     * Test add_device fails when foreign key conflicts
+     * Test add_device fails when name is too long
      */
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
@@ -73,7 +72,7 @@ public class DeviceRepositoryTest {
     }
 
     /**
-     * Test add_device fails when name is too long
+     * Test add_device fails when foreign key conflicts
      */
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
