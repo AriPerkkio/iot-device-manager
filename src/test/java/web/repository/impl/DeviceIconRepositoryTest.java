@@ -72,6 +72,20 @@ public class DeviceIconRepositoryTest {
     }
 
     /**
+     * Test add_device_icon fails when name is null
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testAddDeviceIconThrowsWhenNameNull() {
+        // Given
+        DeviceIcon deviceIconWithLongName = getTestDeviceIcon();
+        deviceIconWithLongName.setName(null);
+
+        // When
+        deviceIconRepository.addDeviceIcon(deviceIconWithLongName);
+    }
+
+    /**
      * Test get_device_icons without parameters finds inserted device icon
      */
     @Transactional
@@ -124,6 +138,23 @@ public class DeviceIconRepositoryTest {
 
         // Update methods do not work as transactional - manual cleanup required
         deviceIconRepository.deleteDeviceIcon(null, result.getName());
+    }
+
+    /**
+     * Test update_device_icon fails when name is null
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testUpdateDeviceIconThrowsWhenNameNNull() {
+        // Given
+        DeviceIcon initialDeviceIcon = getTestDeviceIcon();
+        DeviceIcon updateDeviceIcon = getTestDeviceIcon();
+        updateDeviceIcon.setName(null);
+
+        // When
+        deviceIconRepository.addDeviceIcon(initialDeviceIcon);
+        deviceIconRepository.addDeviceIcon(updateDeviceIcon);
+        deviceIconRepository.updateDeviceIcon(null, updateDeviceIcon.getName(), initialDeviceIcon);
     }
 
     /**
@@ -198,10 +229,8 @@ public class DeviceIconRepositoryTest {
 
         // Then
         assertFalse(result);
-        assertThat(resultsBefore.size(), equalTo(1));
-        assertThat(resultsAfter.size(), equalTo(1));
+        assertThat(resultsBefore.size(), equalTo(resultsAfter.size()));
     }
-
 
     private DeviceIcon getTestDeviceIcon() {
         DeviceIcon deviceIcon = new DeviceIcon();

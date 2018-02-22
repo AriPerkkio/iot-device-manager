@@ -58,6 +58,20 @@ public class DeviceRepositoryTest {
     }
 
     /**
+     * Test add_device fails when name is null
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testAddDeviceThrowsWhenNameNull() {
+        // Given
+        Device deviceWithLongName = getTestDevice();
+        deviceWithLongName.setName(null);
+
+        // When
+        deviceRepository.addDevice(deviceWithLongName);
+    }
+
+    /**
      * Test add_device fails when name is too long
      */
     @Transactional
@@ -84,7 +98,6 @@ public class DeviceRepositoryTest {
         // When
         deviceRepository.addDevice(deviceWithConflict);
     }
-
 
     /**
      * Test get_devices without parameters finds inserted device
@@ -159,6 +172,23 @@ public class DeviceRepositoryTest {
     }
 
     /**
+     * Test update device fails when name is null
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testUpdateDeviceThrowsWhenNameNull() {
+        // Given
+        Device initialDevice = getTestDevice();
+        Device updateDevice = getTestDevice();
+        updateDevice.setName(null);
+
+        // When
+        deviceRepository.addDevice(initialDevice);
+        deviceRepository.addDevice(updateDevice);
+        deviceRepository.updateDevice(null, updateDevice.getName(), null, initialDevice);
+    }
+
+    /**
      * Test update device fails when unique key conflicts
      */
     @Transactional
@@ -229,8 +259,7 @@ public class DeviceRepositoryTest {
 
         //Then
         assertFalse(result);
-        assertThat(resultsBefore.size(), equalTo(1));
-        assertThat(resultsAfter.size(), equalTo(1));
+        assertThat(resultsBefore.size(), equalTo(resultsAfter.size()));
     }
 
     private Device getTestDevice() {
