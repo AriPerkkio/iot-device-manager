@@ -14,7 +14,7 @@ public interface DeviceGroupRepository {
      * @param name
      *          Device Group name used as filter
      * @return
-     *          Device Group matching given parameters
+     *          Device Groups matching given parameters
      */
     Collection<DeviceGroup> getDeviceGroups(Integer id, String name);
 

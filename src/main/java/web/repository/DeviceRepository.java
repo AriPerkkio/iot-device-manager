@@ -22,7 +22,7 @@ public interface DeviceRepository {
      * @param authenticationKey
      *          Authentication key used as filter
      * @return
-     *          Device matching given parameters
+     *          Devices matching given parameters
      */
     Collection<Device> getDevices(Integer id, String name, Integer deviceTypeId, Integer deviceGroupId,
                                   Integer configurationId, String authenticationKey);
