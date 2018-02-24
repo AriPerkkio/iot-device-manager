@@ -55,8 +55,7 @@ DROP PROCEDURE IF EXISTS delete_device_type;
 DELIMITER $$
 CREATE PROCEDURE delete_device_type (
     IN f_id INT,
-    IN f_name VARCHAR(50),
-    IN f_device_icon_id INT)
+    IN f_name VARCHAR(50))
 BEGIN
     SET @query = "DELETE FROM device_type";
     SET @where_clause = " WHERE 1=1";
@@ -69,11 +68,6 @@ BEGIN
 
     IF f_name IS NOT NULL THEN
         SET @where_clause = CONCAT(@where_clause, ' AND name="', f_name, '"');
-        SET @params_ok = 1;
-    END IF;
-
-    IF f_device_icon_id IS NOT NULL THEN
-        SET @where_clause = CONCAT(@where_clause, ' AND device_icon_id="', f_device_icon_id, '"');
         SET @params_ok = 1;
     END IF;
 

@@ -177,8 +177,8 @@ Verify Device Type Stored Procedures Work As Expected
     Setup Connection
 
     # Make sure test types are not in database already
-    Delete Device Type  NULL  "${device_type_name}"  NULL
-    Delete Device Type  NULL  "${device_type_name renamed}"  NULL
+    Delete Device Type  NULL  "${device_type_name}"
+    Delete Device Type  NULL  "${device_type_name renamed}"
 
     Log    Verify add_device_type returns inserted device type
     ${add_device_type result} =    Add Device Type  "${device_type_name}"  NULL
@@ -199,7 +199,7 @@ Verify Device Type Stored Procedures Work As Expected
     Dictionary Should Contain Key   ${updated_device_type result}  device_icon_id
 
     Log   Verify device type is not found after delete_device_type
-    Delete Device Type  NULL  "${device_type_name renamed}"  NULL
+    Delete Device Type  NULL  "${device_type_name renamed}"
     ${get_device_types results} =    Get Device type  NULL  "${device_type_name renamed}"  NULL
     Should Be Equal    ${get_device_types results}    ${None}
 

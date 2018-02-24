@@ -202,8 +202,8 @@ Update Device Type
     [Return]    ${updated_device_type}
 
 Delete Device Type
-    [Arguments]    ${f_id}  ${f_name}  ${f_device_icon_id}
-    @{QueryResults} =    Query    CALL delete_device_type(${f_id}, ${f_name}, ${f_device_icon_id})
+    [Arguments]    ${f_id}  ${f_name}
+    @{QueryResults} =    Query    CALL delete_device_type(${f_id}, ${f_name})
     [Return]    ${QueryResults[0][0]}
 
 ### DEVICE ICON ###
