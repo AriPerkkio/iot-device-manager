@@ -65,11 +65,11 @@ public class DeviceRepositoryTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceThrowsWhenNameNull() {
         // Given
-        Device deviceWithLongName = getTestDevice();
-        deviceWithLongName.setName(null);
+        Device deviceWithNullName = getTestDevice();
+        deviceWithNullName.setName(null);
 
         // When
-        deviceRepository.addDevice(deviceWithLongName);
+        deviceRepository.addDevice(deviceWithNullName);
     }
 
     /**
@@ -87,14 +87,42 @@ public class DeviceRepositoryTest {
     }
 
     /**
-     * Test add_device fails when foreign key conflicts
+     * Test add_device fails when foreign key configuration_id conflicts
      */
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
-    public void testAddDeviceThrowsWhenForeignKeyConflicts() {
+    public void testAddDeviceThrowsWhenConfigurationIdConflicts() {
         // Given
         Device deviceWithConflict = getTestDevice();
         deviceWithConflict.setConfigurationId(999);
+
+        // When
+        deviceRepository.addDevice(deviceWithConflict);
+    }
+
+    /**
+     * Test add_device fails when foreign key device_group_id conflicts
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testAddDeviceThrowsWhenDeviceGroupIdConflicts() {
+        // Given
+        Device deviceWithConflict = getTestDevice();
+        deviceWithConflict.setDeviceGroupId(999);
+
+        // When
+        deviceRepository.addDevice(deviceWithConflict);
+    }
+
+    /**
+     * Test add_device fails when foreign key device_type_id conflicts
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testAddDeviceThrowsWhenDeviceTypeIdConflicts() {
+        // Given
+        Device deviceWithConflict = getTestDevice();
+        deviceWithConflict.setDeviceTypeId(999);
 
         // When
         deviceRepository.addDevice(deviceWithConflict);
@@ -107,14 +135,14 @@ public class DeviceRepositoryTest {
     @Test
     public void testGetDevicesWithoutParametersReturnsInsertedDevice() {
         // Given
-        Device expected = getTestDevice();
+        Device expected = deviceRepository.addDevice(getTestDevice());
 
         // When
-        deviceRepository.addDevice(expected);
         Collection<Device> resultDevices = deviceRepository.getDevices(null, null, null, null, null, null);
 
         // Then
         assertThat(resultDevices, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
+        assertThat(resultDevices, IsCollectionContaining.hasItem(hasProperty("authenticationKey", equalTo(expected.getAuthenticationKey()))));
     }
 
     /**
@@ -132,6 +160,7 @@ public class DeviceRepositoryTest {
 
         // Then
         assertThat(resultDevices, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
+        assertThat(resultDevices, IsCollectionContaining.hasItem(hasProperty("authenticationKey", equalTo(expected.getAuthenticationKey()))));
     }
 
     /**
@@ -141,17 +170,17 @@ public class DeviceRepositoryTest {
     @Test
     public void testUpdateDeviceWithParametersWorks() {
         // Given
-        Device initialDevice = getTestDevice();
+        Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device expected = getTestDevice();
         expected.setName("updated-name");
 
         // When
-        deviceRepository.addDevice(initialDevice);
         deviceRepository.updateDevice(null, initialDevice.getName(), null, expected);
         Collection<Device> results = deviceRepository.getDevices(null, expected.getName(), null, null, null, null);
 
         // Then
         assertThat(results, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
+        assertThat(results, IsCollectionContaining.hasItem(hasProperty("authenticationKey", equalTo(initialDevice.getAuthenticationKey()))));
 
         // Update methods do not work as transactional - manual cleanup required
         deviceRepository.deleteDevice(null, expected.getName(), null);
@@ -163,7 +192,7 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = InvalidDataAccessApiUsageException.class)
     public void testUpdateDeviceWithoutParametersThrows() {
-        // Given
+        // When
         deviceRepository.updateDevice(null, null, null, getTestDevice());
     }
 
@@ -174,35 +203,64 @@ public class DeviceRepositoryTest {
     @Test
     public void testUpdateDeviceReturnsUpdatedDevice() {
         // Given
-        Device initialDevice = getTestDevice();
+        Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device expected = getTestDevice();
         expected.setName("updated-name");
 
         // When
-        deviceRepository.addDevice(initialDevice);
         Device result = deviceRepository.updateDevice(null, initialDevice.getName(), null, expected);
 
         // Then
         assertThat(result.getName(), equalTo(expected.getName()));
+        assertThat(result.getAuthenticationKey(), equalTo(initialDevice.getAuthenticationKey()));
 
         // Update methods do not work as transactional - manual cleanup required
         deviceRepository.deleteDevice(null, result.getName(), null);
     }
 
     /**
-     * Test update device fails when foreign key conflicts
+     * Test update device fails when foreign key configuration_id conflicts
      */
-    @Test(expected = DataIntegrityViolationException.class)
     @Transactional
-    public void testUpdateDeviceThrowsWhenForeignKeyConflicts() {
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testUpdateDeviceThrowsWhenConfigurationIdConflicts() {
         // Given
-        Device device = getTestDevice();
+        Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device deviceWithConflict = getTestDevice();
         deviceWithConflict.setConfigurationId(999);
 
         // When
-        deviceRepository.addDevice(device);
-        deviceRepository.updateDevice(null, device.getName(), null, deviceWithConflict);
+        deviceRepository.updateDevice(null, initialDevice.getName(), null, deviceWithConflict);
+    }
+
+    /**
+     * Test update device fails when foreign key device_group_id conflicts
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testUpdateDeviceThrowsWhenDeviceGroupIdConflicts() {
+        // Given
+        Device initialDevice = deviceRepository.addDevice(getTestDevice());
+        Device deviceWithConflict = getTestDevice();
+        deviceWithConflict.setDeviceGroupId(999);
+
+        // When
+        deviceRepository.updateDevice(null, initialDevice.getName(), null, deviceWithConflict);
+    }
+
+    /**
+     * Test update device fails when foreign key device_type_id conflicts
+     */
+    @Transactional
+    @Test(expected = DataIntegrityViolationException.class)
+    public void testUpdateDeviceThrowsWhenDeviceTypeIdConflicts() {
+        // Given
+        Device initialDevice = deviceRepository.addDevice(getTestDevice());
+        Device deviceWithConflict = getTestDevice();
+        deviceWithConflict.setDeviceTypeId(999);
+
+        // When
+        deviceRepository.updateDevice(null, initialDevice.getName(), null, deviceWithConflict);
     }
 
     /**
@@ -212,14 +270,12 @@ public class DeviceRepositoryTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenNameNull() {
         // Given
-        Device initialDevice = getTestDevice();
+        Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device updateDevice = getTestDevice();
         updateDevice.setName(null);
 
         // When
-        deviceRepository.addDevice(initialDevice);
-        deviceRepository.addDevice(updateDevice);
-        deviceRepository.updateDevice(null, updateDevice.getName(), null, initialDevice);
+        deviceRepository.updateDevice(null, initialDevice.getName(), null, updateDevice);
     }
 
     /**
@@ -229,12 +285,11 @@ public class DeviceRepositoryTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenNameNotUnique() {
         // Given
-        Device initialDevice = getTestDevice();
+        Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device updateDevice = getTestDevice();
         updateDevice.setName("non-conflicting-name");
 
         // When
-        deviceRepository.addDevice(initialDevice);
         deviceRepository.addDevice(updateDevice);
         deviceRepository.updateDevice(null, updateDevice.getName(), null, initialDevice);
     }
@@ -246,12 +301,11 @@ public class DeviceRepositoryTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenNameTooLong() {
         // Given
-        Device initialDevice = getTestDevice();
+        Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device deviceWithLongName = getTestDevice();
         deviceWithLongName.setName(StringUtils.repeat("A", 51));
 
         // When
-        deviceRepository.addDevice(initialDevice);
         deviceRepository.updateDevice(null, initialDevice.getName(), null, deviceWithLongName);
     }
 
@@ -282,11 +336,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test
     public void testDeleteDeviceWithoutParametersWontDeleteAll() {
-        // Given
-        Device device = getTestDevice();
-
         // When
-        deviceRepository.addDevice(device);
+        deviceRepository.addDevice(getTestDevice());
         Collection<Device> resultsBefore = deviceRepository.getDevices(null, null, null, null, null, null);
         Boolean result = deviceRepository.deleteDevice(null, null, null);
         Collection<Device> resultsAfter = deviceRepository.getDevices(null, null, null, null, null, null);

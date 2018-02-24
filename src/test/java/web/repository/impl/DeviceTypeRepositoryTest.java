@@ -105,10 +105,9 @@ public class DeviceTypeRepositoryTest {
     @Test
     public void testGetDeviceTypesWithoutParametersReturnsInsertedDeviceType() {
         // Given
-        DeviceType expected = getTestDeviceType();
+        DeviceType expected = deviceTypeRepository.addDeviceType(getTestDeviceType());
 
         // When
-        deviceTypeRepository.addDeviceType(expected);
         Collection<DeviceType> results = deviceTypeRepository.getDeviceTypes(null, null, null);
 
         // Then
@@ -138,12 +137,11 @@ public class DeviceTypeRepositoryTest {
     @Test
     public void testUpdateDeviceTypeWithParametersWorks() {
         // Given
-        DeviceType initialDeviceType = getTestDeviceType();
+        DeviceType initialDeviceType = deviceTypeRepository.addDeviceType(getTestDeviceType());
         DeviceType expected = getTestDeviceType();
         expected.setName("updated-name");
 
         // When
-        deviceTypeRepository.addDeviceType(initialDeviceType);
         deviceTypeRepository.updateDeviceType(null, initialDeviceType.getName(), expected);
         Collection<DeviceType> results = deviceTypeRepository.getDeviceTypes(null, expected.getName(), null);
 
@@ -171,12 +169,11 @@ public class DeviceTypeRepositoryTest {
     @Test
     public void testUpdateDeviceTypeReturnsUpdatedDeviceType() {
         // Given
-        DeviceType initialDeviceType = getTestDeviceType();
+        DeviceType initialDeviceType = deviceTypeRepository.addDeviceType(getTestDeviceType());
         DeviceType expected = getTestDeviceType();
         expected.setName("updated-name");
 
         // When
-        deviceTypeRepository.addDeviceType(initialDeviceType);
         DeviceType result = deviceTypeRepository.updateDeviceType(null, initialDeviceType.getName(), expected);
 
         // Then
@@ -218,7 +215,7 @@ public class DeviceTypeRepositoryTest {
     }
 
     /**
-     * Test update_device_type fails when foreign key conflicts
+     * Test update_device_type fails when foreign key device_type_id conflicts
      */
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
@@ -226,12 +223,10 @@ public class DeviceTypeRepositoryTest {
         // Given
         DeviceType initialDeviceType = deviceTypeRepository.addDeviceType(getTestDeviceType());
         DeviceType updateDeviceType = getTestDeviceType();
-        updateDeviceType.setName("non-conflicting-name");
         updateDeviceType.setDeviceIconId(999);
 
         // When
-        deviceTypeRepository.addDeviceType(updateDeviceType);
-        deviceTypeRepository.updateDeviceType(null, updateDeviceType.getName(), initialDeviceType);
+        deviceTypeRepository.updateDeviceType(null, initialDeviceType.getName(), updateDeviceType);
     }
 
     /**
@@ -246,8 +241,7 @@ public class DeviceTypeRepositoryTest {
         updateDeviceType.setName(StringUtils.repeat("A", 51));
 
         // When
-        deviceTypeRepository.addDeviceType(updateDeviceType);
-        deviceTypeRepository.updateDeviceType(null, updateDeviceType.getName(), initialDeviceType);
+        deviceTypeRepository.updateDeviceType(null, initialDeviceType.getName(), updateDeviceType);
     }
 
     /**
@@ -277,11 +271,8 @@ public class DeviceTypeRepositoryTest {
     @Transactional
     @Test
     public void testDeleteDeviceTypeWithoutParametersWontDeleteAll() {
-        // Given
-        DeviceType deviceType = getTestDeviceType();
-
         // When
-        deviceTypeRepository.addDeviceType(deviceType);
+        deviceTypeRepository.addDeviceType(getTestDeviceType());
         Collection<DeviceType> resultsBefore = deviceTypeRepository.getDeviceTypes(null, null, null);
         Boolean result = deviceTypeRepository.deleteDeviceType(null, null);
         Collection<DeviceType> resultsAfter = deviceTypeRepository.getDeviceTypes(null, null, null);

@@ -94,11 +94,11 @@ public class DeviceGroupRepositoryTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceGroupThrowsWhenDescriptionTooLong() {
         // Given
-        DeviceGroup deviceGroupWithTooLongName = getTestDeviceGroup();
-        deviceGroupWithTooLongName.setDescription(StringUtils.repeat("A", 101));
+        DeviceGroup deviceGroupWithTooLongDescription = getTestDeviceGroup();
+        deviceGroupWithTooLongDescription.setDescription(StringUtils.repeat("A", 101));
 
         // When
-        deviceGroupRepository.addDeviceGroup(deviceGroupWithTooLongName);
+        deviceGroupRepository.addDeviceGroup(deviceGroupWithTooLongDescription);
     }
 
     /**
@@ -108,10 +108,9 @@ public class DeviceGroupRepositoryTest {
     @Test
     public void testGetDeviceGroupsWithoutParametersReturnsInsertedDeviceGroup() {
         // Given
-        DeviceGroup expected = getTestDeviceGroup();
+        DeviceGroup expected = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
 
         // When
-        deviceGroupRepository.addDeviceGroup(expected);
         Collection<DeviceGroup> results = deviceGroupRepository.getDeviceGroups(null, null);
 
         // Then
@@ -144,13 +143,12 @@ public class DeviceGroupRepositoryTest {
     @Test
     public void testUpdateDeviceGroupWithParametersWorks() {
         // Given
-        DeviceGroup initialDeviceGroup = getTestDeviceGroup();
+        DeviceGroup initialDeviceGroup = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         DeviceGroup expected = getTestDeviceGroup();
         expected.setName("updated-name");
         expected.setDescription("Updated description for testUpdateDeviceGroupReturnsUpdatedDeviceGroup");
 
         // When
-        deviceGroupRepository.addDeviceGroup(initialDeviceGroup);
         deviceGroupRepository.updateDeviceGroup(null, initialDeviceGroup.getName(), expected);
         Collection<DeviceGroup> results = deviceGroupRepository.getDeviceGroups(null, expected.getName());
 
@@ -168,7 +166,7 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = InvalidDataAccessApiUsageException.class)
     public void testUpdateDeviceGroupWithoutParametersThrows() {
-        // Given
+        // When
         deviceGroupRepository.updateDeviceGroup(null, null, getTestDeviceGroup());
     }
 
@@ -179,13 +177,12 @@ public class DeviceGroupRepositoryTest {
     @Test
     public void testUpdateDeviceGroupReturnsUpdatedDeviceGroup() {
         // Given
-        DeviceGroup initialDeviceGroup = getTestDeviceGroup();
+        DeviceGroup initialDeviceGroup = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         DeviceGroup expected = getTestDeviceGroup();
         expected.setName("updated-name");
         expected.setDescription("Updated description for testUpdateDeviceGroupReturnsUpdatedDeviceGroup");
 
         // When
-        deviceGroupRepository.addDeviceGroup(initialDeviceGroup);
         DeviceGroup result = deviceGroupRepository.updateDeviceGroup(null, initialDeviceGroup.getName(), expected);
 
         // Then
@@ -239,8 +236,7 @@ public class DeviceGroupRepositoryTest {
         updateDeviceGroup.setName(StringUtils.repeat("A", 51));
 
         // When
-        deviceGroupRepository.addDeviceGroup(updateDeviceGroup);
-        deviceGroupRepository.updateDeviceGroup(null, updateDeviceGroup.getName(), initialDeviceGroup);
+        deviceGroupRepository.updateDeviceGroup(null, initialDeviceGroup.getName(), updateDeviceGroup);
     }
 
     /**
@@ -255,8 +251,7 @@ public class DeviceGroupRepositoryTest {
         updateDeviceGroup.setDescription(StringUtils.repeat("A", 101));
 
         // When
-        deviceGroupRepository.addDeviceGroup(updateDeviceGroup);
-        deviceGroupRepository.updateDeviceGroup(null, updateDeviceGroup.getName(), initialDeviceGroup);
+        deviceGroupRepository.updateDeviceGroup(null, initialDeviceGroup.getName(), updateDeviceGroup);
     }
 
     /**
@@ -286,11 +281,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test
     public void testDeleteDeviceGroupWithoutParametersWontDeleteAll() {
-        // Given
-        DeviceGroup deviceGroup = getTestDeviceGroup();
-
         // When
-        deviceGroupRepository.addDeviceGroup(deviceGroup);
+        deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         Collection<DeviceGroup> resultsBefore = deviceGroupRepository.getDeviceGroups(null, null);
         Boolean result = deviceGroupRepository.deleteDeviceGroup(null, null);
         Collection<DeviceGroup> resultsAfter = deviceGroupRepository.getDeviceGroups(null, null);

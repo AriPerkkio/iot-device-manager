@@ -93,10 +93,9 @@ public class DeviceIconRepositoryTest {
     @Test
     public void testGetDeviceIconsWithoutParametersReturnsInsertedDeviceIcon() {
         // Given
-        DeviceIcon expected = getTestDeviceIcon();
+        DeviceIcon expected = deviceIconRepository.addDeviceIcon(getTestDeviceIcon());
 
         // When
-        deviceIconRepository.addDeviceIcon(expected);
         Collection<DeviceIcon> results = deviceIconRepository.getDeviceIcons(null, null);
 
         // Then
@@ -126,12 +125,11 @@ public class DeviceIconRepositoryTest {
     @Test
     public void testUpdateDeviceIconWithParametersWorks() {
         // Given
-        DeviceIcon initialDeviceIcon = getTestDeviceIcon();
+        DeviceIcon initialDeviceIcon = deviceIconRepository.addDeviceIcon(getTestDeviceIcon());
         DeviceIcon expected = getTestDeviceIcon();
         expected.setName("updated-name");
 
         // When
-        deviceIconRepository.addDeviceIcon(initialDeviceIcon);
         deviceIconRepository.updateDeviceIcon(null, initialDeviceIcon.getName(), expected);
         Collection<DeviceIcon> results = deviceIconRepository.getDeviceIcons(null, expected.getName());
 
@@ -148,7 +146,7 @@ public class DeviceIconRepositoryTest {
     @Transactional
     @Test (expected = InvalidDataAccessApiUsageException.class)
     public void testUpdateDeviceIconWithoutParametersThrows() {
-        // Given
+        // When
         deviceIconRepository.updateDeviceIcon(null, null, getTestDeviceIcon());
     }
 
@@ -159,12 +157,11 @@ public class DeviceIconRepositoryTest {
     @Test
     public void testUpdateDeviceIconReturnsUpdatedDeviceIcon() {
         // Given
-        DeviceIcon initialDeviceIcon = getTestDeviceIcon();
+        DeviceIcon initialDeviceIcon = deviceIconRepository.addDeviceIcon(getTestDeviceIcon());
         DeviceIcon expected = getTestDeviceIcon();
         expected.setName("updated-name");
 
         // When
-        deviceIconRepository.addDeviceIcon(initialDeviceIcon);
         DeviceIcon result = deviceIconRepository.updateDeviceIcon(null, initialDeviceIcon.getName(), expected);
 
         // Then
@@ -181,14 +178,12 @@ public class DeviceIconRepositoryTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceIconThrowsWhenNameNNull() {
         // Given
-        DeviceIcon initialDeviceIcon = getTestDeviceIcon();
+        DeviceIcon initialDeviceIcon = deviceIconRepository.addDeviceIcon(getTestDeviceIcon());
         DeviceIcon updateDeviceIcon = getTestDeviceIcon();
         updateDeviceIcon.setName(null);
 
         // When
-        deviceIconRepository.addDeviceIcon(initialDeviceIcon);
-        deviceIconRepository.addDeviceIcon(updateDeviceIcon);
-        deviceIconRepository.updateDeviceIcon(null, updateDeviceIcon.getName(), initialDeviceIcon);
+        deviceIconRepository.updateDeviceIcon(null, initialDeviceIcon.getName(), updateDeviceIcon);
     }
 
     /**
@@ -198,29 +193,27 @@ public class DeviceIconRepositoryTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceIconThrowsWhenNameNotUnique() {
         // Given
-        DeviceIcon initialDeviceIcon = getTestDeviceIcon();
+        DeviceIcon initialDeviceIcon = deviceIconRepository.addDeviceIcon(getTestDeviceIcon());
         DeviceIcon updateDeviceIcon = getTestDeviceIcon();
         updateDeviceIcon.setName("non-conflicting-name");
 
         // When
-        deviceIconRepository.addDeviceIcon(initialDeviceIcon);
         deviceIconRepository.addDeviceIcon(updateDeviceIcon);
         deviceIconRepository.updateDeviceIcon(null, updateDeviceIcon.getName(), initialDeviceIcon);
     }
 
     /**
-     * Test update_device_icon fails when unique key conflicts
+     * Test update_device_icon fails when name is too long
      */
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceIconThrowsWhenNameTooLong() {
         // Given
-        DeviceIcon initialDeviceIcon = getTestDeviceIcon();
+        DeviceIcon initialDeviceIcon = deviceIconRepository.addDeviceIcon(getTestDeviceIcon());
         DeviceIcon deviceIconWithLongName = getTestDeviceIcon();
         deviceIconWithLongName.setName(StringUtils.repeat("A", 26));
 
         // When
-        deviceIconRepository.addDeviceIcon(initialDeviceIcon);
         deviceIconRepository.updateDeviceIcon(null, initialDeviceIcon.getName(), deviceIconWithLongName);
     }
 
@@ -252,11 +245,8 @@ public class DeviceIconRepositoryTest {
     @Transactional
     @Test
     public void testDeleteDeviceIconWithoutParametersWontDeleteAll() {
-        // Given
-        DeviceIcon deviceIcon = getTestDeviceIcon();
-
         // When
-        deviceIconRepository.addDeviceIcon(deviceIcon);
+        deviceIconRepository.addDeviceIcon(getTestDeviceIcon());
         Collection<DeviceIcon> resultsBefore = deviceIconRepository.getDeviceIcons(null, null);
         Boolean result = deviceIconRepository.deleteDeviceIcon(null, null);
         Collection<DeviceIcon> resultsAfter = deviceIconRepository.getDeviceIcons(null, null);
