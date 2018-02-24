@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import web.domain.entity.Device;
@@ -131,6 +132,39 @@ public class DeviceRepositoryTest {
 
         // Then
         assertThat(resultDevices, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
+    }
+
+    /**
+     * Test update device with parameters works
+     * Note: Not @Transactional due to update operation usage
+     */
+    @Test
+    public void testUpdateDeviceWithParametersWorks() {
+        // Given
+        Device initialDevice = getTestDevice();
+        Device expected = getTestDevice();
+        expected.setName("updated-name");
+
+        // When
+        deviceRepository.addDevice(initialDevice);
+        deviceRepository.updateDevice(null, initialDevice.getName(), null, expected);
+        Collection<Device> results = deviceRepository.getDevices(null, expected.getName(), null, null, null, null);
+
+        // Then
+        assertThat(results, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
+
+        // Update methods do not work as transactional - manual cleanup required
+        deviceRepository.deleteDevice(null, expected.getName(), null);
+    }
+
+    /**
+     * Test update_device without parameters fails
+     */
+    @Transactional
+    @Test(expected = InvalidDataAccessApiUsageException.class)
+    public void testUpdateDeviceWithoutParametersThrows() {
+        // Given
+        deviceRepository.updateDevice(null, null, null, getTestDevice());
     }
 
     /**

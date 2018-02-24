@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import web.domain.entity.DeviceIcon;
@@ -116,6 +117,39 @@ public class DeviceIconRepositoryTest {
 
         // Then
         assertThat(results, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
+    }
+
+    /**
+     * Test update_device_icon with parameters works
+     * Note: Not @Transactional due to update operation usage
+     */
+    @Test
+    public void testUpdateDeviceIconWithParametersWorks() {
+        // Given
+        DeviceIcon initialDeviceIcon = getTestDeviceIcon();
+        DeviceIcon expected = getTestDeviceIcon();
+        expected.setName("updated-name");
+
+        // When
+        deviceIconRepository.addDeviceIcon(initialDeviceIcon);
+        deviceIconRepository.updateDeviceIcon(null, initialDeviceIcon.getName(), expected);
+        Collection<DeviceIcon> results = deviceIconRepository.getDeviceIcons(null, expected.getName());
+
+        // Then
+        assertThat(results, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
+
+        // Update methods do not work as transactional - manual cleanup required
+        deviceIconRepository.deleteDeviceIcon(null, expected.getName());
+    }
+
+    /**
+     * Test update_device_icon without parameters fails
+     */
+    @Transactional
+    @Test (expected = InvalidDataAccessApiUsageException.class)
+    public void testUpdateDeviceIconWithoutParametersThrows() {
+        // Given
+        deviceIconRepository.updateDeviceIcon(null, null, getTestDeviceIcon());
     }
 
     /**

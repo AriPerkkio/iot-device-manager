@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import web.domain.entity.DeviceGroup;
@@ -134,6 +135,41 @@ public class DeviceGroupRepositoryTest {
         // Then
         assertThat(results, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
         assertThat(results, IsCollectionContaining.hasItem(hasProperty("description", equalTo(expected.getDescription()))));
+    }
+
+    /**
+     * Test update_device_group with parameters works
+     * Note: Not @Transactional due to update operation usage
+     */
+    @Test
+    public void testUpdateDeviceGroupWithParametersWorks() {
+        // Given
+        DeviceGroup initialDeviceGroup = getTestDeviceGroup();
+        DeviceGroup expected = getTestDeviceGroup();
+        expected.setName("updated-name");
+        expected.setDescription("Updated description for testUpdateDeviceGroupReturnsUpdatedDeviceGroup");
+
+        // When
+        deviceGroupRepository.addDeviceGroup(initialDeviceGroup);
+        deviceGroupRepository.updateDeviceGroup(null, initialDeviceGroup.getName(), expected);
+        Collection<DeviceGroup> results = deviceGroupRepository.getDeviceGroups(null, expected.getName());
+
+        // Then
+        assertThat(results, IsCollectionContaining.hasItem(hasProperty("name", equalTo(expected.getName()))));
+        assertThat(results, IsCollectionContaining.hasItem(hasProperty("description", equalTo(expected.getDescription()))));
+
+        // Update methods do not work as transactional - manual cleanup required
+        deviceGroupRepository.deleteDeviceGroup(null, expected.getName());
+    }
+
+    /**
+     * Test update_device_group without parameters fails
+     */
+    @Transactional
+    @Test(expected = InvalidDataAccessApiUsageException.class)
+    public void testUpdateDeviceGroupWithoutParametersThrows() {
+        // Given
+        deviceGroupRepository.updateDeviceGroup(null, null, getTestDeviceGroup());
     }
 
     /**
