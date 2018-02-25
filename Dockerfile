@@ -1,5 +1,5 @@
 # docker build -t iotdevicemanager . --build-arg DB_PASS=<add-client-pass>
-# docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-idm iotdevicemanager bash
+# docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-idm iotdevicemanager
 FROM ubuntu:16.04
 
 ARG DB_PASS=${DB_PASS}
@@ -26,14 +26,13 @@ RUN apt-get update && apt-get install -y \
 
 RUN mkdir /home/user && \
     cd /home/user && \
-    mv /home/iot-device-manager . && \
     git clone https://github.com/AriPerkkio/iot-device-manager.git && \
     cd iot-device-manager && \
-    sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/main/resources/application.properties &&\
-    sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/test/resources/application.properties &&\
+    sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/main/resources/application.properties && \
+    sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/test/resources/application.properties && \
     npm install && \
-    npm run build && \
-    mvn package && \
-    mv target/iot-device-manager-*.jar /home/user/iot-device-manager.jar
+    npm run build
 
-CMD ["java","-jar","/home/user/iot-device-manager.jar"]
+CMD cd /home/user/iot-device-manager && \
+    mvn package && \
+    java -jar target/iot-device-manager-*.jar
