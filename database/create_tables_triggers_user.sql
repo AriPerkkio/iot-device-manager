@@ -76,6 +76,6 @@ DELIMITER ;
 /***** USER *****/
 
 /* TODO environment credentials */
-CREATE USER IF NOT EXISTS 'iot-device-manager-client'@'%' identified by 'client';
+CREATE USER IF NOT EXISTS 'iot-device-manager-client'@'%' IDENTIFIED BY '<mysql-user-password>' PASSWORD EXPIRE NEVER;
 
 GRANT SELECT ON mysql.proc TO 'iot-device-manager-client'@'%';
