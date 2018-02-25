@@ -17,11 +17,9 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <tomcat.version>8.0.32</tomcat.version>
         <thymeleaf.version>3.0.2.RELEASE</thymeleaf.version>
         <thymeleaf-layout-dialect.version>2.1.1</thymeleaf-layout-dialect.version>
     </properties>
-    <packaging>war</packaging>
 
     <dependencies>
         <!-- Spring -->
@@ -46,12 +44,6 @@
             <groupId>com.vladmihalcea</groupId>
             <artifactId>hibernate-types-5</artifactId>
             <version>2.0.0</version>
-        </dependency>
-        <!-- Comment out tomcat container dependency when developing in order to run app in IDEA -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
         </dependency>
         <!-- MySQL -->
         <dependency>
@@ -78,7 +70,6 @@
         </dependency>
     </dependencies>
 
-    <!-- Package as an executable jar -->
     <build>
         <plugins>
 

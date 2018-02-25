@@ -1,6 +1,9 @@
-# docker build -t iotdevicemanager . 
+# docker build -t iotdevicemanager . --build-arg DB_PASS=<add-client-pass>
 # docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-idm iotdevicemanager bash
 FROM ubuntu:16.04
+
+ARG DB_PASS=${DB_PASS}
+ENV DB_PASS=${DB_PASS}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
@@ -19,28 +22,18 @@ RUN apt-get update && apt-get install -y \
     openjdk-8-jdk \
     maven \
     nodejs \
-    git \
-    wget \
-    tar
+    git
 
-# TODO archived version
-# Tomcat
-RUN cd /opt && \
-    wget http://www.nic.funet.fi/pub/mirrors/apache.org/tomcat/tomcat-9/v9.0.4/bin/apache-tomcat-9.0.4.tar.gz && \
-    tar xzf apache-tomcat-9.0.4.tar.gz && \
-    mv apache-tomcat-9.0.4 tomcat9
-
-# TODO ENV credentials
 RUN mkdir /home/user && \
     cd /home/user && \
+    mv /home/iot-device-manager . && \
     git clone https://github.com/AriPerkkio/iot-device-manager.git && \
     cd iot-device-manager && \
+    sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/main/resources/application.properties &&\
+    sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/test/resources/application.properties &&\
     npm install && \
     npm run build && \
     mvn package && \
-    mv target/iot-device-manager-*.war /opt/tomcat9/webapps/iot-device-manager.war
+    mv target/iot-device-manager-*.jar /home/user/iot-device-manager.jar
 
-# TODO
-# CMD ['/opt/tomcat9/bin/startup.sh']
-
-CMD ['bash']
+CMD ["java","-jar","/home/user/iot-device-manager.jar"]
