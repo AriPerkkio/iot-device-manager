@@ -24,6 +24,7 @@ ${device_icon_name renamed}   robot-renamed-icon.png
 # Location
 ${latitude}    52
 ${longitude}   5
+# Shared with Measurement
 ${f_start_time}   2000-01-01 00:00:10
 ${time}           2000-01-01 00:00:20
 ${f_end_time}     2000-01-01 00:00:30
@@ -32,6 +33,7 @@ ${f_end_time}     2000-01-01 00:00:30
 ${configuration_name}           robot-configuration
 ${configuration_name renamed}   robot-configuration-renamed
 ${configuration_description}    Configuration created by tests
+# Shared with Measurement
 ${content}           {"IS_TEST": "TRUE"}
 
 *** Test Cases ***
@@ -43,6 +45,7 @@ Verify Tables Exist
     Table Must Exist    device_icon
     Table Must Exist    configuration
     Table Must Exist    location
+    Table Must Exist    measurement
     Terminate Connection
 
 Verify Procedures Exist
@@ -56,18 +59,21 @@ Verify Procedures Exist
     Should Contain X Times    ${results}    add_device_icon         1
     Should Contain X Times    ${results}    add_device_type         1
     Should Contain X Times    ${results}    add_location            1
+    Should Contain X Times    ${results}    add_measurement         1
     Should Contain X Times    ${results}    delete_configuration    1
     Should Contain X Times    ${results}    delete_device           1
     Should Contain X Times    ${results}    delete_device_group     1
     Should Contain X Times    ${results}    delete_device_icon      1
     Should Contain X Times    ${results}    delete_device_type      1
     Should Contain X Times    ${results}    delete_locations        1
+    Should Contain X Times    ${results}    delete_measurements     1
     Should Contain X Times    ${results}    get_configurations      1
     Should Contain X Times    ${results}    get_devices             1
     Should Contain X Times    ${results}    get_device_groups       1
     Should Contain X Times    ${results}    get_device_icons        1
     Should Contain X Times    ${results}    get_device_types        1
     Should Contain X Times    ${results}    get_locations           1
+    Should Contain X Times    ${results}    get_measurements        1
     Should Contain X Times    ${results}    update_configuration    1
     Should Contain X Times    ${results}    update_device           1
     Should Contain X Times    ${results}    update_device_group     1
@@ -262,6 +268,39 @@ Verify Location Stored Procedures Work As Expected
     Delete Location  ${device_id}  NULL  NULL  NULL
     ${get_location result} =    Get Location  ${device_id}  NULL  NULL  NULL
     Should Be Equal    ${get_location result}  ${None}
+
+    Delete Device  ${device_id}  NULL  NULL
+    Terminate Connection
+
+Verify Measurement Stored Procedures Work As Expected
+    Setup Connection
+
+    # Create device used for measurement tests
+    ${add_device result} =    Add Device  "${device_name}"  NULL  NULL  NULL
+    ${device_id} =    Get From Dictionary    ${add_device result}  id
+
+    Log    Verify add_measurement returns inserted measurement
+    ${add_measurement result} =    Add Measurement  ${device_id}  '${content}'  "${time}"
+    Dictionary Should Contain Key   ${add_measurement result}  id
+    Dictionary Should Contain Item  ${add_measurement result}  content      ${content}
+    Dictionary Should Contain Item  ${add_measurement result}  time         ${time}
+
+    Log    Verify get_measurements finds measurement using exact time
+    ${get_measurement result} =    Get Measurement  ${device_id}  "${time}"  NULL  NULL
+    Dictionary Should Contain Key   ${get_measurement result}  id
+    Dictionary Should Contain Item  ${add_measurement result}  content      ${content}
+    Dictionary Should Contain Item  ${get_measurement result}  time         ${time}
+
+    Log    Verify get_measurements finds measurement using time range
+    ${get_measurement result} =    Get Measurement  ${device_id}  NULL  "${f_start_time}"  "${f_end_time}"
+    Dictionary Should Contain Key   ${get_measurement result}  id
+    Dictionary Should Contain Item  ${add_measurement result}  content      ${content}
+    Dictionary Should Contain Item  ${get_measurement result}  time         ${time}
+
+    Log    Verify measurement is not found after delete_measurements
+    Delete Measurement  ${device_id}  NULL  NULL  NULL
+    ${get_measurement result} =    Get Measurement  ${device_id}  NULL  NULL  NULL
+    Should Be Equal    ${get_measurement result}  ${None}
 
     Delete Device  ${device_id}  NULL  NULL
     Terminate Connection

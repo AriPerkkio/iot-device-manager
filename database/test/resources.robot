@@ -23,6 +23,7 @@ Setup Database
     Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_device.sql
     Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_device_type.sql
     Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_location.sql
+    Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../procedures_measurement.sql
     Run    mysql -u ${Username} -p${Password} -Dtestiotdevicemanager < ../mockdata.sql
 
 Teardown Database
@@ -274,4 +275,36 @@ Get Location
 Delete Location
     [Arguments]    ${f_device_id}  ${f_exact_time}  ${f_start_time}  ${f_end_time}
     @{QueryResults} =    Query    CALL delete_locations(${f_device_id}, ${f_exact_time}, ${f_start_time}, ${f_end_time})
+    [Return]    ${QueryResults[0][0]}
+
+### MEASUREMENT ###
+
+Map Result To Measurement
+    [Arguments]    ${result}
+    ${mapped measurement} =  Create Dictionary
+    ...  id=${result[0]}
+    ...  content=${result[1]}
+    ...  time=${result[2]}
+    [Return]    ${mapped measurement}
+
+Add Measurement
+    [Arguments]    ${p_device_id}  ${p_content}  ${p_time}
+    @{QueryResults} =    Query    CALL add_measurement(${p_device_id}, ${p_content}, ${p_time})
+    ${added_measurement} =    Map Result To Measurement  ${QueryResults[0]}
+    [Return]    ${added_measurement}
+
+Get Measurement
+    [Arguments]    ${f_device_id}  ${f_exact_time}  ${f_start_time}  ${f_end_time}
+    @{QueryResults} =    Query    CALL get_measurements(${f_device_id}, ${f_exact_time}, ${f_start_time}, ${f_end_time})
+    ${length} =    Get Length  ${QueryResults}
+
+    # Map results when resultset contains items
+    ${fetched_measurement} =  Run Keyword If  ${length} != 0
+    ...  Map Result To Measurement    ${QueryResults[0]}
+
+    [Return]    ${fetched_measurement}
+
+Delete Measurement
+    [Arguments]    ${f_device_id}  ${f_exact_time}  ${f_start_time}  ${f_end_time}
+    @{QueryResults} =    Query    CALL delete_measurements(${f_device_id}, ${f_exact_time}, ${f_start_time}, ${f_end_time})
     [Return]    ${QueryResults[0][0]}
