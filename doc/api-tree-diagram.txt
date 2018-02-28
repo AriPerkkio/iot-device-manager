@@ -1,0 +1,29 @@
+/api/v1
+|
+├── devices
+|  ├── group
+|  ├── type
+|  ├── icon
+|  ├── configuration
+|  ├── measurements
+|  ├── locations
+|
+├── groups
+|  ├── devices
+|  ├── measurements
+|  ├── locations
+|
+├── configurations
+|  ├── devices
+|
+├── device-types
+|  ├── devices
+|  ├── icon
+|
+├── device-icons
+|  ├── types
+|
+├── locations
+|
+├── measurements
+|
