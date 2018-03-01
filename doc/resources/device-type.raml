@@ -29,7 +29,7 @@ get:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Parameter validation error",
                 "code": "1001",
@@ -44,7 +44,7 @@ get:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "No items found",
                 "code": "1002",
@@ -53,13 +53,13 @@ get:
             }
           }
     500:
-      description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+      description: Internal errors occured, e.g. unable to connect to database.
       body:
         application/vnd.collection+json:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Internal error",
                 "code": "1003",
@@ -94,7 +94,7 @@ post:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Parameter validation error",
                 "code": "1001",
@@ -109,7 +109,7 @@ post:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Parameter conflict",
                 "code": "1004",
@@ -118,13 +118,13 @@ post:
             }
           }
     500:
-      description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+      description: Internal errors occured, e.g. unable to connect to database.
       body:
         application/vnd.collection+json:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Internal error",
                 "code": "1003",
@@ -171,7 +171,7 @@ put:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Parameter validation error",
                 "code": "1001",
@@ -186,7 +186,7 @@ put:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "No items found",
                 "code": "1002",
@@ -201,7 +201,7 @@ put:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Parameter conflict",
                 "code": "1004",
@@ -210,13 +210,13 @@ put:
             }
           }
     500:
-      description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+      description: Internal errors occured, e.g. unable to connect to database.
       body:
         application/vnd.collection+json:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Internal error",
                 "code": "1003",
@@ -251,7 +251,7 @@ delete:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Parameter validation error",
                 "code": "1001",
@@ -266,7 +266,7 @@ delete:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "No items found",
                 "code": "1002",
@@ -275,13 +275,13 @@ delete:
             }
           }
     500:
-      description: Internal errors occured, e.g. unable to connect to database. Technical descriptions are not leaked to client.
+      description: Internal errors occured, e.g. unable to connect to database.
       body:
         application/vnd.collection+json:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/device-type",
+              "href" : "http://localhost:8080/api/v1/device-types",
               "error": {
                 "title": "Internal error",
                 "code": "1003",

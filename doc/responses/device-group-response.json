@@ -1,10 +1,10 @@
 {
   "collection" : {
     "version" : "1.0",
-    "href" : "http://localhost:8080/api/device-group",
+    "href" : "http://localhost:8080/api/v1/device-groups",
     "items": [
       {
-        "href": "http://localhost:8080/api/device-group?name=example-group",
+        "href": "http://localhost:8080/api/v1/device-group/1",
         "data": [
           { "name": "id", "value": "1", "prompt": "Identifier" },
           { "name": "name", "value": "example-group", "prompt": "Group name" },
@@ -13,7 +13,9 @@
       }
     ],
     "links": [
-      { "rel": "devices", "href":"http://localhost:8080/api/device?deviceGroup=1", "prompt": "Devices" }
+      { "rel": "devices", "href":"http://localhost:8080/api/v1/device-groups/1/devices", "prompt": "Devices" },
+      { "rel": "measurements", "href":"http://localhost:8080/api/v1/device-groups/1/measurements", "prompt": "Measurements" },
+      { "rel": "locations", "href":"http://localhost:8080/api/v1/device-groups/1/locations", "prompt": "Locations" }
     ],
     "template": {
       "data": [
@@ -24,7 +26,7 @@
     "queries": [
       {
         "rel": "search",
-        "href":"http://localhost:8080/api/device-group",
+        "href":"http://localhost:8080/api/v1/device-groups",
         "prompt":"Search",
         "data": [
           { "name": "id", "value": "" },

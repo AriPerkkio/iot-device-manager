@@ -8,7 +8,7 @@
 |  ├── measurements
 |  ├── locations
 |
-├── groups
+├── device-groups
 |  ├── devices
 |  ├── measurements
 |  ├── locations

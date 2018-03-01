@@ -1,7 +1,7 @@
 #%RAML 1.0
 title: iot-device-manager
 mediaType: application/vnd.collection+json
-baseUri: http://localhost:8080/rest
+baseUri: http://localhost:8080/api/v1
 types:
   Device:
     type: object
@@ -75,11 +75,26 @@ types:
       deviceId:
         description: Device id
         type: number
-      coordinates:
-        description: Coordinates of location
-        type: string
+      latitude:
+        description: Latitude of coordinates
+        type: number
+      longitude:
+        description: Longitude of coordinates
+        type: number
       time:
         description: Time of location update
+        type: string
+  Measurement:
+    type: object
+    properties:
+      deviceId:
+        description: Device id
+        type: number
+      content:
+        description: Content as JSON string
+        type: string
+      time:
+        description: Time of the measurement
         type: string
   Configuration:
     type: object
@@ -97,13 +112,59 @@ types:
         type: string
         maxLength: 100
         pattern: "[A-Za-z0-9_ .,-]{1,100}"
-      jsonConfiguration:
+      content:
         description: Configuration's content as JSON
         type: string
 
-/device: !include resources/device.raml
-/device-group: !include resources/device-group.raml
-/device-icon: !include resources/device-icon.raml
-/device-type: !include resources/device-type.raml
-/location: !include resources/location.raml
-/configuration: !include resources/configuration.raml
+/devices:
+  /: !include resources/device.raml
+  /{id}:
+    uriParameters:
+      id:
+        type: number
+        description: Device ID
+    /group: !include resources/device-group.raml
+    /type: !include resources/device-type.raml
+    /icon: !include resources/device-icon.raml
+    /configuration: !include resources/configuration.raml
+    /measurements: !include resources/configuration.raml
+    /locations: !include resources/location.raml
+/device-groups:
+  /: !include resources/device-group.raml
+  /{id}:
+    uriParameters:
+      id:
+        type: number
+        description: Device Group ID
+    /devices: !include resources/device.raml
+    /measurements: !include resources/configuration.raml
+    /locations: !include resources/location.raml
+/device-types:
+  /: !include resources/device-type.raml
+  /{id}:
+    uriParameters:
+      id:
+        type: number
+        description: Device Type ID
+    /devices: !include resources/device.raml
+    /icon: !include resources/device-icon.raml
+/device-icons:
+  /: !include resources/device-icon.raml
+  /{id}:
+    uriParameters:
+      id:
+        type: number
+        description: Device Icon ID
+    /types: !include resources/device-type.raml
+  /{icon-name}:
+    uriParameters:
+      icon-name:
+        type: string
+        description: Icon name
+        example: example-icon.png
+        maxLength: 25
+        pattern: "^[A-Za-z0-9-_]{1,25}.(png)$"
+    /: !include resources/device-icon-file.raml
+/locations: !include resources/location.raml
+/configurations: !include resources/configuration.raml
+/measurements: !include resources/measurements.raml

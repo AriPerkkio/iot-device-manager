@@ -1,10 +1,10 @@
 {
   "collection" : {
     "version" : "1.0",
-    "href" : "http://localhost:8080/api/device-icon",
+    "href" : "http://localhost:8080/api/v1/device-icons",
     "items": [
       {
-        "href": "http://localhost:8080/api/device-icon?name=example-icon.png",
+        "href": "http://localhost:8080/api/v1/device-icons/1",
         "data": [
           { "name": "id", "value": "1", "prompt": "Identifier" },
           { "name": "name", "value": "example-icon.png", "prompt": "Icon name" }
@@ -12,12 +12,12 @@
       }
     ],
     "links": [
-      { "rel": "type", "href":"http://localhost:8080/api/device-type?deviceIconId=1", "prompt": "Device Type" }
+      { "rel": "types", "href":"http://localhost:8080/api/v1/device-icons/1/types", "prompt": "Device Types" }
     ],
     "queries": [
       {
         "rel": "search",
-        "href":"http://localhost:8080/api/device-icon",
+        "href":"http://localhost:8080/api/v1/device-icons",
         "prompt":"Search",
         "data": [
           { "name": "id", "value": "" },
@@ -26,7 +26,7 @@
       },
       {
         "rel": "image",
-        "href":"http://localhost:8080/api/device-icon/{image-name}",
+        "href":"http://localhost:8080/api/v1/device-icons/{name}",
         "prompt":"Search image"
       }
     ]

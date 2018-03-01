@@ -1,32 +1,32 @@
 {
   "collection" : {
     "version" : "1.0",
-    "href" : "http://localhost:8080/api/configuration",
+    "href" : "http://localhost:8080/api/v1/configurations",
     "items": [
       {
-        "href": "http://localhost:8080/api/configuration?name=example-configuration",
+        "href": "http://localhost:8080/api/v1/configurations/1",
         "data": [
           { "name": "id", "value": "1", "prompt": "Configuration Identifier" },
           { "name": "name", "value": "example-configuration", "prompt": "Name" },
           { "name": "description", "value": "Description of example configuration", "prompt": "Description" },
-          { "name": "jsonConfiguration", "value": "{\"IS_TEST\": \"TRUE\"}", "prompt": "Configuration as JSON" }
+          { "name": "content", "value": "{\"IS_TEST\": \"TRUE\"}", "prompt": "Configuration as JSON" }
         ]
       }
     ],
     "links": [
-      { "rel": "device", "href": "http://localhost:8080/api/device?configurationId=1", "prompt": "Device" }
+      { "rel": "devices", "href": "http://localhost:8080/api/v1/configurations/1/devices", "prompt": "Devices" }
     ],
     "template": {
       "data": [
         { "name": "name", "value": "", "prompt": "Name"},
         { "name": "description", "value": "", "prompt": "Description"},
-        { "name": "jsonConfiguration", "value": "", "prompt": "Configuration as JSON"}
+        { "name": "content", "value": "", "prompt": "Configuration as JSON"}
       ]
     },
     "queries": [
       {
         "rel": "search",
-        "href":"http://localhost:8080/api/configuration",
+        "href":"http://localhost:8080/api/v1/configurations",
         "prompt":"Search",
         "data": [
           { "name": "id", "value": "" },

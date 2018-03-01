@@ -1,31 +1,33 @@
 {
   "collection" : {
     "version" : "1.0",
-    "href" : "http://localhost:8080/api/location",
+    "href" : "http://localhost:8080/api/v1/locations",
     "items": [
       {
-        "href": "http://localhost:8080/api/location?deviceId=1",
+        "href": "http://localhost:8080/api/v1/locations?deviceId=1",
         "data": [
           { "name": "deviceId", "value": "1", "prompt": "Device Identifier" },
-          { "name": "coordinates", "value": "52.0800409,5.1273094", "prompt": "Coordinates" },
+          { "name": "latitude", "value": "5.1273094", "prompt": "Latitude" },
+          { "name": "longitude", "value": "52.0800409", "prompt": "Longitude" },
           { "name": "time", "value": "2000-01-01 00:00:10", "prompt": "Timestamp" }
         ]
       }
     ],
     "links": [
-      { "rel": "device", "href": "http://localhost:8080/api/device?deviceId=1", "prompt": "Device" }
+      { "rel": "device", "href": "http://localhost:8080/api/v1/device?deviceId=1", "prompt": "Device" }
     ],
     "template": {
       "data": [
         { "name": "deviceId", "value": "", "prompt": "Device Identifier"},
-        { "name": "coordinates", "value": "", "prompt": "Coordinates"},
+        { "name": "latitude", "value": "", "prompt": "Latitude"},
+        { "name": "longitude", "value": "", "prompt": "Longitude"},
         { "name": "time", "value": "", "prompt": "Timestamp"}
       ]
     },
     "queries": [
       {
         "rel": "search",
-        "href":"http://localhost:8080/api/location",
+        "href":"http://localhost:8080/api/v1/locations",
         "prompt":"Search",
         "data": [
           { "name": "deviceId", "value": "" },

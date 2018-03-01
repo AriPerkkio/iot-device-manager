@@ -1,5 +1,5 @@
 get:
-  description: Get locations matching parameters
+  description: Get measurements matching parameters
   queryParameters:
     deviceId:
       description: Device id used as filter
@@ -19,11 +19,11 @@ get:
       required: false
   responses:
     200:
-      description: Locations succesfully found
+      description: Measurements succesfully found
       body:
         application/vnd.collection+json:
-          type: Location
-          example: !include ../responses/location-response.json
+          type: Measurement
+          example: !include ../responses/measurements-response.json
     400:
       description: Request contains errors, e.g. invalid parameters
       body:
@@ -31,7 +31,7 @@ get:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/v1/locations",
+              "href" : "http://localhost:8080/api/v1/measurements",
               "error": {
                 "title": "Parameter validation error",
                 "code": "1001",
@@ -40,13 +40,13 @@ get:
             }
           }
     404:
-      description: No locations found matching given parameters
+      description: No measurements found matching given parameters
       body:
         application/vnd.collection+json:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/v1/locations",
+              "href" : "http://localhost:8080/api/v1/measurements",
               "error": {
                 "title": "No items found",
                 "code": "1002",
@@ -61,7 +61,7 @@ get:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/v1/locations",
+              "href" : "http://localhost:8080/api/v1/measurements",
               "error": {
                 "title": "Internal error",
                 "code": "1003",
@@ -70,7 +70,7 @@ get:
             }
           }
 post:
-  description: Add location with given parameters
+  description: Add measurement with given parameters
   headers:
     x-authentication-key:
       description: Device's authentication key. Required if id is not present in request parameters
@@ -81,20 +81,20 @@ post:
         deviceId:
           description: Device id. Required if authenticationKey is not present in headers
           type: number
-        coordinates:
-          description: Coordinates of location
+        content:
+          description: Content of measurement
           type: string
         time:
-          description: Time of location update. Current time is used if not defined.
+          description: Time of measurement update. Current time is used if not defined.
           type: string
           required: false
   responses:
     201:
-      description: Location succesfully added. Returns inserted location
+      description: Measurement succesfully added. Returns inserted measurement
       body:
         application/vnd.collection+json:
-          type: Location
-          example: !include ../responses/location-response.json
+          type: Measurement
+          example: !include ../responses/measurement-response.json
     400:
       description: Request contains errors, e.g. invalid parameters
       body:
@@ -102,7 +102,7 @@ post:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/v1/locations",
+              "href" : "http://localhost:8080/api/v1/measurements",
               "error": {
                 "title": "Parameter validation error",
                 "code": "1001",
@@ -117,7 +117,7 @@ post:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/v1/locations",
+              "href" : "http://localhost:8080/api/v1/measurements",
               "error": {
                 "title": "Internal error",
                 "code": "1003",
@@ -126,7 +126,7 @@ post:
             }
           }
 delete:
-  description: Delete locations matching parameters
+  description: Delete measurements matching parameters
   queryParameters:
     deviceId:
       description: Device id used as filter. Required if other request parameters are not present.
@@ -146,7 +146,7 @@ delete:
       required: false
   responses:
     204:
-      description: Locations successfully removed
+      description: Measurements successfully removed
     400:
       description: Request contains errors, e.g. invalid parameters
       body:
@@ -154,7 +154,7 @@ delete:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/v1/locations",
+              "href" : "http://localhost:8080/api/v1/measurements",
               "error": {
                 "title": "Parameter validation error",
                 "code": "1001",
@@ -169,7 +169,7 @@ delete:
           example: {
             "collection": {
               "version": "1.0",
-              "href" : "http://localhost:8080/api/v1/locations",
+              "href" : "http://localhost:8080/api/v1/measurements",
               "error": {
                 "title": "Internal error",
                 "code": "1003",
