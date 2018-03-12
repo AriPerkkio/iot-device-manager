@@ -5,6 +5,7 @@ import web.domain.entity.Device;
 import web.domain.response.ResponseWrapper;
 import web.repository.DeviceRepository;
 import web.service.DeviceService;
+import web.validators.FilterValidator;
 
 import java.util.Collections;
 
@@ -30,7 +31,6 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         return response;
-
     }
 
     @Override
@@ -51,8 +51,23 @@ public class DeviceServiceImpl implements DeviceService {
         ResponseWrapper response = new ResponseWrapper();
 
         try {
+            FilterValidator.checkForMinimumFilters(id, name, authenticationKey);
             response.setPayload(deviceRepository.updateDevice(id, name, authenticationKey, device));
         } catch(Exception e) {
+            response.setErrors(Collections.singleton(e.toString()));
+        }
+
+        return response;
+    }
+
+    @Override
+    public ResponseWrapper deleteDevice(Integer id, String name, String authenticationKey) {
+        ResponseWrapper response = new ResponseWrapper();
+
+        try {
+            FilterValidator.checkForMinimumFilters(id, name, authenticationKey);
+            response.setPayload(deviceRepository.deleteDevice(id, name, authenticationKey));
+        } catch (Exception e) {
             response.setErrors(Collections.singleton(e.toString()));
         }
 

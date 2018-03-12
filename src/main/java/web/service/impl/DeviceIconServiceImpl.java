@@ -9,6 +9,7 @@ import web.domain.entity.DeviceIcon;
 import web.domain.response.ResponseWrapper;
 import web.repository.DeviceIconRepository;
 import web.service.DeviceIconService;
+import web.validators.FilterValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,17 +34,13 @@ public class DeviceIconServiceImpl implements DeviceIconService {
     }
 
     @Override
-    public ResponseWrapper uploadDeviceIcon(MultipartFile icon, String name) {
+    public ResponseWrapper addDeviceIcon(MultipartFile icon, String name) {
         ResponseWrapper responseWrapper = new ResponseWrapper();
-        DeviceIcon deviceIcon = new DeviceIcon();
-        deviceIcon.setName(name);
 
         try {
-            validateFilename(deviceIcon);
-            validateFilenameIsUnique(deviceIcon);
+            DeviceIcon deviceIcon = new DeviceIcon(null, name);
 
             Files.copy(icon.getInputStream(), path.resolve(deviceIcon.getName()));
-
             responseWrapper.setPayload(deviceIconRepository.addDeviceIcon(deviceIcon));
         } catch (Exception e) {
             responseWrapper.setErrors(Collections.singletonList(e.toString()));
@@ -53,20 +50,55 @@ public class DeviceIconServiceImpl implements DeviceIconService {
     }
 
     @Override
-    public Resource getDeviceIcon(DeviceIcon deviceIcon) {
+    public Boolean deleteDeviceIcon(Integer id, String name) {
         try {
-            validateFilename(deviceIcon);
+            Boolean result = deviceIconRepository.deleteDeviceIcon(id, name);
+
+            if (result) {
+                Files.delete(path.resolve(name));
+            }
+
+            return result;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public Resource getDeviceIcon(Integer id, String name) {
+        try {
+            DeviceIcon deviceIcon = deviceIconRepository.getDeviceIcons(id, name).stream().findFirst().get();
+
             return new UrlResource(path.resolve(deviceIcon.getName()).toUri());
         } catch (Exception e) {
             throw new RuntimeException(e.toString());
         }
     }
 
-    private void validateFilename(DeviceIcon deviceIcon) throws Exception {
-        // TODO move to validator
+    @Override
+    public ResponseWrapper getDeviceIcons(Integer id, String name) {
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+
+        try {
+            responseWrapper.setPayload(deviceIconRepository.getDeviceIcons(id, name));
+        } catch (Exception e) {
+            responseWrapper.setErrors(Collections.singletonList(e.toString()));
+        }
+
+        return responseWrapper;
     }
 
-    private void validateFilenameIsUnique(DeviceIcon deviceIcon) throws Exception {
-        // TODO move to validator
+    @Override
+    public ResponseWrapper updateDeviceIcon(Integer id, String name, DeviceIcon deviceIcon) {
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+
+        try {
+            FilterValidator.checkForMinimumFilters(id, name);
+            responseWrapper.setPayload(deviceIconRepository.updateDeviceIcon(id, name, deviceIcon));
+        } catch (Exception e) {
+            responseWrapper.setErrors(Collections.singletonList(e.toString()));
+        }
+
+        return responseWrapper;
     }
 }
