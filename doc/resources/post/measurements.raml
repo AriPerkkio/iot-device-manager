@@ -1,0 +1,55 @@
+description: Add measurement with given parameters
+headers:
+  x-authentication-key:
+    description: Device's authentication key. Required if id is not present in request parameters
+    required: false
+body:
+  application/json:
+    properties:
+      deviceId:
+        description: Device id. Required if authenticationKey is not present in headers
+        type: number
+      content:
+        description: Content of measurement
+        type: string
+      time:
+        description: Time of measurement update. Current time is used if not defined.
+        type: string
+        required: false
+responses:
+  201:
+    description: Measurement succesfully added. Returns inserted measurement
+    body:
+      application/vnd.collection+json:
+        type: Measurement
+        example: !include ../../responses/measurement-response.json
+  400:
+    description: Request contains errors, e.g. invalid parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/measurements",
+            "error": {
+              "title": "Parameter validation error",
+              "code": "1001",
+              "message": "deviceId must be a number"
+            }
+          }
+        }
+  500:
+    description: Internal errors occured, e.g. unable to connect to database.
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/measurements",
+            "error": {
+              "title": "Internal error",
+              "code": "1003",
+              "message": "Server encountered internal error"
+            }
+          }
+        }

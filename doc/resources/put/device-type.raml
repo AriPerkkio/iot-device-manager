@@ -1,0 +1,91 @@
+description: Update given attributes of device type
+queryParameters:
+  id:
+    description: Device type id used as filter. Required if other request parameters are not present
+    type: number
+    required: false
+  name:
+    description: Device type name used as filter. Required if other request parameters are not present
+    required: false
+    type: string
+    maxLength: 50
+    pattern: "[A-Za-z0-9_ .,-]{1,50}"
+body:
+  application/json:
+    description: Attributes to update
+    properties:
+      name:
+        description: Device type name
+        type: string
+        maxLength: 50
+        pattern: "[A-Za-z0-9_ .,-]{1,50}"
+      deviceIconId:
+        description: Device icon id
+        type: number
+responses:
+  200:
+    description: Device type succesfully updated. Returns updated device type
+    body:
+      application/vnd.collection+json:
+        type: DeviceType
+        example: !include ../../responses/device-type-response.json
+  400:
+    description: Request contains errors, e.g. invalid parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/device-types",
+            "error": {
+              "title": "Parameter validation error",
+              "code": "1001",
+              "message": "Name must pass regexp: ^[A-Za-z0-9-_]{1,25}.(png)$"
+            }
+          }
+        }
+  404:
+    description: No device types found matching given parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/device-types",
+            "error": {
+              "title": "No items found",
+              "code": "1002",
+              "message": "No items found with given parameters"
+            }
+          }
+        }
+  409:
+    description: Device type name already used for another device type
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/device-types",
+            "error": {
+              "title": "Parameter conflict",
+              "code": "1004",
+              "message": "Parameter must be unique: name"
+            }
+          }
+        }
+  500:
+    description: Internal errors occured, e.g. unable to connect to database.
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/device-types",
+            "error": {
+              "title": "Internal error",
+              "code": "1003",
+              "message": "Server encountered internal error"
+            }
+          }
+        }

@@ -1,27 +1,33 @@
 /api/v1
 |
 ├── devices
-|  ├── group
-|  ├── type
-|  ├── icon
-|  ├── configuration
-|  ├── measurements
-|  ├── locations
+|  ├── {id}
+|  |  ├── group
+|  |  ├── type
+|  |  ├── icon
+|  |  ├── configuration
+|  |  ├── measurements
+|  |  ├── locations
 |
 ├── device-groups
-|  ├── devices
-|  ├── measurements
-|  ├── locations
-|
-├── configurations
-|  ├── devices
+|  ├── {id}
+|  |  ├── devices
+|  |  ├── measurements
+|  |  ├── locations
 |
 ├── device-types
-|  ├── devices
-|  ├── icon
+|  ├── {id}
+|  |  ├── devices
+|  |  ├── icon
 |
 ├── device-icons
-|  ├── types
+|  ├── {id}
+|  |  ├── types
+|  ├── {icon-name}
+|
+├── configurations
+|  ├── {id}
+|  |  ├── devices
 |
 ├── locations
 |

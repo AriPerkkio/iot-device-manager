@@ -1,0 +1,69 @@
+description: Add new device with given parameters
+body:
+  application/json:
+    properties:
+      name:
+        type: string
+        maxLength: 50
+        pattern: "[A-Za-z0-9_ .,-]{1,50}"
+      deviceTypeId:
+        type: integer
+        required: false
+      deviceGroupId:
+        type: integer
+        required: false
+      configurationId:
+        type: integer
+        required: false
+responses:
+  201:
+    description: Device succesfully added. Returns inserted device including generated id and authentication key
+    body:
+      application/vnd.collection+json:
+        type: Device
+        example: !include ../../responses/device-response.json
+  400:
+    description: Request contains errors, e.g. invalid parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/devices",
+            "error": {
+              "title": "Parameter validation error",
+              "code": "1001",
+              "message": "Name must pass regexp: [A-Za-z0-9_ .,-]{1,50}"
+            }
+          }
+        }
+  409:
+    description: Device name already used for another device
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/devices",
+            "error": {
+              "title": "Parameter conflict",
+              "code": "1004",
+              "message": "Parameter must be unique: name"
+            }
+          }
+        }
+  500:
+    description: Internal errors occured, e.g. unable to connect to database.
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/devices",
+            "error": {
+              "title": "Internal error",
+              "code": "1003",
+              "message": "Server encountered internal error"
+            }
+          }
+        }

@@ -1,0 +1,87 @@
+description: Rename device icon
+queryParameters:
+  id:
+    description: Device icon id used as filter. Required if other request parameters are not present
+    type: number
+    required: false
+  name:
+    description: Device icon name. Required if other request parameters are not present
+    type: string
+    maxLength: 25
+    pattern: "^[A-Za-z0-9-_]{1,25}.(png)$"
+body:
+  application/json:
+    description: Attributes to update
+    properties:
+      name:
+        description: Device icon name
+        type: string
+        maxLength: 25
+        pattern: "^[A-Za-z0-9-_]{1,25}.(png)$"
+responses:
+  200:
+    description: Device icon succesfully renamed. Returns updated attributes of device icon
+    body:
+      application/vnd.collection+json:
+        type: DeviceIcon
+        example: !include ../../responses/device-icon-response.json
+  400:
+    description: Request contains errors, e.g. invalid parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/device-icons",
+            "error": {
+              "title": "Parameter validation error",
+              "code": "1001",
+              "message": "Name must pass regexp: ^[A-Za-z0-9-_]{1,25}.(png)$"
+            }
+          }
+        }
+  404:
+    description: No device icons found matching given parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/device-icons",
+            "error": {
+              "title": "No items found",
+              "code": "1002",
+              "message": "No items found with given parameters"
+            }
+          }
+        }
+  409:
+    description: Device icon name already used for another device icon
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/device-icons",
+            "error": {
+              "title": "Parameter conflict",
+              "code": "1004",
+              "message": "Parameter must be unique: name"
+            }
+          }
+        }
+  500:
+    description: Internal errors occured, e.g. unable to connect to database.
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/device-icons",
+            "error": {
+              "title": "Internal error",
+              "code": "1003",
+              "message": "Server encountered internal error"
+            }
+          }
+        }

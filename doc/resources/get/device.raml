@@ -1,0 +1,82 @@
+description: Get devices matching parameters
+queryParameters:
+  id:
+    description: Device id used as filter
+    type: number
+    required: false
+  name:
+    description: Device name used as filter
+    required: false
+    type: string
+    maxLength: 50
+    pattern: "[A-Za-z0-9_ .,-]{1,50}"
+  deviceTypeId:
+    description: Device type id used as filter
+    type: number
+    required: false
+  deviceGroupId:
+    description: Device group id used as filter
+    type: number
+    required: false
+  configurationId:
+    description: Device configuration id used as filter
+    type: number
+    required: false
+  authenticationKey:
+    description: Device authenticationKey used as filter
+    required: false
+    type: string
+    minLength: 32
+    maxLength: 32
+responses:
+  200:
+    description: Devices succesfully found
+    body:
+      application/vnd.collection+json:
+        type: Device
+        example: !include ../../responses/device-response.json
+  400:
+    description: Request contains errors, e.g. invalid parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/devices",
+            "error": {
+              "title": "Parameter validation error",
+              "code": "1001",
+              "message": "Name must pass regexp: [A-Za-z0-9_ .,-]{1,50}"
+            }
+          }
+        }
+  404:
+    description: No devices found matching given parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/devices",
+            "error": {
+              "title": "No items found",
+              "code": "1002",
+              "message": "No items found with given parameters"
+            }
+          }
+        }
+  500:
+    description: Internal errors occured, e.g. unable to connect to database.
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/devices",
+            "error": {
+              "title": "Internal error",
+              "code": "1003",
+              "message": "Server encountered internal error"
+            }
+          }
+        }

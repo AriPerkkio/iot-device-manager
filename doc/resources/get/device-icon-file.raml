@@ -1,0 +1,10 @@
+description: Returns icon as image
+responses:
+  200:
+    description: Device icon succesfully found
+    body:
+      image/png:
+        type: file
+        fileTypes: ['image/png']
+  404:
+    description: No device icons found matching given parameters

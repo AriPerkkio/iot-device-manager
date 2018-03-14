@@ -1,0 +1,69 @@
+description: Add new configuration type with given parameters
+body:
+  application/json:
+    properties:
+      name:
+        description: Configuration's name
+        type: string
+        maxLength: 50
+        pattern: "[A-Za-z0-9_ .,-]{1,50}"
+      description:
+        description: Configuration's description
+        type: string
+        maxLength: 100
+        pattern: "[A-Za-z0-9_ .,-]{1,100}"
+      jsonConfiguration:
+        description: Configuration's content as JSON
+        type: string
+responses:
+  201:
+    description: Configuration succesfully added. Returns inserted configuration including generated id
+    body:
+      application/vnd.collection+json:
+        type: Configuration
+        example: !include ../../responses/configuration-response.json
+  400:
+    description: Request contains errors, e.g. invalid parameters
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/configurations",
+            "error": {
+              "title": "Parameter validation error",
+              "code": "1001",
+              "message": "id must be a number"
+            }
+          }
+        }
+  409:
+    description: Configuration name already used for another device type
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/configurations",
+            "error": {
+              "title": "Parameter conflict",
+              "code": "1004",
+              "message": "Parameter must be unique: name"
+            }
+          }
+        }
+  500:
+    description: Internal errors occured, e.g. unable to connect to database.
+    body:
+      application/vnd.collection+json:
+        example: {
+          "collection": {
+            "version": "1.0",
+            "href" : "http://localhost:8080/api/v1/configurations",
+            "error": {
+              "title": "Internal error",
+              "code": "1003",
+              "message": "Server encountered internal error"
+            }
+          }
+        }
