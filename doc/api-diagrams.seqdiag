@@ -1,0 +1,17 @@
+Note left of DeviceController: GET /devices
+DeviceController->DeviceService: getDevices
+DeviceService->DeviceRepository:  getDevices
+Note right of DeviceRepository: StoredProcedure call
+DeviceRepository->Database: get_devices
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Devices
+DeviceService->DeviceController: ResultWrapper
+
+Note left of DeviceController: POST /devices
+DeviceController->DeviceService: addDevice
+DeviceService->DeviceRepository:  addDevice
+Note right of DeviceRepository: StoredProcedure call
+DeviceRepository->Database: add_devices
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceController: ResultWrapper

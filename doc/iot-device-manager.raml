@@ -131,10 +131,12 @@ types:
     delete: !include resources/delete/device.raml
     /group:
       get: !include resources/get/device-group.raml
+      post: !include resources/post/device-group.raml
       put: !include resources/put/device-group.raml
       delete: !include resources/delete/device-group.raml
     /type:
       get: !include resources/get/device-type.raml
+      post: !include resources/post/device-type.raml
       put: !include resources/put/device-type.raml
       delete: !include resources/delete/device-type.raml
     /icon:
@@ -143,13 +145,16 @@ types:
       delete: !include resources/delete/device-icon.raml
     /configuration:
       get: !include resources/get/configuration.raml
+      post: !include resources/post/configuration.raml
       put: !include resources/put/configuration.raml
       delete: !include resources/delete/configuration.raml
     /measurements:
-      get: !include resources/get/configuration.raml
-      delete: !include resources/delete/configuration.raml
+      get: !include resources/get/measurements.raml
+      post: !include resources/post/measurements.raml
+      delete: !include resources/delete/measurements.raml
     /locations:
       get: !include resources/get/location.raml
+      post: !include resources/post/location.raml
       delete: !include resources/delete/location.raml
 /device-groups:
   get: !include resources/get/device-group.raml
@@ -166,11 +171,11 @@ types:
     delete: !include resources/delete/device-group.raml
     /devices:
       get: !include resources/get/device.raml
-      put: !include resources/put/device.raml
+      post: !include resources/post/device.raml
       delete: !include resources/delete/device.raml
     /measurements:
-      get: !include resources/get/configuration.raml
-      delete: !include resources/delete/configuration.raml
+      get: !include resources/get/measurements.raml
+      delete: !include resources/delete/measurements.raml
     /locations:
       get: !include resources/get/location.raml
       delete: !include resources/delete/location.raml
@@ -189,10 +194,10 @@ types:
     delete: !include resources/delete/device-type.raml
     /devices:
       get: !include resources/get/device.raml
-      put: !include resources/put/device.raml
       delete: !include resources/delete/device.raml
     /icon:
       get: !include resources/get/device-icon.raml
+      post: !include resources/post/device-icon.raml
       put: !include resources/put/device-icon.raml
       delete: !include resources/delete/device-icon.raml
 /device-icons:
@@ -210,7 +215,7 @@ types:
     delete: !include resources/delete/device-icon.raml
     /types:
       get: !include resources/get/device-type.raml
-      put: !include resources/put/device-type.raml
+      post: !include resources/post/device-type.raml
       delete: !include resources/delete/device-type.raml
   /{icon-name}:
     uriParameters:
@@ -236,7 +241,7 @@ types:
     delete: !include resources/delete/configuration.raml
     /devices:
       get: !include resources/get/device.raml
-      put: !include resources/put/device.raml
+      post: !include resources/post/device.raml
       delete: !include resources/delete/device.raml
 /locations:
   get: !include resources/get/location.raml

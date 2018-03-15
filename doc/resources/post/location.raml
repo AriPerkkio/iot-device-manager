@@ -9,8 +9,11 @@ body:
       deviceId:
         description: Device id. Required if authenticationKey is not present in headers
         type: number
-      coordinates:
-        description: Coordinates of location
+      latitude:
+        description: Latitude of location
+        type: string
+      longitude:
+        description: Longitude of location
         type: string
       time:
         description: Time of location update. Current time is used if not defined.
