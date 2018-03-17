@@ -172,7 +172,6 @@ types:
     /devices:
       get: !include resources/get/device.raml
       post: !include resources/post/device.raml
-      delete: !include resources/delete/device.raml
     /measurements:
       get: !include resources/get/measurements.raml
       delete: !include resources/delete/measurements.raml
@@ -194,7 +193,7 @@ types:
     delete: !include resources/delete/device-type.raml
     /devices:
       get: !include resources/get/device.raml
-      delete: !include resources/delete/device.raml
+      post: !include resources/post/device.raml
     /icon:
       get: !include resources/get/device-icon.raml
       post: !include resources/post/device-icon.raml
@@ -242,7 +241,6 @@ types:
     /devices:
       get: !include resources/get/device.raml
       post: !include resources/post/device.raml
-      delete: !include resources/delete/device.raml
 /locations:
   get: !include resources/get/location.raml
   post: !include resources/post/location.raml
