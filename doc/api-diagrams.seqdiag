@@ -1,3 +1,5 @@
+## /devices/
+
 Note left of DeviceController: GET /devices
 DeviceController->DeviceService: getDevices
 DeviceService->DeviceRepository:  getDevices
@@ -7,11 +9,141 @@ Database->DeviceRepository: Sql ResultSet
 DeviceRepository->DeviceService: Devices
 DeviceService->DeviceController: ResultWrapper
 
+Note left of DeviceController: PUT /devices
+DeviceController->DeviceService: updateDevice
+DeviceService->DeviceRepository:  updateDevice
+Note right of DeviceRepository: StoredProcedure call
+DeviceRepository->Database: update_device
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceController: ResultWrapper
+
 Note left of DeviceController: POST /devices
 DeviceController->DeviceService: addDevice
 DeviceService->DeviceRepository:  addDevice
 Note right of DeviceRepository: StoredProcedure call
-DeviceRepository->Database: add_devices
+DeviceRepository->Database: add_device
 Database->DeviceRepository: Sql ResultSet
 DeviceRepository->DeviceService: Device
+DeviceService->DeviceController: ResultWrapper
+
+Note left of DeviceController: DELETE /devices
+DeviceController->DeviceService: deleteDevice
+DeviceService->DeviceRepository:  deleteDevice
+Note right of DeviceRepository: StoredProcedure call
+DeviceRepository->Database: delete_device
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: isSuccess
+DeviceService->DeviceController: ResultWrapper
+
+## /devices/{id}
+
+Note left of DeviceController: GET /devices/{id}
+DeviceController->DeviceService: getDevice(id)
+DeviceService->DeviceRepository:  getDevice(id)
+Note right of DeviceRepository: StoredProcedure call
+DeviceRepository->Database: get_devices(id)
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceController: ResultWrapper
+
+Note left of DeviceController: PUT /devices/{id}
+DeviceController->DeviceService: updateDevice(id)
+DeviceService->DeviceRepository:  updateDevice(id)
+Note right of DeviceRepository: StoredProcedure call
+DeviceRepository->Database: update_device(id)
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceController: ResultWrapper
+
+Note left of DeviceController: DELETE /devices/{id}
+DeviceController->DeviceService: deleteDevice(id)
+DeviceService->DeviceRepository:  deleteDevice(id)
+Note right of DeviceRepository: StoredProcedure call
+DeviceRepository->Database: delete_device(id)
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: isSuccess
+DeviceService->DeviceController: ResultWrapper
+
+## /devices/{id}/group
+
+Note left of DeviceController: GET /devices/{id}/group
+participant DeviceController
+participant DeviceService
+participant DeviceRepository
+participant DeviceGroupRepository
+participant Database
+DeviceController->DeviceService: getDevicesGroup(id)
+DeviceService->DeviceRepository:  getDevice(id)
+Note over DeviceGroupRepository: StoredProcedure call
+DeviceRepository->Database: get_devices(id)
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceGroupRepository: getDeviceGroup(deviceGroupId)
+Note right of DeviceGroupRepository: StoredProcedure call
+DeviceGroupRepository->Database: get_device_group(id)
+Database->DeviceGroupRepository: Sql Resultset
+DeviceGroupRepository->DeviceService: DeviceGroup
+DeviceService->DeviceController: ResponseWrapper
+
+Note left of DeviceController: PUT /devices/{id}/group
+participant DeviceController
+participant DeviceService
+participant DeviceRepository
+participant DeviceGroupRepository
+participant Database
+DeviceController->DeviceService: updateDevicesGroup(id)
+DeviceService->DeviceRepository:  getDevice(id)
+Note over DeviceGroupRepository: StoredProcedure call
+DeviceRepository->Database: get_devices(id)
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceGroupRepository: updateGroup(deviceGroupId)
+Note right of DeviceGroupRepository: StoredProcedure call
+DeviceGroupRepository->Database: update_device_group(id)
+Database->DeviceGroupRepository: Sql Resultset
+DeviceGroupRepository->DeviceService: DeviceGroup
+DeviceService->DeviceController: ResultWrapper
+
+Note left of DeviceController: POST /devices/{id}/group
+participant DeviceController
+participant DeviceService
+participant DeviceRepository
+participant DeviceGroupRepository
+participant Database
+DeviceController->DeviceService: addGroupForDevice(id)
+DeviceService->DeviceRepository:  getDevice(id)
+Note over DeviceGroupRepository: StoredProcedure call
+DeviceRepository->Database: get_devices(id)
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceGroupRepository: addGroup
+Note right of DeviceGroupRepository: StoredProcedure call
+DeviceGroupRepository->Database: add_device_group
+Database->DeviceGroupRepository: Sql Resultset
+DeviceGroupRepository->DeviceService: DeviceGroup
+DeviceService->DeviceRepository: updateDevice
+Note over DeviceGroupRepository: StoredProcedure call
+DeviceRepository->Database: update_device
+Database->DeviceRepository: Sql Resultset
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceController: ResultWrapper
+
+Note left of DeviceController: DELETE /devices/{id}/group
+participant DeviceController
+participant DeviceService
+participant DeviceRepository
+participant DeviceGroupRepository
+participant Database
+DeviceController->DeviceService: deleteDevicesGroup(id)
+DeviceService->DeviceRepository:  getDevice(id)
+Note over DeviceGroupRepository: StoredProcedure call
+DeviceRepository->Database: get_devices(id)
+Database->DeviceRepository: Sql ResultSet
+DeviceRepository->DeviceService: Device
+DeviceService->DeviceGroupRepository: deleteDeviceGroup(deviceGroupId)
+Note right of DeviceGroupRepository: StoredProcedure call
+DeviceGroupRepository->Database: delete_device_group(id)
+Database->DeviceGroupRepository: Sql Resultset
+DeviceGroupRepository->DeviceService: isSuccess
 DeviceService->DeviceController: ResultWrapper
