@@ -12,7 +12,7 @@
     "build": "NODE_ENV=production webpack -d && npm run api-doc",
     "watch": "NODE_ENV=development webpack -d --watch",
     "start": "NODE_ENV=development webpack-dev-server",
-    "api-doc": "raml2html doc/iot-device-manager.raml > src/main/resources/static/api-doc.html"
+    "api-doc": "api-console build doc/iot-device-manager.raml -o src/main/resources/static/api-doc"
   },
   "dependencies": {
     "history": "^4.7.2",
@@ -24,6 +24,7 @@
     "redux": "^3.7.2"
   },
   "devDependencies": {
+    "api-console-cli": "^0.2.12",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
@@ -37,7 +38,6 @@
     "ignore-styles": "^5.0.1",
     "mocha": "^4.1.0",
     "node-sass": "^4.7.2",
-    "raml2html": "^6.6.0",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.1",
     "uglifyjs-webpack-plugin": "^1.1.6",

@@ -46,20 +46,20 @@ const config = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin([BUILD_DIR + '/*.*']),
+    new CleanWebpackPlugin([BUILD_DIR + '/*.*', BUILD_DIR + '/api-doc']),
     new UglifyJsPlugin({ sourceMap: true }),
     extractSass
   ],
   devServer: {
     historyApiFallback: true,
     port: 8081,
-    contentBase: path.join(INDEX_HTML_DIR),
+    contentBase: [ path.join(INDEX_HTML_DIR), path.join(BUILD_DIR)],
     overlay: {
       errors: true,
       warnings: true,
     },
     proxy: {
-      "/rest/**": {
+      "/api/**": {
         target: "http://localhost:8080"
       }
     }
