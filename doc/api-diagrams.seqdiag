@@ -1027,4 +1027,58 @@ ConfigurationService->ConfigurationController: ResponseWrapper
 
 ## /locations
 
+Note left of LocationController: GET /locations
+LocationController->LocationService: getLocations
+LocationService->LocationRepository:  getLocations
+Note right of LocationRepository: StoredProcedure call
+LocationRepository->Database: get_locations
+Database->LocationRepository: Sql ResultSet
+LocationRepository->LocationService: Locations
+LocationService->LocationController: ResponseWrapper
+
+Note left of LocationController: POST /locations
+LocationController->LocationService: addLocation
+LocationService->LocationRepository:  addLocation
+Note right of LocationRepository: StoredProcedure call
+LocationRepository->Database: add_location
+Database->LocationRepository: Sql ResultSet
+LocationRepository->LocationService: Location
+LocationService->LocationController: ResponseWrapper
+
+Note left of LocationController: DELETE /locations
+LocationController->LocationService: deleteLocations
+LocationService->LocationRepository:  deleteLocations
+Note right of LocationRepository: StoredProcedure call
+LocationRepository->Database: delete_locations
+Database->LocationRepository: Sql ResultSet
+LocationRepository->LocationService: isSuccess
+LocationService->LocationController: ResponseWrapper
+
 ## /measurements
+
+Note left of MeasurementController: GET /measurements
+MeasurementController->MeasurementService: getMeasurements
+MeasurementService->MeasurementRepository:  getMeasurements
+Note right of MeasurementRepository: StoredProcedure call
+MeasurementRepository->Database: get_measurements
+Database->MeasurementRepository: Sql ResultSet
+MeasurementRepository->MeasurementService: Measurements
+MeasurementService->MeasurementController: ResponseWrapper
+
+Note left of MeasurementController: POST /measurements
+MeasurementController->MeasurementService: addMeasurement
+MeasurementService->MeasurementRepository:  addMeasurement
+Note right of MeasurementRepository: StoredProcedure call
+MeasurementRepository->Database: add_measurement
+Database->MeasurementRepository: Sql ResultSet
+MeasurementRepository->MeasurementService: Measurement
+MeasurementService->MeasurementController: ResponseWrapper
+
+Note left of MeasurementController: DELETE /measurements
+MeasurementController->MeasurementService: deleteMeasurements
+MeasurementService->MeasurementRepository:  deleteMeasurements
+Note right of MeasurementRepository: StoredProcedure call
+MeasurementRepository->Database: delete_measurements
+Database->MeasurementRepository: Sql ResultSet
+MeasurementRepository->MeasurementService: isSuccess
+MeasurementService->MeasurementController: ResponseWrapper
