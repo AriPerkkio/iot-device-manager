@@ -46,7 +46,7 @@ const config = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin([BUILD_DIR + '/*.*', BUILD_DIR + '/api-doc']),
+    new CleanWebpackPlugin(BUILD_DIR + '/*.*'),
     new UglifyJsPlugin({ sourceMap: true }),
     extractSass
   ],

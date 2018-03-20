@@ -9,7 +9,7 @@
   "scripts": {
     "test": "NODE_ENV=test mocha src/test/js/*.jsx --require babel-core/register --require ignore-styles",
     "test:debug": "npm run test -- --inspect-brk",
-    "build": "NODE_ENV=production webpack -d && npm run api-doc",
+    "build": "NODE_ENV=production webpack -d",
     "watch": "NODE_ENV=development webpack -d --watch",
     "start": "NODE_ENV=development webpack-dev-server",
     "api-doc": "api-console build doc/iot-device-manager.raml -o src/main/resources/static/api-doc"
