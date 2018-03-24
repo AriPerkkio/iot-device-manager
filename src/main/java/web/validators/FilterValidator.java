@@ -1,7 +1,12 @@
 package web.validators;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.springframework.util.CollectionUtils;
+import org.springframework.validation.Errors;
+import web.domain.response.ErrorCode;
+import web.exception.ExceptionWrapper;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class FilterValidator {
 
@@ -11,12 +16,24 @@ public class FilterValidator {
      * @param filters
      *      Collection of filters to validate
      */
-    public static void checkForMinimumFilters(Object ...filters) throws Exception {
+    public static void checkForMinimumFilters(Object ...filters) throws ExceptionWrapper {
 
-        // Array filter = CollectionUtils.arrayToList(filters).stream().filter(Objects::nonNull).close();
+        Integer filterCount = Arrays.stream(filters)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList())
+            .size();
 
-        if (ArrayUtils.isEmpty(filters) || CollectionUtils.arrayToList(filters).isEmpty()) {
-            throw new Exception("Invalid filters. At least one filter is required.");
+        if (filterCount == 0) {
+            throw new ExceptionWrapper("Filters missing", "At least one filter is required", ErrorCode.PARAMETER_VALIDATION_ERROR);
+        }
+    }
+
+    public static void validateErrors(Errors errors) {
+        if (errors.hasErrors()) {
+            String message = String.format("Invalid value (%s) for parameter %s",
+                errors.getFieldError().getRejectedValue(), errors.getFieldError().getField());
+
+            throw new ExceptionWrapper("Request body validation error", message, ErrorCode.PARAMETER_VALIDATION_ERROR);
         }
     }
 }

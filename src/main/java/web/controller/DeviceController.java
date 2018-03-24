@@ -1,11 +1,16 @@
 package web.controller;
 
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Device;
 import web.domain.response.ErrorCode;
 import web.domain.response.ErrorWrapper;
 import web.domain.response.ResponseWrapper;
 import web.service.DeviceService;
+
+import javax.validation.Valid;
+
+import static web.validators.FilterValidator.validateErrors;
 
 @RestController
 @RequestMapping("/api")
@@ -35,9 +40,9 @@ public class DeviceController {
      * @param authenticationKey
      *      Authentication key used as filter
      * @return
-     *      TODO
+     *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.GET)
+    @RequestMapping(value = URI, method = RequestMethod.GET, produces = "application/vnd.collection+json; charset=utf-8")
     public ResponseWrapper getDevices(
             @RequestParam(name="id", required = false) Integer id,
             @RequestParam(name="name", required = false) String name,
@@ -45,7 +50,6 @@ public class DeviceController {
             @RequestParam(name="deviceGroupId", required = false) Integer deviceGroupId,
             @RequestParam(name="configurationId", required = false) Integer configurationId,
             @RequestParam(name="authenticationKey", required = false) String authenticationKey) {
-
         return deviceService.getDevices(id, name, deviceTypeId, deviceGroupId, configurationId, authenticationKey);
     }
 
@@ -55,10 +59,12 @@ public class DeviceController {
      * @param device
      *      Device to add
      * @return
-     *      TODO
+     *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.POST)
-    public ResponseWrapper addDevice(@RequestBody Device device) {
+    @RequestMapping(value = URI, method = RequestMethod.POST, produces = "application/vnd.collection+json; charset=utf-8")
+    public ResponseWrapper addDevice(@Valid @RequestBody Device device, Errors errors) {
+        validateErrors(errors);
+
         return deviceService.addDevice(device);
     }
 
@@ -75,9 +81,9 @@ public class DeviceController {
      * @param device
      *      Device used to replace existing one
      * @return
-     *      TODO
+     *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.PUT)
+    @RequestMapping(value = URI, method = RequestMethod.PUT, produces = "application/vnd.collection+json; charset=utf-8")
     public ResponseWrapper updateDevice(
             @RequestParam(name="id", required = false) Integer id,
             @RequestParam(name="name", required = false) String name,
@@ -96,9 +102,9 @@ public class DeviceController {
      * @param authenticationKey
      *      Authentication key used as filter
      * @return
-     *      TODO
+     *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.DELETE)
+    @RequestMapping(value = URI, method = RequestMethod.DELETE, produces = "application/vnd.collection+json; charset=utf-8")
     public ResponseWrapper deleteDevice(
             @RequestParam(name="id", required = false) Integer id,
             @RequestParam(name="name", required = false) String name,

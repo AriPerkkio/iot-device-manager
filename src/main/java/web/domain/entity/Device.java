@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @NamedStoredProcedureQueries({
     @NamedStoredProcedureQuery(name = "get_devices", procedureName = "get_devices", resultClasses = Device.class,
@@ -48,6 +49,7 @@ public class Device {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @NotNull
     private String name;
 
     private Integer deviceTypeId;
