@@ -37,16 +37,18 @@ public class ExceptionController {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
     public ResponseWrapper invalidParameterHandling(Exception ex, HttpServletRequest request) throws Exception {
+
+        // TODO remove, leaking internal information
         String message = ex.toString();
 
         if(ex instanceof MethodArgumentTypeMismatchException) {
             MethodArgumentTypeMismatchException mismatchEx = (MethodArgumentTypeMismatchException) ex;
             message = String.format("Invalid value (%s) for parameter %s", mismatchEx.getName(), mismatchEx.getValue().toString());
         } else if(ex instanceof  HttpMessageNotReadableException) {
-            message = "Request body missing";
+            message = "Request body missing or invalid";
         }
 
-        Error error = Error.create("Unhandled error", ErrorCode.PARAMETER_VALIDATION_ERROR.getCode(), message);
+        Error error = Error.create("Parameter validation error", ErrorCode.PARAMETER_VALIDATION_ERROR.getCode(), message);
         URI href = new URI(request.getRequestURL().toString());
 
         return new ResponseWrapper(error.toCollection(href), BAD_REQUEST);

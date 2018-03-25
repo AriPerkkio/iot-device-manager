@@ -74,13 +74,18 @@ public class DeviceMapper {
         return Value.of(optionalValue);
     }
 
+    private static URI buildHref(URI uri) {
+        return buildHref(uri, null, "");
+    }
+
     private static URI buildHref(URI uri, Integer id) {
         return buildHref(uri, id, "");
     }
 
-
     private static URI buildHref(URI uri, Integer id, String postFix) {
-        return uri.resolve(DEVICES_URI + String.format("/%d", id) + postFix);
+        final String idUri = id == null ? "" : String.format("/%d", id);
+
+        return uri.resolve(DEVICES_URI + idUri + postFix);
     }
 
     private static List<Link> mapToLinks(Device device) {
@@ -119,7 +124,7 @@ public class DeviceMapper {
     private static List<Query> getQueries() {
         return Collections.singletonList((
             Query.create(
-                ServletUriComponentsBuilder.fromCurrentRequest().build().toUri(),
+                buildHref(ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri()),
                 "search",
                 Option.of("Search"),
                 Arrays.asList(

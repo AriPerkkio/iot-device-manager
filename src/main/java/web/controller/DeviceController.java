@@ -4,8 +4,8 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Device;
 import web.domain.response.ErrorCode;
-import web.domain.response.ErrorWrapper;
 import web.domain.response.ResponseWrapper;
+import web.exception.ExceptionWrapper;
 import web.service.DeviceService;
 
 import javax.validation.Valid;
@@ -114,6 +114,6 @@ public class DeviceController {
 
     @RequestMapping(value = ID_URI, method = RequestMethod.GET)
     public ResponseWrapper getDevicesIcon() {
-        return new ResponseWrapper(new ErrorWrapper(ErrorCode.INTERNAL_ERROR, "TODO endpoints"));
+        throw new ExceptionWrapper("Not implemented", "Not implemented", ErrorCode.INTERNAL_ERROR);
     }
 }
