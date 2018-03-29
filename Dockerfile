@@ -32,9 +32,12 @@ RUN mkdir /home/user && \
     sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/test/resources/application.properties && \
     npm install && \
     npm run build && \
+    echo -e "\n\n##########################################\nBuilding api-doc. This may take 10-15 mins\n##########################################\n\n" && \
     npm run api-doc && \
     mvn clean package -DskipTests
 
 CMD cd /home/user/iot-device-manager && \
     mvn test && \
+    mvn failsafe:integration-test && \
+    npm run test && \
     java -jar target/iot-device-manager-*.jar
