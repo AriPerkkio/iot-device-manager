@@ -1,15 +1,12 @@
 package web.repository.impl;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import web.domain.entity.Device;
 import web.repository.DeviceRepository;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 

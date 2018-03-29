@@ -55,8 +55,8 @@ public class DeviceMapper {
         Value configurationId = getOptionalValue(device.getConfigurationId());
 
         List<Property> properties = Arrays.asList(
-            Property.value("deviceId", Option.of("Device ID"), deviceId),
-            Property.value("deviceName", Option.of("Device Name"), deviceName),
+            Property.value("id", Option.of("Device ID"), deviceId),
+            Property.value("name", Option.of("Device Name"), deviceName),
             Property.value("deviceGroupId", Option.of("Device Group ID"), groupId),
             Property.value("deviceTypeId", Option.of("Device Type ID"), typeId),
             Property.value("configurationId", Option.of("Configuration ID"), configurationId),

@@ -45,6 +45,7 @@
             <artifactId>hibernate-types-5</artifactId>
             <version>2.0.0</version>
         </dependency>
+        <!-- Support for collection+json TO library -->
         <dependency>
             <groupId>net.hamnaberg.rest</groupId>
             <artifactId>json-collection</artifactId>
@@ -77,7 +78,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -85,49 +85,43 @@
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.5.0</version>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
                 <executions>
-                    <!-- Install npm dependencies -->
+                    <!-- Add integration-test as test source -->
                     <execution>
-                        <id>npm install</id>
-                        <phase>generate-sources</phase>
-                        <goals><goal>exec</goal></goals>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
                         <configuration>
-                            <executable>npm</executable>
-                            <arguments>
-                                <argument>install</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <!-- Run UI Javascript tests -->
-                    <execution>
-                        <id>npm run test</id>
-                        <phase>test</phase>
-                        <goals><goal>exec</goal></goals>
-                        <configuration>
-                            <executable>npm</executable>
-                            <arguments>
-                                <argument>run</argument>
-                                <argument>test</argument>
-                            </arguments>
-                            <skip>${skipTests}</skip>
-                        </configuration>
-                    </execution>
-                    <!-- Build UI bundle -->
-                    <execution>
-                        <id>npm run build</id>
-                        <phase>compile</phase>
-                        <goals><goal>exec</goal></goals>
-                        <configuration>
-                            <executable>npm</executable>
-                            <arguments>
-                                <argument>run</argument>
-                                <argument>build</argument>
-                            </arguments>
+                            <sources>
+                                <source>src/integration-test/java</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.20</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
