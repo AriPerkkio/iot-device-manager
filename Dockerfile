@@ -1,9 +1,12 @@
-# docker build -t iotdevicemanager . --build-arg DB_PASS=<add-client-pass>
+# docker build -t iotdevicemanager . --build-arg DB_PASS=<add-client-pass> APP_PASS=<add-api-and-ui-pass>
 # docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-idm iotdevicemanager
 FROM ubuntu:16.04
 
 ARG DB_PASS=${DB_PASS}
 ENV DB_PASS=${DB_PASS}
+
+ARG APP_PASS=${APP_PASS}
+ENV APP_PASS=${APP_PASS}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
@@ -30,6 +33,8 @@ RUN mkdir /home/user && \
     cd iot-device-manager && \
     sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/main/resources/application.properties && \
     sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/test/resources/application.properties && \
+    sed -i -- 's/iotdevicemanager.password=default-password/iotdevicemanager.password='$APP_PASS'/g' src/main/resources/application.properties && \
+    sed -i -- 's/iotdevicemanager.password=default-password/iotdevicemanager.password='$APP_PASS'/g' src/test/resources/application.properties && \
     npm install && \
     npm run build && \
     echo -e "\n\n##########################################\nBuilding api-doc. This may take 10-15 mins\n##########################################\n\n" && \

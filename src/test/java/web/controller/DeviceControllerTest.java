@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,6 +52,13 @@ public class DeviceControllerTest {
 
     @MockBean
     private DeviceService deviceService;
+
+    @Value("${iotdevicemanager.username}")
+    String user;
+
+    @Value("${iotdevicemanager.password}")
+    String password;
+
 
     @Before
     public void setup() {
@@ -70,7 +79,7 @@ public class DeviceControllerTest {
         when(deviceService.getDevices(any(Integer.class), any(String.class), any(Integer.class), any(Integer.class), any(Integer.class), any(String.class)))
             .thenReturn(responseWrapper);
 
-        mockMvc.perform(get(URI))
+        mockMvc.perform(get(URI).with(httpBasic(user,password)))
             .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
             .andExpect(content().string(jsonContent.toString()));
     }
@@ -84,7 +93,7 @@ public class DeviceControllerTest {
         String deviceGroupId = "string-instead-of-integer";
 
         // When
-        MockHttpServletResponse response = mockMvc.perform(get(URI).param("deviceGroupId", deviceGroupId))
+        MockHttpServletResponse response = mockMvc.perform(get(URI).param("deviceGroupId", deviceGroupId).with(httpBasic(user,password)))
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andExpect(status().isBadRequest()).andReturn().getResponse();
 
@@ -106,7 +115,7 @@ public class DeviceControllerTest {
                 .thenThrow(exceptionWrapper);
 
         // Then
-        MockHttpServletResponse response = mockMvc.perform(get(URI))
+        MockHttpServletResponse response = mockMvc.perform(get(URI).with(httpBasic(user,password)))
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andExpect(status().isInternalServerError()).andReturn().getResponse();
 
@@ -128,7 +137,7 @@ public class DeviceControllerTest {
                 .thenReturn(new ResponseWrapper(jsonContent));
 
         // Then
-        mockMvc.perform(post(URI).content(mapper.writeValueAsString(expected)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post(URI).content(mapper.writeValueAsString(expected)).contentType(MediaType.APPLICATION_JSON).with(httpBasic(user,password)))
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andExpect(content().string(jsonContent.toString()));
     }
@@ -143,7 +152,7 @@ public class DeviceControllerTest {
         expected.setName(null);
 
         // When & Then
-        MockHttpServletResponse response = mockMvc.perform(post(URI).content(mapper.writeValueAsString(expected)).contentType(MediaType.APPLICATION_JSON))
+        MockHttpServletResponse response = mockMvc.perform(post(URI).content(mapper.writeValueAsString(expected)).contentType(MediaType.APPLICATION_JSON).with(httpBasic(user,password)))
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse();
@@ -165,7 +174,7 @@ public class DeviceControllerTest {
                 .thenThrow(exceptionWrapper);
 
         // Then
-        MockHttpServletResponse response = mockMvc.perform(post(URI).content(mapper.writeValueAsString(getTestDevice())).contentType(MediaType.APPLICATION_JSON))
+        MockHttpServletResponse response = mockMvc.perform(post(URI).content(mapper.writeValueAsString(getTestDevice())).contentType(MediaType.APPLICATION_JSON).with(httpBasic(user,password)))
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andExpect(status().isInternalServerError())
                 .andReturn().getResponse();
@@ -188,7 +197,7 @@ public class DeviceControllerTest {
                 .thenReturn(new ResponseWrapper(jsonContent));
 
         // Then
-        mockMvc.perform(put(URI).content(mapper.writeValueAsString(expected)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put(URI).content(mapper.writeValueAsString(expected)).contentType(MediaType.APPLICATION_JSON).with(httpBasic(user,password)))
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andExpect(content().string(jsonContent.toString()));
 
@@ -204,7 +213,7 @@ public class DeviceControllerTest {
         expected.setName(null);
 
         // When
-        MockHttpServletResponse response = mockMvc.perform(put(URI).content(mapper.writeValueAsString(expected)).contentType(MediaType.APPLICATION_JSON))
+        MockHttpServletResponse response = mockMvc.perform(put(URI).content(mapper.writeValueAsString(expected)).contentType(MediaType.APPLICATION_JSON).with(httpBasic(user,password)))
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse();
@@ -226,7 +235,8 @@ public class DeviceControllerTest {
         MockHttpServletResponse response = mockMvc.perform(put(URI)
                 .content(mapper.writeValueAsString(getTestDevice()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("id", id))
+                .param("id", id)
+                .with(httpBasic(user,password)))
                     .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                     .andExpect(status().isBadRequest())
                     .andReturn().getResponse();
@@ -246,7 +256,7 @@ public class DeviceControllerTest {
                 .thenReturn(new ResponseWrapper("", HttpStatus.NO_CONTENT));
 
         // Then
-        mockMvc.perform(delete(URI))
+        mockMvc.perform(delete(URI).with(httpBasic(user,password)))
                 .andExpect(status().isNoContent())
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andExpect(content().string(""));
@@ -261,7 +271,7 @@ public class DeviceControllerTest {
         String id = "string-instead-of-integer";
 
         // When
-        MockHttpServletResponse response = mockMvc.perform(delete(URI).param("id", id))
+        MockHttpServletResponse response = mockMvc.perform(delete(URI).param("id", id).with(httpBasic(user,password)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
                 .andReturn().getResponse();

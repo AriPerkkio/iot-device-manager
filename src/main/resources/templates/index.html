@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <head lang="en">
         <meta charset="UTF-8"/>
         <link rel="stylesheet" href="style.css">
@@ -13,5 +13,8 @@
         <br/>
         <a href="/api-doc/index.html">API documentation</a>
         <script src="bundle.js"></script>
+        <form th:action="@{/logout}" method="post">
+            <input type="submit" value="Sign Out"/>
+        </form>
     </body>
 </html>

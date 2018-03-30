@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -21,9 +22,8 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -38,6 +38,12 @@ public class DeviceTestIT {
     private static final String APPLICATION_VND_COLLECTION_JSON = "application/vnd.collection+json;charset=utf-8";
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Value("${iotdevicemanager.username}")
+    String user;
+
+    @Value("${iotdevicemanager.password}")
+    String password;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -45,7 +51,7 @@ public class DeviceTestIT {
     public void testGetDevicesInitiallyReturnsErrorAndNotFound() throws Exception {
         // When
         MockHttpServletResponse response = mockMvc
-                .perform(get(URI))
+                .perform(get(URI).with(httpBasic(user,password)))
                 .andReturn().getResponse();
 
         // Then
@@ -69,6 +75,7 @@ public class DeviceTestIT {
         // When
         MockHttpServletResponse response = mockMvc
                 .perform(post(URI)
+                        .with(httpBasic(user,password))
                         .content(mapper.writeValueAsString(expected))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -92,11 +99,7 @@ public class DeviceTestIT {
         assertNotNull(data.get("authenticationKey"));
     }
 
-    private void assertData(String jsonValue, String value) {
-        assertThat(jsonValue, is(String.format("%s", value)));
-    }
-
-    private void assertData(String jsonValue, Integer value) {
+    private void assertData(String jsonValue, Object value) {
         assertThat(jsonValue, is(String.format("%s", value)));
     }
 
