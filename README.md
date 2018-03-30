@@ -30,8 +30,9 @@
 #### 2. Server
 - Install Docker
 - cd iot-device-manager/
-- docker build -t iotdevicemanager . --build-arg DB_PASS=<add-client-pass>
-- docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-idm iotdevicemanager
+- docker build -t iotdevicemanager .
+- docker run -dit --name iotdevicemanager -e APP_PASS=<add-api/ui-pass> -e DB_PASS=<add-db-pass> -p 8080:8080 --link mysql-idm iotdevicemanager
+- (Optional - Follows process from logs) docker logs -f iotdevicemanager
 
 ### Option 2:
 - Check Dockerfiles for requirements and steps

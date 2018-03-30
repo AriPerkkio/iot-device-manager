@@ -1,5 +1,13 @@
-# docker build -t iotdevicemanager . --build-arg DB_PASS=<add-client-pass> APP_PASS=<add-api-and-ui-pass>
-# docker run -dit --name iotdevicemanager -p 8080:8080 --link mysql-idm iotdevicemanager
+# docker build -t iotdevicemanager .
+
+# docker run -dit --name iotdevicemanager \
+# -e APP_PASS=<add-api/ui-pass> \
+# -e DB_PASS=<add-db-pass> \
+# -p 8080:8080 \
+# --link mysql-idm iotdevicemanager
+
+# docker logs -f iotdevicemanager
+
 FROM ubuntu:16.04
 
 ARG DB_PASS=${DB_PASS}
@@ -27,7 +35,8 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     git
 
-RUN mkdir /home/user && \
+# Download sources, replace passwords, build api docs, build app, run tests, launch app.
+CMD mkdir /home/user && \
     cd /home/user && \
     git clone https://github.com/AriPerkkio/iot-device-manager.git && \
     cd iot-device-manager && \
@@ -39,9 +48,7 @@ RUN mkdir /home/user && \
     npm run build && \
     echo -e "\n\n##########################################\nBuilding api-doc. This may take 10-15 mins\n##########################################\n\n" && \
     npm run api-doc && \
-    mvn clean package -DskipTests
-
-CMD cd /home/user/iot-device-manager && \
+    mvn clean package -DskipTests && \
     mvn test && \
     mvn failsafe:integration-test && \
     npm run test && \
