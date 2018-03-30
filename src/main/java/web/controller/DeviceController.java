@@ -88,7 +88,10 @@ public class DeviceController {
             @RequestParam(name="id", required = false) Integer id,
             @RequestParam(name="name", required = false) String name,
             @RequestParam(name="authenticationKey", required = false) String authenticationKey,
-            @RequestBody Device device) {
+            @Valid @RequestBody Device device,
+            Errors errors) {
+        validateErrors(errors);
+
         return deviceService.updateDevice(id, name, authenticationKey, device);
     }
 
