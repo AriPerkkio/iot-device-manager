@@ -1,7 +1,11 @@
 #%RAML 1.0
 title: iot-device-manager
 mediaType: application/vnd.collection+json
-baseUri: http://localhost:8080/api/v1
+baseUri: http://ec2-35-173-178-2.compute-1.amazonaws.com/api/
+securitySchemes:
+  basic:
+    description: Basic Authentication is currently used.
+    type: Basic Authentication
 types:
   Device:
     type: object
