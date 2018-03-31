@@ -59,7 +59,6 @@ public class DeviceControllerTest {
     @Value("${iotdevicemanager.password}")
     String password;
 
-
     @Before
     public void setup() {
         // Set request attributes for mappers URI building
@@ -77,18 +76,18 @@ public class DeviceControllerTest {
 
         // When & Then
         when(deviceService.getDevices(any(Integer.class), any(String.class), any(Integer.class), any(Integer.class), any(Integer.class), any(String.class)))
-            .thenReturn(responseWrapper);
+                .thenReturn(responseWrapper);
 
         mockMvc.perform(get(URI).with(httpBasic(user,password)))
-            .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
-            .andExpect(content().string(jsonContent.toString()));
+                .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
+                .andExpect(content().string(jsonContent.toString()));
     }
 
     /**
      * Test get devices returns error when request parameter is invalid type
      */
     @Test
-    public void testGetDeviceReturnsErrorWhenRequestParameterInvalid() throws Exception {
+    public void testGetDevicesReturnsErrorWhenRequestParameterInvalid() throws Exception {
         // Given
         String deviceGroupId = "string-instead-of-integer";
 
@@ -121,6 +120,44 @@ public class DeviceControllerTest {
 
         JsonNode error = responseToErrorNode(response);
         assertThat(error.get("code").asText(), is(ErrorCode.INTERNAL_ERROR.getCode()));
+    }
+
+    /**
+     * Test get device returns device with correct content-type
+     */
+    @Test
+    public void testGetDevice() throws Exception {
+        // Given
+        Collection jsonContent = DeviceMapper.mapToCollection(getTestDevice());
+        ResponseWrapper responseWrapper = new ResponseWrapper(jsonContent);
+
+        // When & Then
+        when(deviceService.getDevices(any(Integer.class), any(String.class), any(Integer.class), any(Integer.class), any(Integer.class), any(String.class)))
+                .thenReturn(responseWrapper);
+
+        mockMvc.perform(get(URI + "/1").with(httpBasic(user,password)))
+                .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
+                .andExpect(content().string(jsonContent.toString()));
+    }
+
+    /**
+     * Test get device returns error when path parameter is invalid type
+     */
+    @Test
+    public void testGetDeviceReturnsErrorWhenPathParameterInvalid() throws Exception {
+        // Given
+        Collection jsonContent = DeviceMapper.mapToCollection(getTestDevice());
+        ResponseWrapper responseWrapper = new ResponseWrapper(jsonContent);
+        String idUri = "/string-instead-of-integer";
+
+        // When & Then
+        MockHttpServletResponse response = mockMvc.perform(get(URI + idUri).with(httpBasic(user,password)))
+                .andExpect(content().contentType(APPLICATION_VND_COLLECTION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse();
+
+        JsonNode error = responseToErrorNode(response);
+        assertThat(error.get("code").asText(), is(ErrorCode.PARAMETER_VALIDATION_ERROR.getCode()));
     }
 
     /**

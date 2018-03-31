@@ -3,9 +3,7 @@ package web.controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Device;
-import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
-import web.exception.ExceptionWrapper;
 import web.service.DeviceService;
 
 import javax.validation.Valid;
@@ -54,6 +52,17 @@ public class DeviceController {
     }
 
     /**
+     * Get device matching given ID
+     *
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = ID_URI, method = RequestMethod.GET, produces = "application/vnd.collection+json; charset=utf-8")
+    public ResponseWrapper getDevice(@PathVariable Integer id) {
+        return deviceService.getDevices(id, null, null, null, null, null);
+    }
+
+    /**
      * Add device from request body to the database
      *
      * @param device
@@ -95,6 +104,25 @@ public class DeviceController {
         return deviceService.updateDevice(id, name, authenticationKey, device);
     }
 
+
+    /**
+     * Update device matching given ID. Existing item in database is replaced using given request body
+     *
+     * @param device
+     *      Device used to replace existing one
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = ID_URI, method = RequestMethod.PUT, produces = "application/vnd.collection+json; charset=utf-8")
+    public ResponseWrapper updateDeviceById(
+            @PathVariable Integer id,
+            @Valid @RequestBody Device device,
+            Errors errors) {
+        validateErrors(errors);
+
+        return deviceService.updateDevice(id, null, null, device);
+    }
+
     /**
      * Delete device matching given request parameters. At least one parameter is required.
      *
@@ -115,8 +143,14 @@ public class DeviceController {
         return deviceService.deleteDevice(id, name, authenticationKey);
     }
 
-    @RequestMapping(value = ID_URI, method = RequestMethod.GET)
-    public ResponseWrapper getDevicesIcon() {
-        throw new ExceptionWrapper("Not implemented", "Not implemented", ErrorCode.INTERNAL_ERROR);
+    /**
+     * Delete device matching given ID.
+     *
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = ID_URI, method = RequestMethod.DELETE, produces = "application/vnd.collection+json; charset=utf-8")
+    public ResponseWrapper deleteDeviceById(@PathVariable Integer id) {
+        return deviceService.deleteDevice(id, null, null);
     }
 }
