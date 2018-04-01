@@ -4,9 +4,15 @@ import javassist.NotFoundException;
 import org.hibernate.HibernateError;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import web.domain.entity.Device;
+import web.domain.entity.DeviceGroup;
+import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
+import web.exception.ExceptionWrapper;
+import web.mapper.DeviceGroupMapper;
+import web.repository.DeviceGroupRepository;
 import web.repository.DeviceRepository;
 import web.service.DeviceService;
 import web.validators.FilterValidator;
@@ -20,9 +26,11 @@ import static web.mapper.DeviceMapper.mapToCollection;
 public class DeviceServiceImpl implements DeviceService {
 
     private final DeviceRepository deviceRepository;
+    private final DeviceGroupRepository deviceGroupRepository;
 
-    DeviceServiceImpl(DeviceRepository deviceRepository) {
+    DeviceServiceImpl(DeviceRepository deviceRepository, DeviceGroupRepository deviceGroupRepository) {
         this.deviceRepository = deviceRepository;
+        this.deviceGroupRepository = deviceGroupRepository;
     }
 
     @Override
@@ -32,7 +40,7 @@ public class DeviceServiceImpl implements DeviceService {
             Collection<Device> devices = deviceRepository.getDevices(
                 id, name, deviceTypeId, deviceGroupId, configurationId, authenticationKey);
 
-            if(devices.size() == 0) {
+            if(CollectionUtils.isEmpty(devices)) {
                 throwNotFoundException(String.format(
                     "[id: %d, name: %s, deviceTypeId: %s, deviceGroupId: %s, configurationId: %s, authenticationKey: %s]",
                     id, name, deviceTypeId, deviceGroupId, configurationId, authenticationKey));
@@ -67,6 +75,12 @@ public class DeviceServiceImpl implements DeviceService {
 
             Device updatedDevice = deviceRepository.updateDevice(id, name, authenticationKey, device);
 
+            // TODO, fix commit calls during single stored procedure. Currently update procedures return old item - not the updated one
+            updatedDevice.setName(device.getName());
+            updatedDevice.setConfigurationId(device.getConfigurationId());
+            updatedDevice.setDeviceGroupId(device.getDeviceGroupId());
+            updatedDevice.setDeviceTypeId(device.getDeviceTypeId());
+
             return new ResponseWrapper(mapToCollection(updatedDevice));
         } catch(Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Update device failed");
@@ -95,6 +109,33 @@ public class DeviceServiceImpl implements DeviceService {
         return null;
     }
 
+    @Override
+    public ResponseWrapper getDevicesGroup(Integer id) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            validateDeviceExists(id, null, null);
+
+            // Device Group ID must be set
+            Integer deviceGroupId = getDevice(id).getDeviceGroupId();
+            if(deviceGroupId == null) {
+                throw new ExceptionWrapper("Get device's group failed", "Device Group ID is null", ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            Collection<DeviceGroup> deviceGroups = deviceGroupRepository.getDeviceGroups(deviceGroupId, null);
+            if(CollectionUtils.isEmpty(deviceGroups) || !deviceGroups.stream().findFirst().isPresent()) {
+                throwNotFoundException(String.format("[deviceGroupId: %d]", id));
+            }
+
+            DeviceGroup devicegroup = deviceGroups.stream().findFirst().get();
+
+            return new ResponseWrapper(DeviceGroupMapper.mapToCollection(devicegroup));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device's group failed");
+        }
+
+        return null;
+    }
+
     /**
      * Validate a device matching given parameters exists
      *
@@ -108,11 +149,25 @@ public class DeviceServiceImpl implements DeviceService {
      *      Exception thrown when device matching given parameters was not found
      */
     private void validateDeviceExists(Integer id, String name, String authenticationKey) throws NotFoundException {
-        Integer deviceCount = deviceRepository.getDevices(id, name, null, null, null, authenticationKey).size();
+        Collection<Device> devices = deviceRepository.getDevices(id, name, null, null, null, authenticationKey);
 
-        if(deviceCount == 0) {
+        if(CollectionUtils.isEmpty(devices)) {
             throwNotFoundException(String.format("[id: %d, name: %s, authenticationKey: %s]", id, name, authenticationKey));
         }
     }
 
+    /**
+     * Get device by ID
+     */
+    private Device getDevice(Integer id) throws Exception {
+        Collection<Device> devices = deviceRepository.getDevices(id, null, null, null, null, null);
+
+        if(CollectionUtils.isEmpty(devices) || !devices.stream().findFirst().isPresent()) {
+            throwNotFoundException(String.format("[id: %d]", id));
+        }
+
+        return devices.stream()
+                .findFirst()
+                .get();
+    }
 }

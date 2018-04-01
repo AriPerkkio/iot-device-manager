@@ -66,4 +66,14 @@ public interface DeviceService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper deleteDevice(Integer id, String name, String authenticationKey);
+
+    /**
+     * Get device's group
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getDevicesGroup(Integer id);
 }

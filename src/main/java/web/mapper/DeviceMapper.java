@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static web.mapper.MapperUtils.buildHref;
+import static web.mapper.MapperUtils.getOptionalValue;
+
 
 public class DeviceMapper {
     private static final String DEVICES_URI = "/devices";
@@ -19,30 +22,46 @@ public class DeviceMapper {
         // Private constructor for static
     }
 
+    /**
+     * Map {@link Device} to {@link Collection}
+     *
+     * @param device
+     *      Device to map
+     * @return
+     *      Collection containing device
+     */
     public static Collection mapToCollection(Device device) {
         return mapToCollection(Collections.singletonList(device));
     }
 
+    /**
+     * Map {@link java.util.Collection<Device>} to {@link net.hamnaberg.json.Collection}
+     *
+     * @param devices
+     *      Collection of devices to map
+     * @return
+     *      Collection containing devices
+     */
     public static Collection mapToCollection(java.util.Collection<Device> devices) {
         List<Item> items = new ArrayList<>();
         List<Link> links = new ArrayList<>();
 
         devices.forEach(device -> {
-            items.add(DeviceMapper.mapToItem(device));
-            links.addAll(DeviceMapper.mapToLinks(device));
+            items.add(mapToItem(device));
+            links.addAll(mapToLinks(device));
         });
 
         return Collection.create(
             ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri(),
             links,
             items,
-            DeviceMapper.getQueries(),
-            DeviceMapper.getTemplate(),
+            getQueries(),
+            getTemplate(),
             null);
     }
 
     private static Item mapToItem(Device device) {
-        URI href = buildHref(ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri(), device.getId());
+        URI href = buildHref(ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri(), DEVICES_URI, device.getId());
 
         // Mandatory fields
         Value deviceId = Value.of(device.getId());
@@ -66,49 +85,27 @@ public class DeviceMapper {
         return Item.create(href, properties);
     }
 
-    private static Value getOptionalValue(Integer optionalValue) {
-        if(optionalValue == null) {
-            return Value.NULL;
-        }
-
-        return Value.of(optionalValue);
-    }
-
-    private static URI buildHref(URI uri) {
-        return buildHref(uri, null, "");
-    }
-
-    private static URI buildHref(URI uri, Integer id) {
-        return buildHref(uri, id, "");
-    }
-
-    private static URI buildHref(URI uri, Integer id, String postFix) {
-        final String idUri = id == null ? "" : String.format("/%d", id);
-
-        return uri.resolve(DEVICES_URI + idUri + postFix);
-    }
-
     private static List<Link> mapToLinks(Device device) {
         URI baseUri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
         Integer id = device.getId();
 
         String groupRel = String.format("device %s group", id);
-        URI groupHref = buildHref(baseUri, id, "/group");
+        URI groupHref = buildHref(baseUri, DEVICES_URI, id, "/group");
 
         String typeRel = String.format("device %s type", id);
-        URI typeHref = buildHref(baseUri, id, "/type");
+        URI typeHref = buildHref(baseUri, DEVICES_URI, id, "/type");
 
         String iconRel = String.format("device %s icon", id);
-        URI iconHref = buildHref(baseUri, id, "/icon");
+        URI iconHref = buildHref(baseUri, DEVICES_URI, id, "/icon");
 
         String configurationRel = String.format("device %s configuration", id);
-        URI configurationHref = buildHref(baseUri, id, "/configuration");
+        URI configurationHref = buildHref(baseUri, DEVICES_URI, id, "/configuration");
 
         String measurementsRel = String.format("device %s measurements", id);
-        URI measurementsHref = buildHref(baseUri, id, "/measurements");
+        URI measurementsHref = buildHref(baseUri, DEVICES_URI, id, "/measurements");
 
         String locationsRel = String.format("device %s locations", id);
-        URI locationsHref = buildHref(baseUri, id, "/locations");
+        URI locationsHref = buildHref(baseUri, DEVICES_URI, id, "/locations");
 
 
         return Arrays.asList(
@@ -124,7 +121,7 @@ public class DeviceMapper {
     private static List<Query> getQueries() {
         return Collections.singletonList((
             Query.create(
-                buildHref(ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri()),
+                buildHref(ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri(), DEVICES_URI),
                 "search",
                 Option.of("Search"),
                 Arrays.asList(

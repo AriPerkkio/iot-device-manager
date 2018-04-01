@@ -104,7 +104,6 @@ public class DeviceController {
         return deviceService.updateDevice(id, name, authenticationKey, device);
     }
 
-
     /**
      * Update device matching given ID. Existing item in database is replaced using given request body
      *
@@ -152,5 +151,10 @@ public class DeviceController {
     @RequestMapping(value = ID_URI, method = RequestMethod.DELETE, produces = "application/vnd.collection+json; charset=utf-8")
     public ResponseWrapper deleteDeviceById(@PathVariable Integer id) {
         return deviceService.deleteDevice(id, null, null);
+    }
+
+    @RequestMapping(value = ID_URI + "/group", method = RequestMethod.GET, produces = "application/vnd.collection+json; charset=utf-8")
+    public ResponseWrapper getDevicesGroup(@PathVariable Integer id) {
+        return deviceService.getDevicesGroup(id);
     }
 }

@@ -1,6 +1,7 @@
 package web.domain.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @NamedStoredProcedureQueries({
     @NamedStoredProcedureQuery(name = "get_device_groups", procedureName = "get_device_groups", resultClasses = DeviceGroup.class,
@@ -35,6 +36,7 @@ public class DeviceGroup {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @NotNull
     private String name;
 
     private String description;
