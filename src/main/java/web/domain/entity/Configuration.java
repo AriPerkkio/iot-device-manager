@@ -5,6 +5,8 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.HashMap;
 
 @NamedStoredProcedureQueries({
@@ -44,8 +46,11 @@ public class Configuration {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @NotNull
+    @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}")
     private String name;
 
+    @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,100}")
     private String description;
 
     // HashMap used to represent MySQL JSON column
