@@ -1,23 +1,32 @@
 package web.service.impl;
 
+import javassist.NotFoundException;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.HibernateError;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import web.domain.entity.DeviceIcon;
-import web.domain.response.ErrorWrapper;
+import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
+import web.exception.ExceptionHandlingUtils;
+import web.exception.ExceptionWrapper;
 import web.repository.DeviceIconRepository;
 import web.service.DeviceIconService;
-import web.validators.FilterValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
-import static web.domain.response.ErrorCode.INTERNAL_ERROR;
+import static web.exception.ExceptionHandlingUtils.throwNotFoundException;
+import static web.mapper.DeviceIconMapper.mapToCollection;
+import static web.validators.FilterValidator.checkForMinimumFilters;
 
 @Service
 public class DeviceIconServiceImpl implements DeviceIconService {
@@ -25,7 +34,8 @@ public class DeviceIconServiceImpl implements DeviceIconService {
     private final DeviceIconRepository deviceIconRepository;
     private final Path path;
     private final String iconsLocation;
-    private final Pattern filenamePattern = Pattern.compile("^[A-Za-z0-9-_]{1,25}.(png)$");
+    private final String filenameRegex = "^[A-Za-z0-9-_]{1,25}.(png)$";
+    private final Pattern filenamePattern = Pattern.compile(filenameRegex);
 
     DeviceIconServiceImpl(DeviceIconRepository deviceIconRepository,
                           @Value("${deviceicon.upload.location.root}") String root,
@@ -36,59 +46,136 @@ public class DeviceIconServiceImpl implements DeviceIconService {
     }
 
     @Override
-    public ResponseWrapper addDeviceIcon(MultipartFile icon, String name) {
-        try {
-            DeviceIcon deviceIcon = new DeviceIcon(null, name);
-            Files.copy(icon.getInputStream(), path.resolve(deviceIcon.getName()));
-
-            return new ResponseWrapper(deviceIconRepository.addDeviceIcon(deviceIcon));
-        } catch (Exception e) {
-            return new ResponseWrapper(new ErrorWrapper(INTERNAL_ERROR, "TODO error handling"));
-        }
-    }
-
-    @Override
-    public Boolean deleteDeviceIcon(Integer id, String name) {
-        try {
-            Boolean result = deviceIconRepository.deleteDeviceIcon(id, name);
-
-            if (result) {
-                Files.delete(path.resolve(name));
-            }
-
-            return result;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    @Override
-    public Resource getDeviceIcon(Integer id, String name) {
-        try {
-            DeviceIcon deviceIcon = deviceIconRepository.getDeviceIcons(id, name).stream().findFirst().get();
-
-            return new UrlResource(path.resolve(deviceIcon.getName()).toUri());
-        } catch (Exception e) {
-            throw new RuntimeException(e.toString());
-        }
-    }
-
-    @Override
     public ResponseWrapper getDeviceIcons(Integer id, String name) {
         try {
-            return new ResponseWrapper(deviceIconRepository.getDeviceIcons(id, name));
+            validateDeviceIconName(name);
+            Collection<DeviceIcon> deviceIcons = deviceIconRepository.getDeviceIcons(id, name);
+
+           if(CollectionUtils.isEmpty(deviceIcons)) {
+                throwNotFoundException(String.format("[id: %d, name: %s]",id, name));
+           }
+
+            return new ResponseWrapper(mapToCollection(deviceIcons));
         } catch (Exception e) {
-            return new ResponseWrapper(new ErrorWrapper(INTERNAL_ERROR, "TODO error handling"));
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device icons failed");
         }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addDeviceIcon(MultipartFile icon, String name) {
+        try {
+            checkForMinimumFilters(name);
+            validateDeviceIconName(name);
+
+            DeviceIcon deviceIcon = new DeviceIcon(null, name);
+            DeviceIcon addedDeviceIcon = deviceIconRepository.addDeviceIcon(deviceIcon);
+            Files.copy(icon.getInputStream(), path.resolve(deviceIcon.getName()));
+
+            return new ResponseWrapper(mapToCollection(addedDeviceIcon));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device icon failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper deleteDeviceIcon(Integer id, String name) {
+        try {
+            checkForMinimumFilters(id, name);
+            validateDeviceIconName(name);
+
+            DeviceIcon deviceIcon = getDeviceIcon(id, name);
+            Boolean deleteSuccessful = deviceIconRepository.deleteDeviceIcon(id, name);
+
+            if (deleteSuccessful) {
+                Files.delete(path.resolve(deviceIcon.getName()));
+            } else {
+                throw new HibernateError("");
+            }
+
+            return new ResponseWrapper("", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete device icon failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public Resource getDeviceIconFile(String name) {
+        try {
+            checkForMinimumFilters(name);
+            validateDeviceIconName(name);
+            validateDeviceIconExists(name);
+
+            return new UrlResource(path.resolve(name).toUri());
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device icon failed");
+        }
+
+        return null;
     }
 
     @Override
     public ResponseWrapper updateDeviceIcon(Integer id, String name, DeviceIcon deviceIcon) {
         try {
-            FilterValidator.checkForMinimumFilters(id, name);
-            return new ResponseWrapper(deviceIconRepository.updateDeviceIcon(id, name, deviceIcon));
+            checkForMinimumFilters(id, name);
+            validateDeviceIconName(deviceIcon.getName());
+            validateDeviceIconName(name);
+
+            DeviceIcon originalDeviceIcon = getDeviceIcon(id, name);
+            DeviceIcon updatedDeviceIcon = deviceIconRepository.updateDeviceIcon(id, name, deviceIcon);
+            Files.move(path.resolve(originalDeviceIcon.getName()), path.resolve(deviceIcon.getName()));
+
+            // TODO, fix commit calls during single stored procedure. Currently update procedures return old item - not the updated one
+            updatedDeviceIcon.setName(deviceIcon.getName());
+
+            return new ResponseWrapper(mapToCollection(updatedDeviceIcon));
         } catch (Exception e) {
-            return new ResponseWrapper(new ErrorWrapper(INTERNAL_ERROR, "TODO error handling"));
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Update device icon failed");
         }
+
+        return null;
+    }
+
+    /**
+     * Validate device icon name matches pattern
+     */
+    private void validateDeviceIconName(String name) {
+        if(!StringUtils.isEmpty(name) && !filenamePattern.matcher(name).matches()) {
+            throw new ExceptionWrapper(
+                    "Parameter validation",
+                    String.format("Device icon name %s does not meet regex pattern: %s", name, filenameRegex),
+                    ErrorCode.PARAMETER_VALIDATION_ERROR);
+        }
+    }
+
+    private void validateDeviceIconExists(String name) throws NotFoundException {
+        getDeviceIcon(null, name);
+    }
+
+    /**
+     * Get device icon. Validates name. Verifies device icon exists in database and file system
+     */
+    private DeviceIcon getDeviceIcon(Integer id, String name) throws NotFoundException {
+        validateDeviceIconName(name);
+        Collection<DeviceIcon> deviceIcons = deviceIconRepository.getDeviceIcons(id, name);
+
+        if(CollectionUtils.isEmpty(deviceIcons) || !deviceIcons.stream().findFirst().isPresent()) {
+            throwNotFoundException(String.format("[id: %d, name: %s]", id, name));
+        }
+
+        DeviceIcon deviceIcon = deviceIcons.stream()
+            .findFirst()
+            .get();
+
+        if(Files.notExists(path.resolve(deviceIcon.getName()))) {
+            throwNotFoundException(String.format("[id: %d, name: %s]", id, name));
+        }
+
+        return deviceIcon;
     }
 }

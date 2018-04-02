@@ -8,16 +8,26 @@ import web.domain.response.ResponseWrapper;
 public interface DeviceIconService {
 
     /**
-     * Get device icon as {@link Resource}. At least one filter is required.
+     * Get device icons matching given parameters
      *
      * @param id
      *      Device icon ID used as filter
      * @param name
      *      Device icon name used as filter
      * @return
-     *      Device icon resource when icon found. Null when no match found.
+     *      ResponseWrapper containing payload or errors
      */
-    Resource getDeviceIcon(Integer id, String name);
+    ResponseWrapper getDeviceIcons(Integer id, String name);
+
+    /**
+     * Get device icon as {@link Resource}
+     *
+     * @param name
+     *      Device icon name used as filter
+     * @return
+     *      Device icon resource when icon found. Runtime exception is thrown otherwise
+     */
+    Resource getDeviceIconFile(String name);
 
     /**
      * Add device icon to the database.
@@ -30,18 +40,6 @@ public interface DeviceIconService {
      *      ResponseWrapper containing payload or error
      */
     ResponseWrapper addDeviceIcon(MultipartFile icon, String name);
-
-    /**
-     * Get device icons matching given parameters
-     *
-     * @param id
-     *      Device icon ID used as filter
-     * @param name
-     *      Device icon name used as filter
-     * @return
-     *      ResponseWrapper containing payloar or errors
-     */
-    ResponseWrapper getDeviceIcons(Integer id, String name);
 
     /**
      * Update device icon matching given filter parameters. At least one parameter is required.
@@ -65,7 +63,7 @@ public interface DeviceIconService {
      * @param name
      *      Device icon name used as filter
      * @return
-     *      True when delete is successful, false when delete failed
+     *      ResponseWrapper containing payload or errors
      */
-    Boolean deleteDeviceIcon(Integer id, String name);
+    ResponseWrapper deleteDeviceIcon(Integer id, String name);
 }

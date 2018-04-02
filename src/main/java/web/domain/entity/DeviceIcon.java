@@ -1,6 +1,7 @@
 package web.domain.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @NamedStoredProcedureQueries({
     @NamedStoredProcedureQuery(name = "get_device_icons", procedureName = "get_device_icons", resultClasses = DeviceIcon.class,
@@ -42,6 +43,7 @@ public class DeviceIcon {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @NotNull
     private String name;
 
     public Integer getId() {

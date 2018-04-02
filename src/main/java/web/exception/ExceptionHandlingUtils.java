@@ -21,7 +21,7 @@ public class ExceptionHandlingUtils {
      */
     public static void validateRepositoryExceptions(Exception e, String title) throws ExceptionWrapper {
         // Initial values
-        String message = "Unknown error occurred";
+        String message = e.toString();
         ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
 
         if(e instanceof NotFoundException) {
