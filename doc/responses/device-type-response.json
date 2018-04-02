@@ -19,7 +19,7 @@
     "template": {
       "data": [
         { "name": "name", "value": "", "prompt": "Type name", "regexp": "[A-Za-z0-9_ .,-]{1,50}"},
-        { "name": "deviceTypeId", "value": "", "prompt": "Device Type Identifier"}
+        { "name": "deviceIconId", "value": "", "prompt": "Device Icon Identifier"}
       ]
     },
     "queries": [

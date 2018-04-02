@@ -35,7 +35,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class DeviceTestIT {
 
     private static final String URI = "/api/devices";
-    private static final String APPLICATION_VND_COLLECTION_JSON = "application/vnd.collection+json;charset=utf-8";
+    private static final String APPLICATION_VND_COLLECTION_JSON = "application/vnd.collection+json; charset=utf-8";
+    private static final String APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE = "application/vnd.collection+json;charset=utf-8";
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Value("${iotdevicemanager.username}")
@@ -59,7 +60,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode collection = jsonNode.get("collection");
@@ -82,7 +83,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode collection = jsonNode.get("collection");
@@ -105,7 +106,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode collection = jsonNode.get("collection");
@@ -136,7 +137,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode items = jsonNode.get("collection").get("items");
@@ -173,7 +174,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode items = jsonNode.get("collection").get("items");
@@ -202,7 +203,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode items = jsonNode.get("collection").get("items");
@@ -238,7 +239,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode error = jsonNode.get("collection").get("error");
@@ -261,7 +262,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode error = jsonNode.get("collection").get("error");
@@ -290,7 +291,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode error = jsonNode.get("collection").get("error");
@@ -325,7 +326,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode items = jsonNode.get("collection").get("items");
@@ -358,7 +359,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
-        assertEquals(response.getContentType(), APPLICATION_VND_COLLECTION_JSON);
+        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
 
         JsonNode jsonNode = mapper.readTree(response.getContentAsString());
         JsonNode error = jsonNode.get("collection").get("error");
