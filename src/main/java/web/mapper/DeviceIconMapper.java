@@ -14,7 +14,7 @@ import java.util.List;
 import static web.mapper.MapperUtils.buildHref;
 
 public class DeviceIconMapper {
-    private static final String DEVICE_ICONS_URI = "/device-icons";
+    private static final String DEVICE_ICONS_URI = "/api/device-icons";
 
     private DeviceIconMapper() {
         // Private constructor for static

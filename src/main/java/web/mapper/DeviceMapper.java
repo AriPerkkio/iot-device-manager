@@ -16,7 +16,7 @@ import static web.mapper.MapperUtils.getOptionalValue;
 
 
 public class DeviceMapper {
-    private static final String DEVICES_URI = "/devices";
+    private static final String DEVICES_URI = "/api/devices";
 
     private DeviceMapper() {
         // Private constructor for static

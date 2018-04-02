@@ -15,7 +15,7 @@ import static web.mapper.MapperUtils.buildHref;
 import static web.mapper.MapperUtils.getOptionalValue;
 
 public class DeviceGroupMapper {
-    private static final String DEVICE_GROUPS_URI = "/device-groups";
+    private static final String DEVICE_GROUPS_URI = "/api/device-groups";
 
     private DeviceGroupMapper() {
         // Private constructor for static

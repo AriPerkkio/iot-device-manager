@@ -17,7 +17,7 @@ import static web.mapper.MapperUtils.buildHref;
 import static web.mapper.MapperUtils.getOptionalValue;
 
 public class ConfigurationMapper {
-    private static final String CONFIGURATIONS_URI = "/configurations";
+    private static final String CONFIGURATIONS_URI = "/api/configurations";
 
     private ConfigurationMapper() {
         // Private constructor for static

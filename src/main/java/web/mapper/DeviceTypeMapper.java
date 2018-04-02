@@ -15,7 +15,7 @@ import static web.mapper.MapperUtils.buildHref;
 import static web.mapper.MapperUtils.getOptionalValue;
 
 public class DeviceTypeMapper {
-    private static final String DEVICE_TYPES_URI = "/device-types";
+    private static final String DEVICE_TYPES_URI = "/api/device-types";
 
     private DeviceTypeMapper() {
         // Private constructor for static
