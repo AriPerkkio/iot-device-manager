@@ -1,5 +1,6 @@
 package web.domain.response;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -19,6 +20,12 @@ public class ResponseWrapper extends ResponseEntity {
 
     public ResponseWrapper(Object payload, HttpStatus httpStatus) {
         super(payload.toString(), httpStatus);
+        this.payload = payload;
+        this.httpStatus = httpStatus;
+    }
+
+    public ResponseWrapper(Object payload, HttpHeaders httpHeaders, HttpStatus httpStatus) {
+        super(payload.toString(), httpHeaders, httpStatus);
         this.payload = payload;
         this.httpStatus = httpStatus;
     }

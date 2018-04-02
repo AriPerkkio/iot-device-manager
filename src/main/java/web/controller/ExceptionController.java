@@ -1,6 +1,7 @@
 package web.controller;
 
 import net.hamnaberg.json.Error;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,12 +20,18 @@ import static org.springframework.http.HttpStatus.*;
 @ControllerAdvice
 public class ExceptionController {
 
+    private final HttpHeaders httpHeaders;
+
+    ExceptionController(HttpHeaders httpHeaders) {
+        this.httpHeaders = httpHeaders;
+    }
+
     @ExceptionHandler({Exception.class})
     public ResponseWrapper unhandledExceptionHandler(Exception ex, HttpServletRequest request) throws Exception {
         Error error = Error.create("Unhandled error", ErrorCode.INTERNAL_ERROR.getCode(), ex.toString());
         URI href = new URI(request.getRequestURL().toString());
 
-        return new ResponseWrapper(error.toCollection(href), INTERNAL_SERVER_ERROR);
+        return new ResponseWrapper(error.toCollection(href), httpHeaders, INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({ ExceptionWrapper.class })
@@ -32,7 +39,7 @@ public class ExceptionController {
         Error error = Error.create(ex.getTitle(), ex.getCodeAsString(), ex.getMessage());
         URI href = new URI(request.getRequestURL().toString());
 
-        return new ResponseWrapper(error.toCollection(href), resolveHttpStatus(ex.getCode()));
+        return new ResponseWrapper(error.toCollection(href), httpHeaders,resolveHttpStatus(ex.getCode()));
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
@@ -51,7 +58,7 @@ public class ExceptionController {
         Error error = Error.create("Parameter validation error", ErrorCode.PARAMETER_VALIDATION_ERROR.getCode(), message);
         URI href = new URI(request.getRequestURL().toString());
 
-        return new ResponseWrapper(error.toCollection(href), BAD_REQUEST);
+        return new ResponseWrapper(error.toCollection(href), httpHeaders, BAD_REQUEST);
     }
 
     private HttpStatus resolveHttpStatus(ErrorCode errorCode) {
