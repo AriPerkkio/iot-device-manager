@@ -40,6 +40,8 @@ import java.util.HashMap;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class Measurement {
     @Id
+    private Integer id;
+
     private Integer deviceId;
 
     // HashMap used to represent MySQL JSON column
@@ -48,6 +50,14 @@ public class Measurement {
     private HashMap content;
 
     private Date time;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Integer getDeviceId() {
         return deviceId;

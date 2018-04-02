@@ -8,7 +8,7 @@ CREATE PROCEDURE get_locations (
     IN f_start_time DATETIME,
     IN f_end_time DATETIME)
 BEGIN
-    SET @query = "SELECT device_id, longitude, latitude, time FROM location";
+    SET @query = "SELECT id, device_id, longitude, latitude, time FROM location";
     SET @where_clause = " WHERE 1=1";
 
     IF f_device_id IS NOT NULL THEN
@@ -40,8 +40,8 @@ DROP PROCEDURE IF EXISTS add_location;
 DELIMITER $$
 CREATE PROCEDURE add_location (
     IN p_device_id INT,
-    IN p_latitude DECIMAL,
-    IN p_longitude DECIMAL,
+    IN p_latitude DECIMAL(6,3),
+    IN p_longitude DECIMAL(6,3),
     IN p_time DATETIME)
 BEGIN
     SET @time = p_time;

@@ -1,5 +1,6 @@
 package web.service;
 
+import javassist.NotFoundException;
 import web.domain.entity.Device;
 import web.domain.response.ResponseWrapper;
 
@@ -76,4 +77,18 @@ public interface DeviceService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper getDevicesGroup(Integer id);
+
+    /**
+     * Validate a device matching given parameters exists
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param name
+     *      Device name used as filter
+     * @param authenticationKey
+     *      Device authentication key used as filter
+     * @throws NotFoundException
+     *      Exception thrown when device matching given parameters was not found
+     */
+    void validateDeviceExists(Integer id, String name, String authenticationKey) throws NotFoundException;
 }

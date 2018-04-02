@@ -1,9 +1,11 @@
 package web.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -34,14 +36,30 @@ import java.util.Date;
 @Entity
 @Table(name = "location")
 public class Location {
+
     @Id
+    private Integer id;
+
+    @NotNull
     private Integer deviceId;
 
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private BigDecimal latitude;
 
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private BigDecimal longitude;
 
     private Date time;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Integer getDeviceId() {
         return deviceId;
@@ -88,6 +106,7 @@ public class Location {
             .append(latitude, location.latitude)
             .append(longitude, location.longitude)
             .append(time, location.time)
+            .append(id, location.id)
             .isEquals();
     }
 
@@ -98,6 +117,7 @@ public class Location {
             .append(latitude)
             .append(longitude)
             .append(time)
+            .append(id)
             .toHashCode();
     }
 }

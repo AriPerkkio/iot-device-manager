@@ -249,10 +249,11 @@ Delete Device Icon
 Map Result To Location
     [Arguments]    ${result}
     ${mapped location} =  Create Dictionary
-    ...  id=${result[0]}
-    ...  longitude=${result[1]}
-    ...  latitude=${result[2]}
-    ...  time=${result[3]}
+    ...  unused_id=${result[0]}
+    ...  id=${result[1]}
+    ...  longitude=${result[2]}
+    ...  latitude=${result[3]}
+    ...  time=${result[4]}
     [Return]    ${mapped location}
 
 Add Location
@@ -282,9 +283,10 @@ Delete Location
 Map Result To Measurement
     [Arguments]    ${result}
     ${mapped measurement} =  Create Dictionary
-    ...  id=${result[0]}
-    ...  content=${result[1]}
-    ...  time=${result[2]}
+    ...  unused_id=${result[0]}
+    ...  id=${result[1]}
+    ...  content=${result[2]}
+    ...  time=${result[3]}
     [Return]    ${mapped measurement}
 
 Add Measurement

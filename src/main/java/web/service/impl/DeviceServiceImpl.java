@@ -136,19 +136,8 @@ public class DeviceServiceImpl implements DeviceService {
         return null;
     }
 
-    /**
-     * Validate a device matching given parameters exists
-     *
-     * @param id
-     *      Device ID used as filter
-     * @param name
-     *      Device name used as filter
-     * @param authenticationKey
-     *      Device authentication key used as filter
-     * @throws NotFoundException
-     *      Exception thrown when device matching given parameters was not found
-     */
-    private void validateDeviceExists(Integer id, String name, String authenticationKey) throws NotFoundException {
+    @Override
+    public void validateDeviceExists(Integer id, String name, String authenticationKey) throws NotFoundException {
         Collection<Device> devices = deviceRepository.getDevices(id, name, null, null, null, authenticationKey);
 
         if(CollectionUtils.isEmpty(devices)) {

@@ -39,14 +39,16 @@ CREATE TABLE IF NOT EXISTS device (
 );
 
 CREATE TABLE IF NOT EXISTS location (
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     device_id INT NOT NULL,
-    latitude DECIMAL NOT NULL,
-    longitude DECIMAL NOT NULL,
+    latitude DECIMAL(6,3) NOT NULL,
+    longitude DECIMAL(6,3) NOT NULL,
     time DATETIME NOT NULL,
     FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS measurement (
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     device_id INT NOT NULL,
     content JSON NOT NULL,
     time DATETIME NOT NULL,

@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 
@@ -185,8 +186,10 @@ public class LocationRepositoryTest {
         Collection<Location> results = locationRepository.getLocations(null, null, startTime, null);
 
         // Then
-        assertThat(results, IsCollectionContaining.hasItem(expected));
-    }
+        assertThat(results.size(), is(1));
+        Location location = results.stream().findFirst().get();
+        assertThat(expected.getDeviceId(), is(location.getDeviceId()));
+        assertThat(expected.getTime(), is(location.getTime()));    }
 
     /**
      * Test get_locations with end_time finds inserted location
@@ -205,8 +208,10 @@ public class LocationRepositoryTest {
         Collection<Location> results = locationRepository.getLocations(null, null, null, endTime);
 
         // Then
-        assertThat(results, IsCollectionContaining.hasItem(expected));
-    }
+        assertThat(results.size(), is(1));
+        Location location = results.stream().findFirst().get();
+        assertThat(expected.getDeviceId(), is(location.getDeviceId()));
+        assertThat(expected.getTime(), is(location.getTime()));    }
 
     /**
      * Test get_locations with start_time and end_time finds inserted location
@@ -226,7 +231,10 @@ public class LocationRepositoryTest {
         Collection<Location> results = locationRepository.getLocations(null, null, startTime, endTime);
 
         // Then
-        assertThat(results, IsCollectionContaining.hasItem(expected));
+        assertThat(results.size(), is(1));
+        Location location = results.stream().findFirst().get();
+        assertThat(expected.getDeviceId(), is(location.getDeviceId()));
+        assertThat(expected.getTime(), is(location.getTime()));
     }
 
 

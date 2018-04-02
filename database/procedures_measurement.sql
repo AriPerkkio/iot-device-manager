@@ -8,7 +8,7 @@ CREATE PROCEDURE get_measurements (
     IN f_start_time DATETIME,
     IN f_end_time DATETIME)
 BEGIN
-    SET @query = "SELECT device_id, content, time FROM measurement";
+    SET @query = "SELECT id, device_id, content, time FROM measurement";
     SET @where_clause = " WHERE 1=1";
 
     IF f_device_id IS NOT NULL THEN
