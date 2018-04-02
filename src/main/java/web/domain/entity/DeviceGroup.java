@@ -2,6 +2,7 @@ package web.domain.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @NamedStoredProcedureQueries({
     @NamedStoredProcedureQuery(name = "get_device_groups", procedureName = "get_device_groups", resultClasses = DeviceGroup.class,
@@ -37,8 +38,10 @@ public class DeviceGroup {
     private Integer id;
 
     @NotNull
+    @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}")
     private String name;
 
+    @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,100}")
     private String description;
 
     public Integer getId() {

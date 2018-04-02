@@ -1,6 +1,8 @@
 package web.domain.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @NamedStoredProcedureQueries({
     @NamedStoredProcedureQuery(name = "get_device_types", procedureName = "get_device_types", resultClasses = DeviceType.class,
@@ -35,6 +37,8 @@ public class DeviceType {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @NotNull
+    @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}")
     private String name;
 
     private Integer deviceIconId;

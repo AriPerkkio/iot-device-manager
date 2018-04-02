@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @NamedStoredProcedureQueries({
     @NamedStoredProcedureQuery(name = "get_devices", procedureName = "get_devices", resultClasses = Device.class,
@@ -50,6 +51,7 @@ public class Device {
     private Integer id;
 
     @NotNull
+    @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}")
     private String name;
 
     private Integer deviceTypeId;
