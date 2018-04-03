@@ -1,6 +1,7 @@
 package web.domain.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -47,8 +49,10 @@ public class Measurement {
     // HashMap used to represent MySQL JSON column
     @Type(type = "json")
     @Column(columnDefinition = "json")
+    @NotNull
     private HashMap content;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private Date time;
 
     public Integer getId() {

@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.Date;
 
 import static web.exception.ExceptionHandlingUtils.throwNotFoundException;
-import static web.mapper.LocationMapper.formatTime;
 import static web.mapper.LocationMapper.mapToCollection;
+import static web.mapper.MapperUtils.formatTime;
 
 @Service
 public class LocationServiceImpl implements LocationService {

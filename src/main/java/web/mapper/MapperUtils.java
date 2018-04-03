@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.hamnaberg.json.Value;
 
 import java.net.URI;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
  * Helper utilities for collection+json mappers
  */
-class MapperUtils {
+public class MapperUtils {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -20,14 +23,14 @@ class MapperUtils {
     /**
      * {@link #buildHref(URI uri, String resourceUri, Integer id, String postFix)}
      */
-    static URI buildHref(URI uri, String resourceUri) {
+    public static URI buildHref(URI uri, String resourceUri) {
         return buildHref(uri, resourceUri, null, "");
     }
 
     /**
      * {@link #buildHref(URI uri, String resourceUri, Integer id, String postFix)}
      */
-    static URI buildHref(URI uri, String resourceUri, Integer id) {
+    public static URI buildHref(URI uri, String resourceUri, Integer id) {
         return buildHref(uri, resourceUri, id, "");
     }
 
@@ -45,7 +48,7 @@ class MapperUtils {
      * @return
      *      Build URI
      */
-    static URI buildHref(URI uri, String resourceUri, Integer id, String postFix) {
+    public static URI buildHref(URI uri, String resourceUri, Integer id, String postFix) {
         final String idUri = id == null ? "" : String.format("/%d", id);
 
         return uri.resolve(resourceUri + idUri + postFix);
@@ -60,7 +63,7 @@ class MapperUtils {
      * @throws Exception
      *      Exception thrown when JSON parse fails
      */
-    static Value getOptionalValue(HashMap optionalValue) throws Exception {
+    public static Value getOptionalValue(HashMap optionalValue) throws Exception {
         if(optionalValue == null) {
             return Value.NULL;
         }
@@ -75,7 +78,7 @@ class MapperUtils {
      * @return
      *      {@link Value} for given Integer
      */
-    static Value getOptionalValue(Integer optionalValue) {
+    public static Value getOptionalValue(Integer optionalValue) {
         if(optionalValue == null) {
             return Value.NULL;
         }
@@ -90,11 +93,29 @@ class MapperUtils {
      * @return
      *      {@link Value} for given String
      */
-    static Value getOptionalValue(String optionalValue) {
+    public static Value getOptionalValue(String optionalValue) {
         if(optionalValue == null) {
             return Value.NULL;
         }
 
         return Value.of(optionalValue);
+    }
+
+
+    /**
+     * Format time to string
+     *
+     * @param time
+     *      Time to format
+     * @return
+     *      Formatted string
+     */
+    public static String formatTime(Date time) {
+        if(time == null) {
+            return null;
+        }
+
+        return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+            .format(new Timestamp(time.getTime()));
     }
 }
