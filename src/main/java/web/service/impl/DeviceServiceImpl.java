@@ -7,13 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.DeviceType;
 import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
 import web.exception.ExceptionWrapper;
 import web.mapper.DeviceGroupMapper;
+import web.mapper.DeviceTypeMapper;
 import web.repository.DeviceGroupRepository;
 import web.repository.DeviceRepository;
+import web.repository.DeviceTypeRepository;
 import web.service.DeviceService;
 import web.validators.FilterValidator;
 
@@ -27,10 +30,13 @@ public class DeviceServiceImpl implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final DeviceGroupRepository deviceGroupRepository;
+    private final DeviceTypeRepository deviceTypeRepository;
 
-    DeviceServiceImpl(DeviceRepository deviceRepository, DeviceGroupRepository deviceGroupRepository) {
+    DeviceServiceImpl(DeviceRepository deviceRepository, DeviceGroupRepository deviceGroupRepository,
+                      DeviceTypeRepository deviceTypeRepository) {
         this.deviceRepository = deviceRepository;
         this.deviceGroupRepository = deviceGroupRepository;
+        this.deviceTypeRepository = deviceTypeRepository;
     }
 
     @Override
@@ -116,12 +122,12 @@ public class DeviceServiceImpl implements DeviceService {
 
             Integer deviceGroupId = getDevice(id).getDeviceGroupId();
             if(deviceGroupId == null) {
-                throw new ExceptionWrapper("Get device's group failed", "Device Group ID is null", ErrorCode.NO_ITEMS_FOUND);
+                throw new ExceptionWrapper("Get device's group failed", "Device Group ID is null", ErrorCode.PARAMETER_CONFLICT);
             }
 
             Collection<DeviceGroup> deviceGroups = deviceGroupRepository.getDeviceGroups(deviceGroupId, null);
             if(CollectionUtils.isEmpty(deviceGroups) || !deviceGroups.stream().findFirst().isPresent()) {
-                throwNotFoundException(String.format("[deviceGroupId: %d]", id));
+                throwNotFoundException(String.format("[deviceGroupId: %d]", deviceGroupId));
             }
 
             DeviceGroup devicegroup = deviceGroups.stream().findFirst().get();
@@ -169,8 +175,8 @@ public class DeviceServiceImpl implements DeviceService {
             if(device.getDeviceGroupId() == null) {
                 throw new ExceptionWrapper(
                     "Update device's group failed",
-                    "Device doesn't belong to any group",
-                    ErrorCode.PARAMETER_VALIDATION_ERROR);
+                    "Device Group ID is null",
+                    ErrorCode.PARAMETER_CONFLICT);
             }
 
             DeviceGroup updatedDeviceGroup = deviceGroupRepository.updateDeviceGroup(device.getDeviceGroupId(), null, deviceGroup);
@@ -190,7 +196,7 @@ public class DeviceServiceImpl implements DeviceService {
             Device device = getDevice(id);
 
             if(device.getDeviceGroupId() == null) {
-                throw new ExceptionWrapper("Delete device's group failed", "Device Group ID is null", ErrorCode.NO_ITEMS_FOUND);
+                throw new ExceptionWrapper("Delete device's group failed", "Device Group ID is null", ErrorCode.PARAMETER_CONFLICT);
             }
 
             Boolean deleteSuccessful = deviceGroupRepository.deleteDeviceGroup(device.getDeviceGroupId(), null);
@@ -202,6 +208,104 @@ public class DeviceServiceImpl implements DeviceService {
             return new ResponseWrapper("", HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete device's group failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper getDevicesType(Integer id) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+
+            Integer deviceTypeId = getDevice(id).getDeviceTypeId();
+            if(deviceTypeId == null) {
+                throw new ExceptionWrapper("Get device's type failed", "Device Type ID is null", ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            Collection<DeviceType> deviceTypes = deviceTypeRepository.getDeviceTypes(deviceTypeId, null, null);
+            if(CollectionUtils.isEmpty(deviceTypes) || !deviceTypes.stream().findFirst().isPresent()) {
+                throwNotFoundException(String.format("[deviceTypeId: %d]", deviceTypeId));
+            }
+
+            DeviceType deviceType = deviceTypes.stream().findFirst().get();
+
+            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(deviceType));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device's type failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addTypeForDevice(Integer id, DeviceType deviceType) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceTypeId() != null) {
+                throw new ExceptionWrapper(
+                    "Add type for device failed",
+                    String.format("Device belongs to type %d already. Modify device's type ID to change its type.", device.getDeviceTypeId()),
+                    ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            // Add new type and use its ID for device's typeId
+            DeviceType addedDeviceType = deviceTypeRepository.addDeviceType(deviceType);
+            device.setDeviceTypeId(addedDeviceType.getId());
+            deviceRepository.updateDevice(id, null, null, device);
+
+            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(addedDeviceType));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add type for device failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper updateDevicesType(Integer id, DeviceType deviceType) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceTypeId() == null) {
+                throw new ExceptionWrapper(
+                    "Update device's type failed",
+                    "Device Type ID is null",
+                    ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            DeviceType updatedDeviceType = deviceTypeRepository.updateDeviceType(device.getDeviceTypeId(), null, deviceType);
+
+            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(updatedDeviceType));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Update device's type failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper deleteDevicesType(Integer id) {
+        try{
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceTypeId() == null) {
+                throw new ExceptionWrapper("Delete device's type failed", "Device Type ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            Boolean deleteSuccessful = deviceTypeRepository.deleteDeviceType(device.getDeviceTypeId(), null);
+
+            if(!deleteSuccessful) {
+                throw new HibernateError("");
+            }
+
+            return new ResponseWrapper("", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete device's type failed");
         }
 
         return null;

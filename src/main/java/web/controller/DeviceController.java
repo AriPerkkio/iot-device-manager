@@ -4,6 +4,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.DeviceType;
 import web.domain.response.ResponseWrapper;
 import web.service.DeviceService;
 
@@ -18,6 +19,7 @@ public class DeviceController {
     private static final String URI = "/devices";
     private static final String ID_URI = URI + "/{id}";
     private static final String GROUP_URI = ID_URI + "/group";
+    private static final String TYPE_URI = ID_URI + "/type";
     private final DeviceService deviceService;
 
     DeviceController(DeviceService deviceService) {
@@ -219,5 +221,71 @@ public class DeviceController {
     @RequestMapping(value = GROUP_URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDevicesGroup(@PathVariable Integer id) {
         return deviceService.deleteDevicesGroup(id);
+    }
+
+    /**
+     * Get device's type
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = TYPE_URI, method = RequestMethod.GET)
+    public ResponseWrapper getDevicesType(@PathVariable Integer id) {
+        return deviceService.getDevicesType(id);
+    }
+
+    /**
+     * Add type for given device
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param deviceType
+     *      Device type to add for given device
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = TYPE_URI, method = RequestMethod.POST)
+    public ResponseWrapper addTypeForDevice(
+        @PathVariable Integer id,
+        @Valid @RequestBody DeviceType deviceType,
+        Errors errors) {
+        validateErrors(errors);
+
+        return deviceService.addTypeForDevice(id, deviceType);
+    }
+
+    /**
+     * Update device's type
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param deviceType
+     *      Device type used to replace device's current type
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = TYPE_URI, method = RequestMethod.PUT)
+    public ResponseWrapper updateDevicesType(
+        @PathVariable Integer id,
+        @Valid @RequestBody DeviceType deviceType,
+        Errors errors) {
+        validateErrors(errors);
+
+        return deviceService.updateDevicesType(id, deviceType);
+    }
+
+    /**
+     * Delete device's type
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = TYPE_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteDevicesType(@PathVariable Integer id) {
+        return deviceService.deleteDevicesType(id);
     }
 }

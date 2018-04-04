@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS device (
     device_group_id INT,
     configuration_id INT,
     authentication_key VARCHAR(32) UNIQUE NOT NULL,
-    FOREIGN KEY (device_type_id) REFERENCES device_type(id),
+    FOREIGN KEY (device_type_id) REFERENCES device_type(id) ON DELETE SET NULL,
     FOREIGN KEY (device_group_id) REFERENCES device_group(id) ON DELETE SET NULL,
     FOREIGN KEY (configuration_id) REFERENCES configuration(id) ON DELETE SET NULL,
     INDEX(authentication_key)
