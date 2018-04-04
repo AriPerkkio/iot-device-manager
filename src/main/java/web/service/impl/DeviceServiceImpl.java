@@ -113,9 +113,7 @@ public class DeviceServiceImpl implements DeviceService {
     public ResponseWrapper getDevicesGroup(Integer id) {
         try {
             FilterValidator.checkForMinimumFilters(id);
-            validateDeviceExists(id, null, null);
 
-            // Device Group ID must be set
             Integer deviceGroupId = getDevice(id).getDeviceGroupId();
             if(deviceGroupId == null) {
                 throw new ExceptionWrapper("Get device's group failed", "Device Group ID is null", ErrorCode.NO_ITEMS_FOUND);
@@ -131,6 +129,79 @@ public class DeviceServiceImpl implements DeviceService {
             return new ResponseWrapper(DeviceGroupMapper.mapToCollection(devicegroup));
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device's group failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addGroupForDevice(Integer id, DeviceGroup deviceGroup) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceGroupId() != null) {
+                throw new ExceptionWrapper(
+                    "Add group for device failed",
+                    String.format("Device belongs to group %d already. Modify device's group ID to change its group.", device.getDeviceGroupId()),
+                    ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            // Add new group and use its ID for device's groupId
+            DeviceGroup addedDeviceGroup = deviceGroupRepository.addDeviceGroup(deviceGroup);
+            device.setDeviceGroupId(addedDeviceGroup.getId());
+            deviceRepository.updateDevice(id, null, null, device);
+
+            return new ResponseWrapper(DeviceGroupMapper.mapToCollection(addedDeviceGroup));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add group for device failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper updateDevicesGroup(Integer id, DeviceGroup deviceGroup) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceGroupId() == null) {
+                throw new ExceptionWrapper(
+                    "Update device's group failed",
+                    "Device doesn't belong to any group",
+                    ErrorCode.PARAMETER_VALIDATION_ERROR);
+            }
+
+            DeviceGroup updatedDeviceGroup = deviceGroupRepository.updateDeviceGroup(device.getDeviceGroupId(), null, deviceGroup);
+
+            return new ResponseWrapper(DeviceGroupMapper.mapToCollection(updatedDeviceGroup));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Update device's group failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper deleteDevicesGroup(Integer id) {
+        try{
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceGroupId() == null) {
+                throw new ExceptionWrapper("Delete device's group failed", "Device Group ID is null", ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            Boolean deleteSuccessful = deviceGroupRepository.deleteDeviceGroup(device.getDeviceGroupId(), null);
+
+            if(!deleteSuccessful) {
+                throw new HibernateError("");
+            }
+
+            return new ResponseWrapper("", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete device's group failed");
         }
 
         return null;

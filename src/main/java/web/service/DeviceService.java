@@ -2,6 +2,7 @@ package web.service;
 
 import javassist.NotFoundException;
 import web.domain.entity.Device;
+import web.domain.entity.DeviceGroup;
 import web.domain.response.ResponseWrapper;
 
 public interface DeviceService {
@@ -77,6 +78,41 @@ public interface DeviceService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper getDevicesGroup(Integer id);
+
+    /**
+     * Add group for device
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param deviceGroup
+     *      Device group to add for given device
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper addGroupForDevice(Integer id, DeviceGroup deviceGroup);
+
+    /**
+     * Update device's group
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param deviceGroup
+     *      Device group used to replace device's current group
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper updateDevicesGroup(Integer id, DeviceGroup deviceGroup);
+
+
+    /**
+     * Delete device's group
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper deleteDevicesGroup(Integer id);
 
     /**
      * Validate a device matching given parameters exists

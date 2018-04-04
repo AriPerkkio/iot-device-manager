@@ -3,6 +3,7 @@ package web.controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Device;
+import web.domain.entity.DeviceGroup;
 import web.domain.response.ResponseWrapper;
 import web.service.DeviceService;
 
@@ -11,11 +12,12 @@ import javax.validation.Valid;
 import static web.validators.FilterValidator.validateErrors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api", produces = "application/vnd.collection+json; charset=utf-8")
 public class DeviceController {
 
     private static final String URI = "/devices";
     private static final String ID_URI = URI + "/{id}";
+    private static final String GROUP_URI = ID_URI + "/group";
     private final DeviceService deviceService;
 
     DeviceController(DeviceService deviceService) {
@@ -40,7 +42,7 @@ public class DeviceController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.GET, produces = "application/vnd.collection+json; charset=utf-8")
+    @RequestMapping(value = URI, method = RequestMethod.GET)
     public ResponseWrapper getDevices(
             @RequestParam(name="id", required = false) Integer id,
             @RequestParam(name="name", required = false) String name,
@@ -57,7 +59,7 @@ public class DeviceController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.GET, produces = "application/vnd.collection+json; charset=utf-8")
+    @RequestMapping(value = ID_URI, method = RequestMethod.GET)
     public ResponseWrapper getDevice(@PathVariable Integer id) {
         return deviceService.getDevices(id, null, null, null, null, null);
     }
@@ -70,7 +72,7 @@ public class DeviceController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.POST, produces = "application/vnd.collection+json; charset=utf-8")
+    @RequestMapping(value = URI, method = RequestMethod.POST)
     public ResponseWrapper addDevice(@Valid @RequestBody Device device, Errors errors) {
         validateErrors(errors);
 
@@ -92,7 +94,7 @@ public class DeviceController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.PUT, produces = "application/vnd.collection+json; charset=utf-8")
+    @RequestMapping(value = URI, method = RequestMethod.PUT)
     public ResponseWrapper updateDevice(
             @RequestParam(name="id", required = false) Integer id,
             @RequestParam(name="name", required = false) String name,
@@ -112,7 +114,7 @@ public class DeviceController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.PUT, produces = "application/vnd.collection+json; charset=utf-8")
+    @RequestMapping(value = ID_URI, method = RequestMethod.PUT)
     public ResponseWrapper updateDeviceById(
             @PathVariable Integer id,
             @Valid @RequestBody Device device,
@@ -134,7 +136,7 @@ public class DeviceController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.DELETE, produces = "application/vnd.collection+json; charset=utf-8")
+    @RequestMapping(value = URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDevice(
             @RequestParam(name="id", required = false) Integer id,
             @RequestParam(name="name", required = false) String name,
@@ -148,13 +150,74 @@ public class DeviceController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.DELETE, produces = "application/vnd.collection+json; charset=utf-8")
+    @RequestMapping(value = ID_URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDeviceById(@PathVariable Integer id) {
         return deviceService.deleteDevice(id, null, null);
     }
 
-    @RequestMapping(value = ID_URI + "/group", method = RequestMethod.GET, produces = "application/vnd.collection+json; charset=utf-8")
+    /**
+     * Get device's group
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = GROUP_URI, method = RequestMethod.GET)
     public ResponseWrapper getDevicesGroup(@PathVariable Integer id) {
         return deviceService.getDevicesGroup(id);
+    }
+
+    /**
+     * Add group for device
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param deviceGroup
+     *      Device group to add for given device
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = GROUP_URI, method = RequestMethod.POST)
+    public ResponseWrapper addGroupForDevice(
+        @PathVariable Integer id,
+        @Valid @RequestBody DeviceGroup deviceGroup,
+        Errors errors) {
+        validateErrors(errors);
+
+        return deviceService.addGroupForDevice(id, deviceGroup);
+    }
+
+    /**
+     * Update device's group
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param deviceGroup
+     *      Device group used to replace device's current group
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = GROUP_URI, method = RequestMethod.PUT)
+    public ResponseWrapper updateDevicesGroup(
+        @PathVariable Integer id,
+        @Valid @RequestBody DeviceGroup deviceGroup,
+        Errors errors) {
+        validateErrors(errors);
+
+        return deviceService.updateDevicesGroup(id, deviceGroup);
+    }
+
+    /**
+     * Delete device's group
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = GROUP_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteDevicesGroup(@PathVariable Integer id) {
+        return deviceService.deleteDevicesGroup(id);
     }
 }
