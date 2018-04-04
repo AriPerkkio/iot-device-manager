@@ -4,6 +4,7 @@ import net.hamnaberg.json.Error;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,6 +57,18 @@ public class ExceptionController {
         }
 
         Error error = Error.create("Parameter validation error", ErrorCode.PARAMETER_VALIDATION_ERROR.getCode(), message);
+        URI href = new URI(request.getRequestURL().toString());
+
+        return new ResponseWrapper(error.toCollection(href), httpHeaders, BAD_REQUEST);
+    }
+
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+    public ResponseWrapper httpRequestExceptionHandler(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) throws Exception {
+        String message = String.format("Method %s not supported for %s",
+            ex.getMethod(),
+            request.getServletPath());
+
+        Error error = Error.create("HTTP request error", ErrorCode.INTERNAL_ERROR.getCode(), message);
         URI href = new URI(request.getRequestURL().toString());
 
         return new ResponseWrapper(error.toCollection(href), httpHeaders, BAD_REQUEST);
