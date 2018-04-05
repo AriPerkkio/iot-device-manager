@@ -7,15 +7,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.Measurement;
+import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
+import web.exception.ExceptionWrapper;
 import web.mapper.DeviceMapper;
+import web.mapper.MeasurementMapper;
 import web.repository.DeviceGroupRepository;
 import web.repository.DeviceRepository;
+import web.repository.MeasurementRepository;
 import web.service.DeviceGroupService;
 import web.validators.FilterValidator;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import static web.exception.ExceptionHandlingUtils.throwNotFoundException;
 import static web.mapper.DeviceGroupMapper.mapToCollection;
@@ -25,10 +32,13 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
 
     final DeviceGroupRepository deviceGroupRepository;
     final DeviceRepository deviceRepository;
+    final MeasurementRepository measurementRepository;
 
-    DeviceGroupServiceImpl(DeviceGroupRepository deviceGroupRepository, DeviceRepository deviceRepository) {
+    DeviceGroupServiceImpl(DeviceGroupRepository deviceGroupRepository, DeviceRepository deviceRepository,
+                           MeasurementRepository measurementRepository) {
         this.deviceGroupRepository = deviceGroupRepository;
         this.deviceRepository = deviceRepository;
+        this.measurementRepository = measurementRepository;
     }
 
     @Override
@@ -132,6 +142,79 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device to group failed");
         }
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper getGroupsMeasurements(Integer id, Date exactTime, Date startTime, Date endTime) {
+        try {
+            FilterValidator.checkForMinimumFilters(id, exactTime, startTime, endTime);
+            validateGroupExists(id, null);
+
+            Collection<Device> devices = deviceRepository.getDevices(null, null, null, id, null, null);
+
+            if(CollectionUtils.isEmpty(devices)) {
+                throw new ExceptionWrapper(
+                    "Get group's measurements failed",
+                    String.format("No devices found for group %d", id),
+                    ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            Collection<Measurement> measurements = new ArrayList<>();
+            for(Device device : devices) {
+                measurements.addAll(measurementRepository.getMeasurements(device.getId(), exactTime, startTime, endTime));
+            }
+
+            if(CollectionUtils.isEmpty(measurements)) {
+                throw new ExceptionWrapper(
+                    "Get group's measurements failed",
+                    String.format("No measurements found for group %d", id),
+                    ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            return new ResponseWrapper(MeasurementMapper.mapToCollection(measurements));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get group's measurements failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper deleteGroupsMeasurements(Integer id, Date exactTime, Date startTime, Date endTime) {
+        try {
+            FilterValidator.checkForMinimumFilters(id, exactTime, startTime, endTime);
+            validateGroupExists(id, null);
+
+            Collection<Device> devices = deviceRepository.getDevices(null, null, null, id, null, null);
+
+            if(CollectionUtils.isEmpty(devices)) {
+                throw new ExceptionWrapper(
+                    "Delete group's measurements failed",
+                    String.format("No devices found for group %d", id),
+                    ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            // Report success if at least one delete operation was successful
+            Boolean atLeastOneDeleteSuccessful = false;
+            for(Device device : devices) {
+                Boolean deleteSuccessful = measurementRepository.deleteMeasurements(device.getId(), exactTime, startTime, endTime);
+
+                if(deleteSuccessful) {
+                    atLeastOneDeleteSuccessful = true;
+                }
+            }
+
+            if(!atLeastOneDeleteSuccessful) {
+                throw new HibernateError("");
+            }
+
+            return new ResponseWrapper("", HttpStatus.NO_CONTENT);
+
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete group's measurements failed");
+        }
+
         return null;
     }
 

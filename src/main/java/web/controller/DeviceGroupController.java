@@ -1,5 +1,6 @@
 package web.controller;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Device;
@@ -8,6 +9,8 @@ import web.domain.response.ResponseWrapper;
 import web.service.DeviceGroupService;
 
 import javax.validation.Valid;
+
+import java.util.Date;
 
 import static web.validators.FilterValidator.validateErrors;
 
@@ -18,6 +21,7 @@ public class DeviceGroupController {
     private static final String URI = "/device-groups";
     private static final String ID_URI = URI + "/{id}";
     private static final String DEVICES_URI = ID_URI + "/devices";
+    private static final String MEASUREMENTS_URI = ID_URI + "/measurements";
     private final DeviceGroupService deviceGroupService;
 
     DeviceGroupController(DeviceGroupService deviceGroupService) {
@@ -177,5 +181,39 @@ public class DeviceGroupController {
         validateErrors(errors, "id");
 
         return deviceGroupService.addDeviceToGroup(id, device);
+    }
+
+    /**
+     * Get group's measurements
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = MEASUREMENTS_URI, method = RequestMethod.GET)
+    public ResponseWrapper getGroupsMeasurements(
+        @PathVariable Integer id,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "exactTime", required = false) Date exactTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
+        return deviceGroupService.getGroupsMeasurements(id, exactTime, startTime, endTime);
+    }
+
+    /**
+     * Delete group's measurements
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = MEASUREMENTS_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteGroupsMeasurements(
+        @PathVariable Integer id,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "exactTime", required = false) Date exactTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
+        return deviceGroupService.deleteGroupsMeasurements(id, exactTime, startTime, endTime);
     }
 }

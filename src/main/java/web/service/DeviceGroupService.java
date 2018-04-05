@@ -4,6 +4,8 @@ import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
 import web.domain.response.ResponseWrapper;
 
+import java.util.Date;
+
 public interface DeviceGroupService {
 
     /**
@@ -76,4 +78,36 @@ public interface DeviceGroupService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper addDeviceToGroup(Integer id, Device device);
+
+    /**
+     * Get group's measurements
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getGroupsMeasurements(Integer id, Date exactTime, Date startTime, Date endTime);
+
+    /**
+     * Delete group's measurements
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper deleteGroupsMeasurements(Integer id, Date exactTime, Date startTime, Date endTime);
 }
