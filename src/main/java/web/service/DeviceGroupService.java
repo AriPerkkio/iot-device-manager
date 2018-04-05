@@ -1,5 +1,6 @@
 package web.service;
 
+import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
 import web.domain.response.ResponseWrapper;
 
@@ -53,4 +54,26 @@ public interface DeviceGroupService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper deleteDeviceGroup(Integer id, String name);
+
+    /**
+     * Get group's devices
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getGroupsDevices(Integer id);
+
+    /**
+     * Add device to group
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @param device
+     *      Device to add into group
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper addDeviceToGroup(Integer id, Device device);
 }

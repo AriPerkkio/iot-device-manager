@@ -5,10 +5,13 @@ import org.hibernate.HibernateError;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
+import web.mapper.DeviceMapper;
 import web.repository.DeviceGroupRepository;
+import web.repository.DeviceRepository;
 import web.service.DeviceGroupService;
 import web.validators.FilterValidator;
 
@@ -21,9 +24,11 @@ import static web.mapper.DeviceGroupMapper.mapToCollection;
 public class DeviceGroupServiceImpl implements DeviceGroupService {
 
     final DeviceGroupRepository deviceGroupRepository;
+    final DeviceRepository deviceRepository;
 
-    DeviceGroupServiceImpl(DeviceGroupRepository deviceGroupRepository) {
+    DeviceGroupServiceImpl(DeviceGroupRepository deviceGroupRepository, DeviceRepository deviceRepository) {
         this.deviceGroupRepository = deviceGroupRepository;
+        this.deviceRepository = deviceRepository;
     }
 
     @Override
@@ -93,6 +98,40 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Update device group failed");
         }
 
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper getGroupsDevices(Integer id) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            validateGroupExists(id, null);
+            Collection<Device> devices = deviceRepository.getDevices(null, null, null, id, null, null);
+
+            if(CollectionUtils.isEmpty(devices)) {
+                throwNotFoundException(String.format("[deviceGroupId: %d]",id));
+            }
+
+            return new ResponseWrapper(DeviceMapper.mapToCollection(devices));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get group's devices failed");
+        }
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addDeviceToGroup(Integer id, Device device) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            validateGroupExists(id, null);
+
+            device.setDeviceGroupId(id);
+            Device addedDevice = deviceRepository.addDevice(device);
+
+            return new ResponseWrapper(DeviceMapper.mapToCollection(addedDevice));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device to group failed");
+        }
         return null;
     }
 
