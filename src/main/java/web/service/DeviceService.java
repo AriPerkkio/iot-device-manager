@@ -3,6 +3,7 @@ package web.service;
 import javassist.NotFoundException;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
 import web.domain.response.ResponseWrapper;
 
@@ -158,6 +159,38 @@ public interface DeviceService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper deleteDevicesType(Integer id);
+
+    /**
+     * Get device's icon.
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getDevicesIconInformation(Integer id);
+
+    /**
+     * Get device's icon.
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param deviceIcon
+     *      Device icon used to replace existing one in database
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper renameDevicesIcon(Integer id, DeviceIcon deviceIcon);
+
+    /**
+     * Delete device's icon.
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper deleteDevicesIcon(Integer id);
 
     /**
      * Validate a device matching given parameters exists

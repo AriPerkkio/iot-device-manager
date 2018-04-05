@@ -5,10 +5,14 @@ import org.hibernate.HibernateError;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
+import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
+import web.exception.ExceptionWrapper;
 import web.repository.DeviceTypeRepository;
+import web.service.DeviceIconService;
 import web.service.DeviceTypeService;
 import web.validators.FilterValidator;
 
@@ -21,9 +25,11 @@ import static web.mapper.DeviceTypeMapper.mapToCollection;
 public class DeviceTypeServiceImpl implements DeviceTypeService {
 
     private final DeviceTypeRepository deviceTypeRepository;
+    private final DeviceIconService deviceIconService;
 
-    DeviceTypeServiceImpl(DeviceTypeRepository deviceTypeRepository) {
+    DeviceTypeServiceImpl(DeviceTypeRepository deviceTypeRepository, DeviceIconService deviceIconService) {
         this.deviceTypeRepository = deviceTypeRepository;
+        this.deviceIconService = deviceIconService;
     }
 
     @Override
@@ -96,6 +102,63 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         return null;
     }
 
+    @Override
+    public ResponseWrapper getTypesIcon(Integer id) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+
+            DeviceType deviceType = getDeviceType(id, null);
+
+            if(deviceType.getDeviceIconId() == null) {
+                throw new ExceptionWrapper("Get device type's icon failed", "DeviceIcon ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            return deviceIconService.getDeviceIcons(deviceType.getDeviceIconId(), null);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device type's icon failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper renameTypesIcon(Integer id, DeviceIcon deviceIcon) {
+        try{
+            FilterValidator.checkForMinimumFilters(id);
+
+            DeviceType deviceType = getDeviceType(id, null);
+
+            if(deviceType.getDeviceIconId() == null) {
+                throw new ExceptionWrapper("Rename device type's icon failed", "DeviceIcon ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            return deviceIconService.updateDeviceIcon(deviceType.getDeviceIconId(), null, deviceIcon);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Rename device type's icon failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper deleteTypesIcon(Integer id) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+
+            DeviceType deviceType = getDeviceType(id, null);
+
+            if(deviceType.getDeviceIconId() == null) {
+                throw new ExceptionWrapper("delete device type's icon failed", "DeviceIcon ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            return deviceIconService.deleteDeviceIcon(deviceType.getDeviceIconId(), null);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete device type's icon failed");
+        }
+
+        return null;
+    }
+
     /**
      * Validate a type matching given parameters exists
      *
@@ -107,10 +170,16 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      *      Exception thrown when type matching given parameters was not found
      */
     private void validateTypeExists(Integer id, String name) throws NotFoundException {
+        getDeviceType(id, name);
+    }
+
+    private DeviceType getDeviceType(Integer id, String name) throws NotFoundException {
         Collection<DeviceType> deviceTypes = deviceTypeRepository.getDeviceTypes(id, name, null);
 
-        if(CollectionUtils.isEmpty(deviceTypes)) {
+        if(CollectionUtils.isEmpty(deviceTypes) || !deviceTypes.stream().findFirst().isPresent()) {
             throwNotFoundException(String.format("[id: %d, name: %s]", id, name));
         }
+
+        return deviceTypes.stream().findFirst().get();
     }
 }

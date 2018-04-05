@@ -4,6 +4,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
 import web.domain.response.ResponseWrapper;
 import web.service.DeviceService;
@@ -20,6 +21,7 @@ public class DeviceController {
     private static final String ID_URI = URI + "/{id}";
     private static final String GROUP_URI = ID_URI + "/group";
     private static final String TYPE_URI = ID_URI + "/type";
+    private static final String ICON_URI = ID_URI + "/icon";
     private final DeviceService deviceService;
 
     DeviceController(DeviceService deviceService) {
@@ -288,4 +290,49 @@ public class DeviceController {
     public ResponseWrapper deleteDevicesType(@PathVariable Integer id) {
         return deviceService.deleteDevicesType(id);
     }
+
+    /**
+     * Get device's icon's information
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = ICON_URI, method = RequestMethod.GET)
+    public ResponseWrapper getDevicesIconInformation(@PathVariable Integer id) {
+        return deviceService.getDevicesIconInformation(id);
+    }
+
+    /**
+     * Rename device's icon
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = ICON_URI, method = RequestMethod.PUT)
+    public ResponseWrapper renameDevicesIcon(
+        @PathVariable Integer id,
+        @Valid @RequestBody DeviceIcon deviceIcon,
+        Errors errors) {
+        validateErrors(errors);
+
+        return deviceService.renameDevicesIcon(id, deviceIcon);
+    }
+
+    /**
+     * Delete device's icon
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = ICON_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteDevicesIcon(@PathVariable Integer id) {
+        return deviceService.deleteDevicesIcon(id);
+    }
+
 }

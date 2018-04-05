@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -43,7 +44,8 @@ public class ExceptionController {
         return new ResponseWrapper(error.toCollection(href), httpHeaders,resolveHttpStatus(ex.getCode()));
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class,
+        HttpMessageNotReadableException.class, MissingServletRequestParameterException.class })
     public ResponseWrapper invalidParameterHandling(Exception ex, HttpServletRequest request) throws Exception {
 
         // TODO remove, leaking internal information
@@ -52,6 +54,8 @@ public class ExceptionController {
         if(ex instanceof MethodArgumentTypeMismatchException) {
             MethodArgumentTypeMismatchException mismatchEx = (MethodArgumentTypeMismatchException) ex;
             message = String.format("Invalid value (%s) for parameter %s", mismatchEx.getName(), mismatchEx.getValue().toString());
+        } else if(ex instanceof MissingServletRequestParameterException) {
+            message = String.format("Missing request parameter %s", ((MissingServletRequestParameterException) ex).getParameterName());
         } else if(ex instanceof  HttpMessageNotReadableException) {
             message = "Request body missing or invalid";
         }

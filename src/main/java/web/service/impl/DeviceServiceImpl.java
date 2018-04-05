@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
 import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
@@ -18,6 +19,7 @@ import web.repository.DeviceGroupRepository;
 import web.repository.DeviceRepository;
 import web.repository.DeviceTypeRepository;
 import web.service.DeviceService;
+import web.service.DeviceTypeService;
 import web.validators.FilterValidator;
 
 import java.util.Collection;
@@ -31,12 +33,14 @@ public class DeviceServiceImpl implements DeviceService {
     private final DeviceRepository deviceRepository;
     private final DeviceGroupRepository deviceGroupRepository;
     private final DeviceTypeRepository deviceTypeRepository;
+    private final DeviceTypeService deviceTypeService;
 
     DeviceServiceImpl(DeviceRepository deviceRepository, DeviceGroupRepository deviceGroupRepository,
-                      DeviceTypeRepository deviceTypeRepository) {
+                      DeviceTypeRepository deviceTypeRepository, DeviceTypeService deviceTypeService) {
         this.deviceRepository = deviceRepository;
         this.deviceGroupRepository = deviceGroupRepository;
         this.deviceTypeRepository = deviceTypeRepository;
+        this.deviceTypeService = deviceTypeService;
     }
 
     @Override
@@ -310,6 +314,60 @@ public class DeviceServiceImpl implements DeviceService {
 
         return null;
     }
+
+    @Override
+    public ResponseWrapper getDevicesIconInformation(Integer id) {
+        try{
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceTypeId() == null) {
+                throw new ExceptionWrapper("Get device's icon failed", "Device Type ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            return deviceTypeService.getTypesIcon(device.getDeviceTypeId());
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device's icon failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper renameDevicesIcon(Integer id, DeviceIcon deviceIcon) {
+        try{
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceTypeId() == null) {
+                throw new ExceptionWrapper("Rename device's icon failed", "Device Type ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            return deviceTypeService.renameTypesIcon(device.getDeviceTypeId(), deviceIcon);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Rename device's icon failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper deleteDevicesIcon(Integer id) {
+        try{
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getDeviceTypeId() == null) {
+                throw new ExceptionWrapper("Delete device's icon failed", "Device Type ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            return deviceTypeService.deleteTypesIcon(device.getDeviceTypeId());
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete device's icon failed");
+        }
+
+        return null;}
+
 
     @Override
     public void validateDeviceExists(Integer id, String name, String authenticationKey) throws NotFoundException {
