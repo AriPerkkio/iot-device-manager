@@ -2,10 +2,7 @@ package web.controller;
 
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import web.domain.entity.Device;
-import web.domain.entity.DeviceGroup;
-import web.domain.entity.DeviceIcon;
-import web.domain.entity.DeviceType;
+import web.domain.entity.*;
 import web.domain.response.ResponseWrapper;
 import web.service.DeviceService;
 
@@ -22,6 +19,7 @@ public class DeviceController {
     private static final String GROUP_URI = ID_URI + "/group";
     private static final String TYPE_URI = ID_URI + "/type";
     private static final String ICON_URI = ID_URI + "/icon";
+    private static final String CONFIGURATION_URI = ID_URI + "/configuration";
     private final DeviceService deviceService;
 
     DeviceController(DeviceService deviceService) {
@@ -335,4 +333,69 @@ public class DeviceController {
         return deviceService.deleteDevicesIcon(id);
     }
 
+    /**
+     * Get device's configuration
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = CONFIGURATION_URI, method = RequestMethod.GET)
+    public ResponseWrapper getDevicesConfiguration(@PathVariable Integer id) {
+        return deviceService.getDevicesConfiguration(id);
+    }
+
+    /**
+     * Add configuration for given device
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param configuration
+     *      Configuration to add for given device
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = CONFIGURATION_URI, method = RequestMethod.POST)
+    public ResponseWrapper addConfigurationForDevice(
+        @PathVariable Integer id,
+        @Valid @RequestBody Configuration configuration,
+        Errors errors) {
+        validateErrors(errors);
+
+        return deviceService.addConfigurationForDevice(id, configuration);
+    }
+
+    /**
+     * Update device's configuration
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param configuration
+     *      Device configuration used to replace device's current configuration
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = CONFIGURATION_URI, method = RequestMethod.PUT)
+    public ResponseWrapper updateDevicesConfiguration(
+        @PathVariable Integer id,
+        @Valid @RequestBody Configuration configuration,
+        Errors errors) {
+        validateErrors(errors);
+
+        return deviceService.updateDevicesConfiguration(id, configuration);
+    }
+
+    /**
+     * Delete device's configuration
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = CONFIGURATION_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteDevicesConfiguration(@PathVariable Integer id) {
+        return deviceService.deleteDevicesConfiguration(id);
+    }
 }

@@ -1,10 +1,7 @@
 package web.service;
 
 import javassist.NotFoundException;
-import web.domain.entity.Device;
-import web.domain.entity.DeviceGroup;
-import web.domain.entity.DeviceIcon;
-import web.domain.entity.DeviceType;
+import web.domain.entity.*;
 import web.domain.response.ResponseWrapper;
 
 public interface DeviceService {
@@ -191,6 +188,51 @@ public interface DeviceService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper deleteDevicesIcon(Integer id);
+
+    /**
+     * Get device's configuration
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getDevicesConfiguration(Integer id);
+
+    /**
+     * Add configuration for device
+     *
+     * @param id
+     *      Device ID used as filter
+     *
+     * @param configuration
+     *      Configuration to add for given device
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper addConfigurationForDevice(Integer id, Configuration configuration);
+
+    /**
+     * Update device's configuration
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param configuration
+     *      Configuration used to replace existing one
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper updateDevicesConfiguration(Integer id, Configuration configuration);
+
+    /**
+     * Delete device's configuration
+     *
+     * @param id
+     *      Device ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper deleteDevicesConfiguration(Integer id);
 
     /**
      * Validate a device matching given parameters exists

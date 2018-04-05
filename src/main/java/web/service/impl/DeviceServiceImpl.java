@@ -5,16 +5,15 @@ import org.hibernate.HibernateError;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import web.domain.entity.Device;
-import web.domain.entity.DeviceGroup;
-import web.domain.entity.DeviceIcon;
-import web.domain.entity.DeviceType;
+import web.domain.entity.*;
 import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
 import web.exception.ExceptionWrapper;
+import web.mapper.ConfigurationMapper;
 import web.mapper.DeviceGroupMapper;
 import web.mapper.DeviceTypeMapper;
+import web.repository.ConfigurationRepository;
 import web.repository.DeviceGroupRepository;
 import web.repository.DeviceRepository;
 import web.repository.DeviceTypeRepository;
@@ -34,13 +33,16 @@ public class DeviceServiceImpl implements DeviceService {
     private final DeviceGroupRepository deviceGroupRepository;
     private final DeviceTypeRepository deviceTypeRepository;
     private final DeviceTypeService deviceTypeService;
+    private final ConfigurationRepository configurationRepository;
 
     DeviceServiceImpl(DeviceRepository deviceRepository, DeviceGroupRepository deviceGroupRepository,
-                      DeviceTypeRepository deviceTypeRepository, DeviceTypeService deviceTypeService) {
+                      DeviceTypeRepository deviceTypeRepository, DeviceTypeService deviceTypeService,
+                      ConfigurationRepository configurationRepository) {
         this.deviceRepository = deviceRepository;
         this.deviceGroupRepository = deviceGroupRepository;
         this.deviceTypeRepository = deviceTypeRepository;
         this.deviceTypeService = deviceTypeService;
+        this.configurationRepository = configurationRepository;
     }
 
     @Override
@@ -366,8 +368,106 @@ public class DeviceServiceImpl implements DeviceService {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete device's icon failed");
         }
 
-        return null;}
+        return null;
+    }
 
+    @Override
+    public ResponseWrapper getDevicesConfiguration(Integer id) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+
+            Integer configurationId = getDevice(id).getConfigurationId();
+            if (configurationId == null) {
+                throw new ExceptionWrapper("Get device's configuration failed", "Device Configuration ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            Collection<Configuration> configurations = configurationRepository.getConfigurations(configurationId, null);
+            if (CollectionUtils.isEmpty(configurations) || !configurations.stream().findFirst().isPresent()) {
+                throwNotFoundException(String.format("[configurationId: %d]", configurationId));
+            }
+
+            Configuration configuration = configurations.stream().findFirst().get();
+
+            return new ResponseWrapper(ConfigurationMapper.mapToCollection(configuration));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device's configuration failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addConfigurationForDevice(Integer id, Configuration configuration) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getConfigurationId() != null) {
+                throw new ExceptionWrapper(
+                    "Add configuration for device failed",
+                    String.format("Configuration %d is already set for device. Modify device's configuration ID to change its configuration.", device.getConfigurationId()),
+                    ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            // Add new configuration and use its ID for device's configurationId
+            Configuration addedConfiguration = configurationRepository.addConfiguration(configuration);
+            device.setConfigurationId(addedConfiguration.getId());
+            deviceRepository.updateDevice(id, null, null, device);
+
+            return new ResponseWrapper(ConfigurationMapper.mapToCollection(addedConfiguration));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add configuration for device failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper updateDevicesConfiguration(Integer id, Configuration configuration) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            Device device = getDevice(id);
+
+            if(device.getConfigurationId() == null) {
+                throw new ExceptionWrapper(
+                    "Update device's configuration failed",
+                    "Configuration ID is null",
+                    ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            Configuration updatedConfiguration = configurationRepository.updateConfiguration(device.getConfigurationId(), null, configuration);
+
+            return new ResponseWrapper(ConfigurationMapper.mapToCollection(updatedConfiguration));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Update device's configuration failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper deleteDevicesConfiguration(Integer id) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+
+            Integer configurationId = getDevice(id).getConfigurationId();
+            if (configurationId == null) {
+                throw new ExceptionWrapper("Delete device's configuration failed", "Device Configuration ID is null", ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            Boolean deleteSuccessful = configurationRepository.deleteConfiguration(configurationId, null);
+
+            if(!deleteSuccessful) {
+                throw new HibernateError("");
+            }
+
+            return new ResponseWrapper("", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete device's configuration failed");
+        }
+
+        return null;
+    }
 
     @Override
     public void validateDeviceExists(Integer id, String name, String authenticationKey) throws NotFoundException {
