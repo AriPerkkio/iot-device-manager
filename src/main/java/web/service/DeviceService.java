@@ -4,6 +4,8 @@ import javassist.NotFoundException;
 import web.domain.entity.*;
 import web.domain.response.ResponseWrapper;
 
+import java.util.Date;
+
 public interface DeviceService {
 
     /**
@@ -233,6 +235,94 @@ public interface DeviceService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper deleteDevicesConfiguration(Integer id);
+
+    /**
+     * Get device's measurements
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search measurement updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search measurement updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search measurement updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getDevicesMeasurements(Integer id, Date exactTime, Date startTime, Date endTime);
+
+    /**
+     * Add measurement for device
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param measurement
+     *      Measurement to add for given device
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper addMeasurementForDevice(Integer id, Measurement measurement);
+
+    /**
+     * Delete device's measurements
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search measurement updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search measurement updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search measurement updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper deleteDevicesMeasurements(Integer id, Date exactTime, Date startTime, Date endTime);
+
+    /**
+     * Get device's location updates
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getDevicesLocations(Integer id, Date exactTime, Date startTime, Date endTime);
+
+    /**
+     * Add location update for device
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param location
+     *      Location to add for given device
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper addLocationForDevice(Integer id, Location location);
+
+    /**
+     * Delete device's locations updates
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper deleteDevicesLocations(Integer id, Date exactTime, Date startTime, Date endTime);
 
     /**
      * Validate a device matching given parameters exists

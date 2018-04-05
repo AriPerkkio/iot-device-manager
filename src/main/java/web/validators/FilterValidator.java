@@ -28,6 +28,12 @@ public class FilterValidator {
         }
     }
 
+    /**
+     * Validate request body errors
+     *
+     * @param errors
+     *      Errors to check
+     */
     public static void validateErrors(Errors errors) {
         if (errors.hasErrors()) {
             String message = String.format("Invalid value (%s) for parameter %s",
@@ -35,5 +41,19 @@ public class FilterValidator {
 
             throw new ExceptionWrapper("Request body validation error", message, ErrorCode.PARAMETER_VALIDATION_ERROR);
         }
+    }
+
+    /**
+     * Validate request body errors. Ignore error caused by fieldToSkip parameter.
+     * @param errors
+     *      Error to validate
+     * @param fieldToSkip
+     *      Field which errors are ignored
+     */
+    public static void validateErrors(Errors errors, String fieldToSkip) {
+        if(errors.hasErrors() && errors.getAllErrors().size() == 1 && fieldToSkip.equals(errors.getFieldError().getField())) {
+            return;
+        }
+        validateErrors(errors);
     }
 }

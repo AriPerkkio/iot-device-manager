@@ -1,5 +1,6 @@
 package web.controller;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.*;
@@ -7,6 +8,8 @@ import web.domain.response.ResponseWrapper;
 import web.service.DeviceService;
 
 import javax.validation.Valid;
+
+import java.util.Date;
 
 import static web.validators.FilterValidator.validateErrors;
 
@@ -20,6 +23,8 @@ public class DeviceController {
     private static final String TYPE_URI = ID_URI + "/type";
     private static final String ICON_URI = ID_URI + "/icon";
     private static final String CONFIGURATION_URI = ID_URI + "/configuration";
+    private static final String MEASUREMENTS_URI = ID_URI + "/measurements";
+    private static final String LOCATIONS_URI = ID_URI + "/locations";
     private final DeviceService deviceService;
 
     DeviceController(DeviceService deviceService) {
@@ -397,5 +402,137 @@ public class DeviceController {
     @RequestMapping(value = CONFIGURATION_URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDevicesConfiguration(@PathVariable Integer id) {
         return deviceService.deleteDevicesConfiguration(id);
+    }
+
+    /**
+     * Get device's measurements
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search measurement updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search measurement updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search measurement updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = MEASUREMENTS_URI, method = RequestMethod.GET)
+    public ResponseWrapper getDevicesMeasurements(
+        @PathVariable Integer id,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "exactTime", required = false) Date exactTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
+        return deviceService.getDevicesMeasurements(id, exactTime, startTime, endTime);
+    }
+
+    /**
+     * Add measurement for device
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param measurement
+     *      Measurement to add for given device
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = MEASUREMENTS_URI, method = RequestMethod.POST)
+    public ResponseWrapper addMeasurementsForDevice(
+        @PathVariable Integer id,
+        @Valid @RequestBody Measurement measurement,
+        Errors errors) {
+        validateErrors(errors, "deviceId");
+
+        return deviceService.addMeasurementForDevice(id, measurement);
+    }
+
+    /**
+     * Delete device's measurements
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search measurement updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search measurement updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search measurement updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = MEASUREMENTS_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteDevicesMeasurements(
+        @PathVariable Integer id,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "exactTime", required = false) Date exactTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
+        return deviceService.deleteDevicesMeasurements(id, exactTime, startTime, endTime);
+    }
+
+    /**
+     * Get device's location updates
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = LOCATIONS_URI, method = RequestMethod.GET)
+    public ResponseWrapper getDevicesLocations(
+        @PathVariable Integer id,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "exactTime", required = false) Date exactTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
+        return deviceService.getDevicesLocations(id, exactTime, startTime, endTime);
+    }
+
+    /**
+     * Add location for device
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param location
+     *      Location to add for given device
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = LOCATIONS_URI, method = RequestMethod.POST)
+    public ResponseWrapper addLocationsForDevice(
+        @PathVariable Integer id,
+        @Valid @RequestBody Location location,
+        Errors errors) {
+        validateErrors(errors, "deviceId");
+
+        return deviceService.addLocationForDevice(id, location);
+    }
+
+    /**
+     * Delete device's location updates
+     *
+     * @param id
+     *      Device ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = LOCATIONS_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteDevicesLocations(
+        @PathVariable Integer id,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "exactTime", required = false) Date exactTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
+        return deviceService.deleteDevicesLocations(id, exactTime, startTime, endTime);
     }
 }

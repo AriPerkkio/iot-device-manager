@@ -2,6 +2,7 @@ package web.service.impl;
 
 import javassist.NotFoundException;
 import org.hibernate.HibernateError;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -24,9 +25,10 @@ import static web.mapper.MapperUtils.formatTime;
 public class LocationServiceImpl implements LocationService {
 
     private final LocationRepository locationRepository;
+    // Uses @Lazy injection due to circular dependency
     private final DeviceService deviceService;
 
-    LocationServiceImpl(LocationRepository locationRepository, DeviceService deviceService) {
+    LocationServiceImpl(LocationRepository locationRepository, @Lazy DeviceService deviceService) {
         this.locationRepository = locationRepository;
         this.deviceService = deviceService;
     }

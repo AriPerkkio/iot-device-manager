@@ -19,9 +19,12 @@ import web.repository.DeviceRepository;
 import web.repository.DeviceTypeRepository;
 import web.service.DeviceService;
 import web.service.DeviceTypeService;
+import web.service.LocationService;
+import web.service.MeasurementService;
 import web.validators.FilterValidator;
 
 import java.util.Collection;
+import java.util.Date;
 
 import static web.exception.ExceptionHandlingUtils.throwNotFoundException;
 import static web.mapper.DeviceMapper.mapToCollection;
@@ -34,15 +37,20 @@ public class DeviceServiceImpl implements DeviceService {
     private final DeviceTypeRepository deviceTypeRepository;
     private final DeviceTypeService deviceTypeService;
     private final ConfigurationRepository configurationRepository;
+    private final MeasurementService measurementService;
+    private final LocationService locationService;
 
     DeviceServiceImpl(DeviceRepository deviceRepository, DeviceGroupRepository deviceGroupRepository,
                       DeviceTypeRepository deviceTypeRepository, DeviceTypeService deviceTypeService,
-                      ConfigurationRepository configurationRepository) {
+                      ConfigurationRepository configurationRepository, MeasurementService measurementService,
+                      LocationService locationService) {
         this.deviceRepository = deviceRepository;
         this.deviceGroupRepository = deviceGroupRepository;
         this.deviceTypeRepository = deviceTypeRepository;
         this.deviceTypeService = deviceTypeService;
         this.configurationRepository = configurationRepository;
+        this.measurementService = measurementService;
+        this.locationService = locationService;
     }
 
     @Override
@@ -467,6 +475,38 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         return null;
+    }
+
+    @Override
+    public ResponseWrapper getDevicesMeasurements(Integer id, Date exactTime, Date startTime, Date endTime) {
+        return measurementService.getMeasurements(id, exactTime, startTime, endTime);
+    }
+
+    @Override
+    public ResponseWrapper addMeasurementForDevice(Integer id, Measurement measurement) {
+        measurement.setDeviceId(id);
+        return measurementService.addMeasurement(measurement);
+    }
+
+    @Override
+    public ResponseWrapper deleteDevicesMeasurements(Integer id, Date exactTime, Date startTime, Date endTime) {
+        return measurementService.deleteMeasurements(id, exactTime, startTime, endTime);
+    }
+
+    @Override
+    public ResponseWrapper getDevicesLocations(Integer id, Date exactTime, Date startTime, Date endTime) {
+        return locationService.getLocations(id, exactTime, startTime, endTime);
+    }
+
+    @Override
+    public ResponseWrapper addLocationForDevice(Integer id, Location location) {
+        location.setDeviceId(id);
+        return locationService.addLocation(location);
+    }
+
+    @Override
+    public ResponseWrapper deleteDevicesLocations(Integer id, Date exactTime, Date startTime, Date endTime) {
+        return locationService.deleteLocations(id, exactTime, startTime, endTime);
     }
 
     @Override

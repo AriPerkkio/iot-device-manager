@@ -2,6 +2,7 @@ package web.service.impl;
 
 import javassist.NotFoundException;
 import org.hibernate.HibernateError;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -24,9 +25,10 @@ import static web.mapper.MeasurementMapper.mapToCollection;
 public class MeasurementServiceImpl implements MeasurementService {
 
     private final MeasurementRepository measurementRepository;
+    // Uses @Lazy injection due to circular dependency
     private final DeviceService deviceService;
 
-    MeasurementServiceImpl(MeasurementRepository measurementRepository, DeviceService deviceService) {
+    MeasurementServiceImpl(MeasurementRepository measurementRepository, @Lazy DeviceService deviceService) {
         this.measurementRepository = measurementRepository;
         this.deviceService = deviceService;
     }
