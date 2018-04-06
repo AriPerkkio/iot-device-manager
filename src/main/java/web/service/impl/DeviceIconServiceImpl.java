@@ -11,11 +11,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import web.domain.entity.DeviceIcon;
+import web.domain.entity.DeviceType;
 import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
 import web.exception.ExceptionWrapper;
+import web.mapper.DeviceTypeMapper;
 import web.repository.DeviceIconRepository;
+import web.repository.DeviceTypeRepository;
 import web.service.DeviceIconService;
 
 import java.nio.file.Files;
@@ -32,15 +35,18 @@ import static web.validators.FilterValidator.checkForMinimumFilters;
 public class DeviceIconServiceImpl implements DeviceIconService {
 
     private final DeviceIconRepository deviceIconRepository;
+    private final DeviceTypeRepository deviceTypeRepository;
+
     private final Path path;
     private final String iconsLocation;
     private final String filenameRegex = "^[A-Za-z0-9-_]{1,25}.(png)$";
     private final Pattern filenamePattern = Pattern.compile(filenameRegex);
 
-    DeviceIconServiceImpl(DeviceIconRepository deviceIconRepository,
+    DeviceIconServiceImpl(DeviceIconRepository deviceIconRepository, DeviceTypeRepository deviceTypeRepository,
                           @Value("${deviceicon.upload.location.root}") String root,
                           @Value("${deviceicon.upload.location.icons}") String iconsLocation) {
         this.deviceIconRepository = deviceIconRepository;
+        this.deviceTypeRepository = deviceTypeRepository;
         this.iconsLocation = iconsLocation;
         this.path = Paths.get(root + iconsLocation);
     }
@@ -109,7 +115,7 @@ public class DeviceIconServiceImpl implements DeviceIconService {
         try {
             checkForMinimumFilters(name);
             validateDeviceIconName(name);
-            validateDeviceIconExists(name);
+            validateDeviceIconExists(null, name);
 
             return new UrlResource(path.resolve(name).toUri());
         } catch (Exception e) {
@@ -141,6 +147,43 @@ public class DeviceIconServiceImpl implements DeviceIconService {
         return null;
     }
 
+    @Override
+    public ResponseWrapper getIconsTypes(Integer id) {
+        try {
+            checkForMinimumFilters(id);
+            validateDeviceIconExists(id, null);
+
+            Collection<DeviceType> deviceTypes = deviceTypeRepository.getDeviceTypes(null, null, id);
+
+            if(CollectionUtils.isEmpty(deviceTypes)) {
+                throwNotFoundException(String.format("[deviceTypeId: %d]",id));
+            }
+
+            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(deviceTypes));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get icon's types failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addTypeWithIcon(Integer id, DeviceType deviceType) {
+        try {
+            checkForMinimumFilters(id);
+            validateDeviceIconExists(id, null);
+
+            deviceType.setDeviceIconId(id);
+            DeviceType addedDeviceType = deviceTypeRepository.addDeviceType(deviceType);
+
+            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(addedDeviceType));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add type with icon failed");
+        }
+
+        return null;
+    }
+
     /**
      * Validate device icon name matches pattern
      */
@@ -153,8 +196,8 @@ public class DeviceIconServiceImpl implements DeviceIconService {
         }
     }
 
-    private void validateDeviceIconExists(String name) throws NotFoundException {
-        getDeviceIcon(null, name);
+    private void validateDeviceIconExists(Integer id, String name) throws NotFoundException {
+        getDeviceIcon(id, name);
     }
 
     /**

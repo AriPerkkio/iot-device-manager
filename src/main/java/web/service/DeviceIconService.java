@@ -3,6 +3,7 @@ package web.service;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import web.domain.entity.DeviceIcon;
+import web.domain.entity.DeviceType;
 import web.domain.response.ResponseWrapper;
 
 public interface DeviceIconService {
@@ -66,4 +67,27 @@ public interface DeviceIconService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper deleteDeviceIcon(Integer id, String name);
+
+    /**
+     * Get icon's types
+     *
+     * @param id
+     *      Device icon ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getIconsTypes(Integer id);
+
+    /**
+     * Add type with icon
+     *
+     * @param id
+     *      Device icon ID used as filter
+     * @param deviceType
+     *      Device type to add with given icon
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper addTypeWithIcon(Integer id, DeviceType deviceType);
+
 }
