@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import web.domain.entity.Configuration;
+import web.domain.entity.Device;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
 import web.repository.ConfigurationRepository;
 import web.service.ConfigurationService;
+import web.service.DeviceService;
 import web.validators.FilterValidator;
 
 import java.util.Collection;
@@ -21,9 +23,11 @@ import static web.mapper.ConfigurationMapper.mapToCollection;
 public class ConfigurationServiceImpl implements ConfigurationService {
 
     final ConfigurationRepository configurationRepository;
+    final DeviceService deviceService;
 
-    ConfigurationServiceImpl(ConfigurationRepository configurationRepository) {
+    ConfigurationServiceImpl(ConfigurationRepository configurationRepository, DeviceService deviceService) {
         this.configurationRepository = configurationRepository;
+        this.deviceService = deviceService;
     }
 
     @Override
@@ -92,6 +96,35 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             return new ResponseWrapper("", HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete configuration failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper getConfigurationsDevices(Integer id, Integer deviceTypeId, Integer deviceGroupId) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            validateConfigurationExists(id, null);
+
+            return deviceService.getDevices(null, null, deviceTypeId, deviceGroupId, id, null);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get configuration's devices failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addDeviceWithConfiguration(Integer id, Device device) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            validateConfigurationExists(id, null);
+
+            device.setConfigurationId(id);
+            return deviceService.addDevice(device);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device with configuration failed");
         }
 
         return null;

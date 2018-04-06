@@ -1,6 +1,7 @@
 package web.service;
 
 import web.domain.entity.Configuration;
+import web.domain.entity.Device;
 import web.domain.response.ResponseWrapper;
 
 public interface ConfigurationService {
@@ -52,4 +53,30 @@ public interface ConfigurationService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper deleteConfiguration(Integer id, String name);
+
+    /**
+     * Get configuration's devices
+     *
+     * @param id
+     *      Configuration ID used as filter
+     * @param deviceTypeId
+     *      Device type ID used as filter
+     * @param deviceGroupId
+     *      Device group ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    ResponseWrapper getConfigurationsDevices(Integer id, Integer deviceTypeId, Integer deviceGroupId);
+
+    /**
+     * Add device with configuration
+     *
+     * @param id
+     *      Configuration ID used as filter
+     * @param device
+     *      Device to add with given configuration
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    ResponseWrapper addDeviceWithConfiguration(Integer id, Device device);
 }

@@ -3,6 +3,7 @@ package web.controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Configuration;
+import web.domain.entity.Device;
 import web.domain.response.ResponseWrapper;
 import web.service.ConfigurationService;
 
@@ -11,12 +12,12 @@ import javax.validation.Valid;
 import static web.validators.FilterValidator.validateErrors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api", produces = "application/vnd.collection+json; charset=utf-8")
 public class ConfigurationController {
 
     private static final String URI = "/configurations";
     private static final String ID_URI = URI + "/{id}";
-    private static final String CONTENT_TYPE = "application/vnd.collection+json; charset=utf-8";
+    private static final String DEVICES_URI = ID_URI + "/devices";
     private final ConfigurationService configurationService;
 
     ConfigurationController(ConfigurationService configurationService) {
@@ -33,7 +34,7 @@ public class ConfigurationController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.GET, produces = CONTENT_TYPE)
+    @RequestMapping(value = URI, method = RequestMethod.GET)
     public ResponseWrapper getConfigurations(
         @RequestParam(name="id", required = false) Integer id,
         @RequestParam(name="name", required = false) String name) {
@@ -48,7 +49,7 @@ public class ConfigurationController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.GET, produces = CONTENT_TYPE)
+    @RequestMapping(value = ID_URI, method = RequestMethod.GET)
     public ResponseWrapper getConfigurationById(
         @PathVariable Integer id) {
         return configurationService.getConfigurations(id, null);
@@ -62,7 +63,7 @@ public class ConfigurationController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.POST, produces = CONTENT_TYPE)
+    @RequestMapping(value = URI, method = RequestMethod.POST)
     public ResponseWrapper addConfiguration(
         @Valid @RequestBody Configuration configuration,
         Errors errors) {
@@ -83,7 +84,7 @@ public class ConfigurationController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.PUT, produces = CONTENT_TYPE)
+    @RequestMapping(value = URI, method = RequestMethod.PUT)
     public ResponseWrapper updateConfiguration(
         @RequestParam(name="id", required = false) Integer id,
         @RequestParam(name="name", required = false) String name,
@@ -104,7 +105,7 @@ public class ConfigurationController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.PUT, produces = CONTENT_TYPE)
+    @RequestMapping(value = ID_URI, method = RequestMethod.PUT)
     public ResponseWrapper updateConfigurationById(
         @PathVariable Integer id,
         @Valid @RequestBody Configuration configuration,
@@ -124,7 +125,7 @@ public class ConfigurationController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = URI, method = RequestMethod.DELETE, produces = CONTENT_TYPE)
+    @RequestMapping(value = URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteConfiguration(
         @RequestParam(name="id", required = false) Integer id,
         @RequestParam(name="name", required = false) String name) {
@@ -139,9 +140,50 @@ public class ConfigurationController {
      * @return
      *      ResponseWrapper containing payload
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.DELETE, produces = CONTENT_TYPE)
+    @RequestMapping(value = ID_URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteConfigurationById(
         @PathVariable Integer id) {
         return configurationService.deleteConfiguration(id, null);
     }
+
+    /**
+     * Get configuration's devices
+     *
+     * @param id
+     *      Configuration ID used as filter
+     * @param deviceTypeId
+     *      Device type ID used as filter
+     * @param deviceGroupId
+     *      Device group ID used as filter
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = DEVICES_URI, method = RequestMethod.GET)
+    public ResponseWrapper getConfigurationsDevices(
+        @PathVariable Integer id,
+        @RequestParam(name="deviceTypeId", required = false) Integer deviceTypeId,
+        @RequestParam(name="deviceGroupId", required = false) Integer deviceGroupId) {
+        return configurationService.getConfigurationsDevices(id, deviceTypeId, deviceGroupId);
+    }
+
+    /**
+     * Add device with configuration
+     *
+     * @param id
+     *      Configuration ID used as filter
+     * @param device
+     *      Device to add with given configuration
+     * @return
+     *      ResponseWrapper containing payload
+     */
+    @RequestMapping(value = DEVICES_URI, method = RequestMethod.POST)
+    public ResponseWrapper addDeviceWithConfiguration(
+        @PathVariable Integer id,
+        @Valid @RequestBody Device device,
+        Errors errors) {
+        validateErrors(errors);
+
+        return configurationService.addDeviceWithConfiguration(id, device);
+    }
+
 }
