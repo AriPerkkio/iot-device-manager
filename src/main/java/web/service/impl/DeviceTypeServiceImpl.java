@@ -2,9 +2,11 @@ package web.service.impl;
 
 import javassist.NotFoundException;
 import org.hibernate.HibernateError;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import web.domain.entity.Device;
 import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
 import web.domain.response.ErrorCode;
@@ -13,6 +15,7 @@ import web.exception.ExceptionHandlingUtils;
 import web.exception.ExceptionWrapper;
 import web.repository.DeviceTypeRepository;
 import web.service.DeviceIconService;
+import web.service.DeviceService;
 import web.service.DeviceTypeService;
 import web.validators.FilterValidator;
 
@@ -26,10 +29,13 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 
     private final DeviceTypeRepository deviceTypeRepository;
     private final DeviceIconService deviceIconService;
+    private final DeviceService deviceService;
 
-    DeviceTypeServiceImpl(DeviceTypeRepository deviceTypeRepository, DeviceIconService deviceIconService) {
+    DeviceTypeServiceImpl(DeviceTypeRepository deviceTypeRepository, DeviceIconService deviceIconService,
+                          @Lazy DeviceService deviceService) {
         this.deviceTypeRepository = deviceTypeRepository;
         this.deviceIconService = deviceIconService;
+        this.deviceService = deviceService;
     }
 
     @Override
@@ -158,6 +164,32 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 
         return null;
     }
+
+    @Override
+    public ResponseWrapper getTypesDevices(Integer id, Integer deviceGroupId, Integer configurationId) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+
+            return deviceService.getDevices(null, null, id, deviceGroupId, configurationId, null);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get type's devices failed");
+        }
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addDeviceWithType(Integer id, Device device) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            device.setDeviceTypeId(id);
+
+            return deviceService.addDevice(device);
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device with type failed");
+        }
+        return null;
+    }
+
 
     /**
      * Validate a type matching given parameters exists

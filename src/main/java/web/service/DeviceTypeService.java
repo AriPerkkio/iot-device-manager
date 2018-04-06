@@ -1,5 +1,6 @@
 package web.service;
 
+import web.domain.entity.Device;
 import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
 import web.domain.response.ResponseWrapper;
@@ -85,4 +86,29 @@ public interface DeviceTypeService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper deleteTypesIcon(Integer id);
+
+    /**
+     * Get device type's devices
+     * @param id
+     *      Device type ID used as filter
+     * @param deviceGroupId
+     *      Device group ID used as filter
+     * @param configurationId
+     *      Configuration ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper getTypesDevices(Integer id, Integer deviceGroupId, Integer configurationId);
+
+    /**
+     * Add device with given type
+     *
+     * @param id
+     *      Device type ID used as filter
+     * @param device
+     *      Device to add with given type
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper addDeviceWithType(Integer id, Device device);
 }

@@ -2,6 +2,7 @@ package web.controller;
 
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import web.domain.entity.Device;
 import web.domain.entity.DeviceType;
 import web.domain.response.ResponseWrapper;
 import web.service.DeviceTypeService;
@@ -11,12 +12,12 @@ import javax.validation.Valid;
 import static web.validators.FilterValidator.validateErrors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api", produces = "application/vnd.collection+json; charset=utf-8")
 public class DeviceTypeController {
 
     private static final String URI = "/device-types";
     private static final String ID_URI = URI + "/{id}";
-    private static final String CONTENT_TYPE = "application/vnd.collection+json; charset=utf-8";
+    private static final String DEVICES_URI = ID_URI + "/devices";
     private final DeviceTypeService deviceTypeService;
 
     DeviceTypeController(DeviceTypeService deviceTypeService) {
@@ -35,7 +36,7 @@ public class DeviceTypeController {
      * @return
      *      ResponseWrapper containing payload or error
      */
-    @RequestMapping(value = URI, method = RequestMethod.GET, produces = CONTENT_TYPE)
+    @RequestMapping(value = URI, method = RequestMethod.GET)
     public ResponseWrapper getDeviceTypes(
         @RequestParam(value="id", required = false) Integer id,
         @RequestParam(value="name", required = false) String name,
@@ -51,7 +52,7 @@ public class DeviceTypeController {
      * @return
      *      ResponseWrapper containing payload or error
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.GET, produces = CONTENT_TYPE)
+    @RequestMapping(value = ID_URI, method = RequestMethod.GET)
     public ResponseWrapper getDeviceTypeById(
         @PathVariable Integer id) {
         return deviceTypeService.getDeviceTypes(id, null, null);
@@ -65,7 +66,7 @@ public class DeviceTypeController {
      * @return
      *      ResponseWrapper containing payload or errors
      */
-    @RequestMapping(value = URI, method = RequestMethod.POST, produces = CONTENT_TYPE)
+    @RequestMapping(value = URI, method = RequestMethod.POST)
     public ResponseWrapper addDeviceType(
         @Valid @RequestBody DeviceType deviceType,
         Errors errors) {
@@ -84,7 +85,7 @@ public class DeviceTypeController {
      * @return
      *      ResponseWrapper containing payload or errors
      */
-    @RequestMapping(value = URI, method = RequestMethod.PUT, produces = CONTENT_TYPE)
+    @RequestMapping(value = URI, method = RequestMethod.PUT)
     public ResponseWrapper updateDeviceType(
         @RequestParam(value="id", required = false) Integer id,
         @RequestParam(value="name", required = false) String name,
@@ -103,7 +104,7 @@ public class DeviceTypeController {
      * @return
      *      ResponseWrapper containing payload or errors
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.PUT, produces = CONTENT_TYPE)
+    @RequestMapping(value = ID_URI, method = RequestMethod.PUT)
     public ResponseWrapper updateDeviceTypeById(
         @PathVariable Integer id,
         @Valid @RequestBody DeviceType deviceType,
@@ -123,7 +124,7 @@ public class DeviceTypeController {
      * @return
      *      ResponseWrapper containing payload or errors
      */
-    @RequestMapping(value = URI, method = RequestMethod.DELETE, produces = CONTENT_TYPE)
+    @RequestMapping(value = URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDeviceType(
         @RequestParam(value="id", required = false) Integer id,
         @RequestParam(value="name", required = false) String name) {
@@ -131,16 +132,53 @@ public class DeviceTypeController {
     }
 
     /**
-     * Delete device type matching given parameters
+     * Delete device type matching given ID
      *
      * @param id
      *      Device type ID used as filter
      * @return
      *      ResponseWrapper containing payload or errors
      */
-    @RequestMapping(value = ID_URI, method = RequestMethod.DELETE, produces = CONTENT_TYPE)
+    @RequestMapping(value = ID_URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDeviceTypeById(@PathVariable Integer id) {
         return deviceTypeService.deleteDeviceType(id, null);
     }
 
+    /**
+     * Get device type's devices
+     * @param id
+     *      Device type ID used as filter
+     * @param deviceGroupId
+     *      Device group ID used as filter
+     * @param configurationId
+     *      Configuration ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = DEVICES_URI, method = RequestMethod.GET)
+    public ResponseWrapper getTypesDevices(
+        @PathVariable Integer id,
+        @RequestParam(name="deviceGroupId", required = false) Integer deviceGroupId,
+        @RequestParam(name="configurationId", required = false) Integer configurationId) {
+        return deviceTypeService.getTypesDevices(id, deviceGroupId, configurationId);
+    }
+
+    /**
+     * Add device with given type
+     *
+     * @param id
+     *      Device type ID used as filter
+     * @param device
+     *      Device to add with given type
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = DEVICES_URI, method = RequestMethod.POST)
+    public ResponseWrapper addDeviceWithType(
+        @PathVariable Integer id,
+        @Valid @RequestBody Device device,
+        Errors errors) {
+        validateErrors(errors);
+        return deviceTypeService.addDeviceWithType(id, device);
+    }
 }
