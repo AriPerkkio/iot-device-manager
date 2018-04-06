@@ -7,15 +7,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.Location;
 import web.domain.entity.Measurement;
 import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
 import web.exception.ExceptionWrapper;
 import web.mapper.DeviceMapper;
+import web.mapper.LocationMapper;
 import web.mapper.MeasurementMapper;
 import web.repository.DeviceGroupRepository;
 import web.repository.DeviceRepository;
+import web.repository.LocationRepository;
 import web.repository.MeasurementRepository;
 import web.service.DeviceGroupService;
 import web.validators.FilterValidator;
@@ -26,6 +29,7 @@ import java.util.Date;
 
 import static web.exception.ExceptionHandlingUtils.throwNotFoundException;
 import static web.mapper.DeviceGroupMapper.mapToCollection;
+import static web.mapper.MapperUtils.formatTime;
 
 @Service
 public class DeviceGroupServiceImpl implements DeviceGroupService {
@@ -33,12 +37,14 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
     final DeviceGroupRepository deviceGroupRepository;
     final DeviceRepository deviceRepository;
     final MeasurementRepository measurementRepository;
+    final LocationRepository locationRepository;
 
     DeviceGroupServiceImpl(DeviceGroupRepository deviceGroupRepository, DeviceRepository deviceRepository,
-                           MeasurementRepository measurementRepository) {
+                           MeasurementRepository measurementRepository, LocationRepository locationRepository) {
         this.deviceGroupRepository = deviceGroupRepository;
         this.deviceRepository = deviceRepository;
         this.measurementRepository = measurementRepository;
+        this.locationRepository = locationRepository;
     }
 
     @Override
@@ -166,9 +172,11 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
             }
 
             if(CollectionUtils.isEmpty(measurements)) {
+                String parameters = String.format("exactTime %s, startTime %s, endTime: %s",
+                    formatTime(exactTime), formatTime(startTime), formatTime(endTime));
                 throw new ExceptionWrapper(
                     "Get group's measurements failed",
-                    String.format("No measurements found for group %d", id),
+                    String.format("No measurements found for group %d with parameters: %s", id, parameters),
                     ErrorCode.NO_ITEMS_FOUND);
             }
 
@@ -213,6 +221,82 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
 
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete group's measurements failed");
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public ResponseWrapper getGroupsLocations(Integer id, Date exactTime, Date startTime, Date endTime) {
+        try {
+            FilterValidator.checkForMinimumFilters(id, exactTime, startTime, endTime);
+            validateGroupExists(id, null);
+
+            Collection<Device> devices = deviceRepository.getDevices(null, null, null, id, null, null);
+
+            if(CollectionUtils.isEmpty(devices)) {
+                throw new ExceptionWrapper(
+                    "Get group's location updates failed",
+                    String.format("No devices found for group %d", id),
+                    ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            Collection<Location> locations = new ArrayList<>();
+            for(Device device : devices) {
+                locations.addAll(locationRepository.getLocations(device.getId(), exactTime, startTime, endTime));
+            }
+
+            if(CollectionUtils.isEmpty(locations)) {
+                String parameters = String.format("exactTime %s, startTime %s, endTime: %s",
+                    formatTime(exactTime), formatTime(startTime), formatTime(endTime));
+                throw new ExceptionWrapper(
+                    "Get group's location updates failed",
+                    String.format("No locations found for group %d with parameters: %s", id, parameters),
+                    ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            return new ResponseWrapper(LocationMapper.mapToCollection(locations));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get group's location updates failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper deleteGroupsLocations(Integer id, Date exactTime, Date startTime, Date endTime) {
+        try {
+            FilterValidator.checkForMinimumFilters(id, exactTime, startTime, endTime);
+            validateGroupExists(id, null);
+
+            Collection<Device> devices = deviceRepository.getDevices(null, null, null, id, null, null);
+
+            if(CollectionUtils.isEmpty(devices)) {
+                throw new ExceptionWrapper(
+                    "Delete group's location updates failed",
+                    String.format("No devices found for group %d", id),
+                    ErrorCode.NO_ITEMS_FOUND);
+            }
+
+            // Report success if at least one delete operation was successful
+            Boolean atLeastOneDeleteSuccessful = false;
+            for(Device device : devices) {
+                Boolean deleteSuccessful = locationRepository.deleteLocations(device.getId(), exactTime, startTime, endTime);
+
+                if(deleteSuccessful) {
+                    atLeastOneDeleteSuccessful = true;
+                }
+            }
+
+            if(!atLeastOneDeleteSuccessful) {
+                throw new HibernateError("");
+            }
+
+            return new ResponseWrapper("", HttpStatus.NO_CONTENT);
+
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Delete group's location updates failed");
         }
 
         return null;

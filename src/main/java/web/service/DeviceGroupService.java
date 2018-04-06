@@ -85,11 +85,11 @@ public interface DeviceGroupService {
      * @param id
      *      Device group ID used as filter
      * @param exactTime
-     *      Time used as filter. Search location updates which match timestamp
+     *      Time used as filter. Search measurements which match timestamp
      * @param startTime
-     *      Start time used as filter. Search location updates which occurred after this time.
+     *      Start time used as filter. Search measurements which occurred after this time.
      * @param endTime
-     *      End time used as filter. Search location updates which occurred before this time.
+     *      End time used as filter. Search measurements which occurred before this time.
      * @return
      *      ResponseWrapper containing payload or errors
      */
@@ -97,6 +97,22 @@ public interface DeviceGroupService {
 
     /**
      * Delete group's measurements
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search measurements which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search measurements which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search measurements which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper deleteGroupsMeasurements(Integer id, Date exactTime, Date startTime, Date endTime);
+
+    /**
+     * Get group's location updates
      *
      * @param id
      *      Device group ID used as filter
@@ -109,5 +125,21 @@ public interface DeviceGroupService {
      * @return
      *      ResponseWrapper containing payload or errors
      */
-    ResponseWrapper deleteGroupsMeasurements(Integer id, Date exactTime, Date startTime, Date endTime);
+    ResponseWrapper getGroupsLocations(Integer id, Date exactTime, Date startTime, Date endTime);
+
+    /**
+     * Delete group's location updates
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper deleteGroupsLocations(Integer id, Date exactTime, Date startTime, Date endTime);
 }

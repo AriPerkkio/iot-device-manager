@@ -93,7 +93,7 @@ public class LocationMapper {
         Integer id = location.getDeviceId();
 
         String deviceRel = "device";
-        URI deviceHref = buildHref(baseUri, DEVICES_URI, null, String.format("?id=%d", id));
+        URI deviceHref = buildHref(baseUri, DEVICES_URI, null, String.format("/%d", id));
 
         return Link.create(deviceHref, deviceRel, Option.of("Device"));
     }

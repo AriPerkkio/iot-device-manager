@@ -22,6 +22,7 @@ public class DeviceGroupController {
     private static final String ID_URI = URI + "/{id}";
     private static final String DEVICES_URI = ID_URI + "/devices";
     private static final String MEASUREMENTS_URI = ID_URI + "/measurements";
+    private static final String LOCATIONS_URI = ID_URI + "/locations";
     private final DeviceGroupService deviceGroupService;
 
     DeviceGroupController(DeviceGroupService deviceGroupService) {
@@ -188,6 +189,12 @@ public class DeviceGroupController {
      *
      * @param id
      *      Device group ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search measurements which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search measurements which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search measurements which occurred before this time.
      * @return
      *      ResponseWrapper containing payload or errors
      */
@@ -205,6 +212,12 @@ public class DeviceGroupController {
      *
      * @param id
      *      Device group ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search measurements which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search measurements which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search measurements which occurred before this time.
      * @return
      *      ResponseWrapper containing payload or errors
      */
@@ -215,5 +228,51 @@ public class DeviceGroupController {
         @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
         @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
         return deviceGroupService.deleteGroupsMeasurements(id, exactTime, startTime, endTime);
+    }
+
+    /**
+     * Get group's location updates
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = LOCATIONS_URI, method = RequestMethod.GET)
+    public ResponseWrapper getGroupsLocations(
+        @PathVariable Integer id,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "exactTime", required = false) Date exactTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
+        return deviceGroupService.getGroupsLocations(id, exactTime, startTime, endTime);
+    }
+
+    /**
+     * Delete group's location updatess
+     *
+     * @param id
+     *      Device group ID used as filter
+     * @param exactTime
+     *      Time used as filter. Search location updates which match timestamp
+     * @param startTime
+     *      Start time used as filter. Search location updates which occurred after this time.
+     * @param endTime
+     *      End time used as filter. Search location updates which occurred before this time.
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = LOCATIONS_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteGroupsLocations(
+        @PathVariable Integer id,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "exactTime", required = false) Date exactTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "startTime", required = false) Date startTime,
+        @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") @RequestParam(value = "endTime", required = false) Date endTime) {
+        return deviceGroupService.deleteGroupsLocations(id, exactTime, startTime, endTime);
     }
 }
