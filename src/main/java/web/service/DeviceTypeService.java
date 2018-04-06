@@ -1,5 +1,6 @@
 package web.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
@@ -66,6 +67,20 @@ public interface DeviceTypeService {
      *      ResponseWrapper containing payload or errors
      */
     ResponseWrapper getTypesIcon(Integer id);
+
+    /**
+     * Add icon for type
+     *
+     * @param id
+     *      Device type ID used as filter
+     * @param icon
+     *      Icon to add as {@link MultipartFile}
+     * @param name
+     *      Name for new icon
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    ResponseWrapper addIconForType(Integer id, MultipartFile icon, String name);
 
     /**
      * Rename device type's icon

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
@@ -13,6 +14,7 @@ import web.domain.response.ErrorCode;
 import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionHandlingUtils;
 import web.exception.ExceptionWrapper;
+import web.repository.DeviceIconRepository;
 import web.repository.DeviceTypeRepository;
 import web.service.DeviceIconService;
 import web.service.DeviceService;
@@ -30,12 +32,14 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     private final DeviceTypeRepository deviceTypeRepository;
     private final DeviceIconService deviceIconService;
     private final DeviceService deviceService;
+    private final DeviceIconRepository deviceIconRepository;
 
     DeviceTypeServiceImpl(DeviceTypeRepository deviceTypeRepository, DeviceIconService deviceIconService,
-                          @Lazy DeviceService deviceService) {
+                          @Lazy DeviceService deviceService, DeviceIconRepository deviceIconRepository) {
         this.deviceTypeRepository = deviceTypeRepository;
         this.deviceIconService = deviceIconService;
         this.deviceService = deviceService;
+        this.deviceIconRepository = deviceIconRepository;
     }
 
     @Override
@@ -124,6 +128,38 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Get device type's icon failed");
         }
 
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper addIconForType(Integer id, MultipartFile icon, String name) {
+        try {
+            FilterValidator.checkForMinimumFilters(id);
+            DeviceType deviceType = getDeviceType(id, null);
+
+            if(deviceType.getDeviceIconId() != null) {
+                throw new ExceptionWrapper(
+                    "Add icon for type failed",
+                    String.format("Device type has icon %d already", deviceType.getDeviceIconId()),
+                    ErrorCode.PARAMETER_CONFLICT);
+            }
+
+            deviceIconService.addDeviceIcon(icon, name);
+            Collection<DeviceIcon> deviceIcons = deviceIconRepository.getDeviceIcons(null, name);
+
+            if(CollectionUtils.isEmpty(deviceIcons) || !deviceIcons.stream().findFirst().isPresent()) {
+                throw new HibernateError("");
+            }
+
+            DeviceIcon addedDeviceIcon = deviceIcons.stream().findFirst().get();
+            deviceType.setDeviceIconId(addedDeviceIcon.getId());
+
+            DeviceType updatedDeviceType = deviceTypeRepository.updateDeviceType(id, null, deviceType);
+
+            return new ResponseWrapper(mapToCollection(updatedDeviceType));
+        } catch (Exception e) {
+            ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add icon for type failed");
+        }
         return null;
     }
 

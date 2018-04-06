@@ -2,7 +2,9 @@ package web.controller;
 
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import web.domain.entity.Device;
+import web.domain.entity.DeviceIcon;
 import web.domain.entity.DeviceType;
 import web.domain.response.ResponseWrapper;
 import web.service.DeviceTypeService;
@@ -18,6 +20,7 @@ public class DeviceTypeController {
     private static final String URI = "/device-types";
     private static final String ID_URI = URI + "/{id}";
     private static final String DEVICES_URI = ID_URI + "/devices";
+    private static final String ICON_URI = ID_URI + "/icon";
     private final DeviceTypeService deviceTypeService;
 
     DeviceTypeController(DeviceTypeService deviceTypeService) {
@@ -180,5 +183,70 @@ public class DeviceTypeController {
         Errors errors) {
         validateErrors(errors);
         return deviceTypeService.addDeviceWithType(id, device);
+    }
+
+    /**
+     * Get device type's icon
+     *
+     * @param id
+     *      Device type ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = ICON_URI, method = RequestMethod.GET)
+    public ResponseWrapper getTypesIconInformation(
+        @PathVariable Integer id) {
+        return deviceTypeService.getTypesIcon(id);
+    }
+
+    /**
+     * Add icon for type
+     *
+     * @param id
+     *      Device type ID used as filter
+     * @param icon
+     *      Icon to add as {@link MultipartFile}
+     * @param name
+     *      Name for new icon
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = ICON_URI, method = RequestMethod.POST)
+    public ResponseWrapper addIconForType(
+        @PathVariable Integer id,
+        @RequestParam("name") String name,
+        @Valid @RequestBody MultipartFile icon) {
+        return deviceTypeService.addIconForType(id, icon, name);
+    }
+
+    /**
+     * Rename device type's icon
+     *
+     * @param id
+     *      Device type ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = ICON_URI, method = RequestMethod.PUT)
+    public ResponseWrapper renameTypesIcon(
+        @PathVariable Integer id,
+        @Valid @RequestBody DeviceIcon deviceIcon,
+        Errors errors) {
+        validateErrors(errors);
+        return deviceTypeService.renameTypesIcon(id, deviceIcon);
+    }
+
+    /**
+     * Delete device type's icon
+     *
+     * @param id
+     *      Device type ID used as filter
+     * @return
+     *      ResponseWrapper containing payload or errors
+     */
+    @RequestMapping(value = ICON_URI, method = RequestMethod.DELETE)
+    public ResponseWrapper deleteTypesIcon(
+        @PathVariable Integer id) {
+        return deviceTypeService.deleteTypesIcon(id);
     }
 }
