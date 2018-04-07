@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.core.IsCollectionContaining;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,12 +33,16 @@ public class ConfigurationRepositoryTest {
     @Autowired
     ConfigurationRepository configurationRepository;
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     /**
      * Test add_configuration returns added configuration
      */
     @Transactional
     @Test
     public void testAddConfigurationReturnsAddedConfiguration() throws Exception {
+        log.info("Test add_configuration returns added configuration");
+
         // Given
         Configuration expected = getTestConfiguration();
 
@@ -55,6 +61,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddConfigurationThrowsWhenNameNotUnique() throws Exception {
+        log.info("Test add_configuration fails when configuration with duplicate name is used");
+
         // Given
         Configuration configuration = getTestConfiguration();
 
@@ -70,6 +78,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddConfigurationThrowsWhenNameNull() throws Exception {
+        log.info("Test add_configuration fails when name is null");
+
         // Given
         Configuration configuration = getTestConfiguration();
         configuration.setName(null);
@@ -85,6 +95,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddConfigurationThrowsWhenNameTooLong() throws Exception {
+        log.info("Test add_configuration fails when name is too long");
+
         // Given
         Configuration configuration = getTestConfiguration();
         configuration.setName(StringUtils.repeat("A", 51));
@@ -99,6 +111,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddConfigurationThrowsWhenDescriptionTooLong() throws Exception {
+        log.info("Test add_configuration fails when description is too long");
+
         // Given
         Configuration configuration = getTestConfiguration();
         configuration.setDescription(StringUtils.repeat("A", 101));
@@ -113,6 +127,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test
     public void testGetConfigurationsWithoutParametersReturnsInsertedConfiguration() throws Exception {
+        log.info("Test get_configurations without parameters finds inserted configuration");
+
         // Given
         Configuration expected = configurationRepository.addConfiguration(getTestConfiguration());
 
@@ -131,6 +147,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test
     public void testGetConfigurationsWithParametersReturnsInsertedConfiguration() throws Exception {
+        log.info("Test get_configurations with parameters finds inserted configuration");
+
         // Given
         Configuration expected = configurationRepository.addConfiguration(getTestConfiguration());
 
@@ -149,6 +167,8 @@ public class ConfigurationRepositoryTest {
      */
     @Test
     public void testUpdateConfigurationWithParametersWorks() throws Exception {
+        log.info("Test update_configuration with parameters works");
+
         // Given
         Configuration initialConfiguration = configurationRepository.addConfiguration(getTestConfiguration());
         Configuration expected = getTestConfiguration();
@@ -175,6 +195,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = InvalidDataAccessApiUsageException.class)
     public void testUpdateConfigurationWithoutParametersThrows() throws Exception {
+        log.info("Test update_configuration without parameters fails");
+
         // When
         configurationRepository.updateConfiguration(null, null, getTestConfiguration());
     }
@@ -185,6 +207,8 @@ public class ConfigurationRepositoryTest {
      */
     @Test
     public void testUpdateConfigurationReturnsUpdatedConfiguration() throws Exception {
+        log.info("Test update_configuration returns updated configuration");
+
         // Given
         Configuration initialConfiguration = configurationRepository.addConfiguration(getTestConfiguration());
         Configuration expected = getTestConfiguration();
@@ -210,6 +234,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateConfigurationThrowsWhenNameNull() throws Exception {
+        log.info("Test update_configuration fails when name is null");
+
         // Given
         Configuration initialConfiguration = configurationRepository.addConfiguration(getTestConfiguration());
         Configuration configurationWithNullName = getTestConfiguration();
@@ -225,6 +251,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateConfigurationThrowsWhenNameNotUnique() throws Exception {
+        log.info("Test update_configuration fails when unique key conflicts");
+
         // Given
         Configuration initialConfiguration = configurationRepository.addConfiguration(getTestConfiguration());
         Configuration updateConfiguration = getTestConfiguration();
@@ -241,6 +269,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateConfigurationThrowsWhenNameTooLong() throws Exception {
+        log.info("Test update_configuration fails when name is too long");
+
         // Given
         Configuration initialConfiguration = configurationRepository.addConfiguration(getTestConfiguration());
         Configuration updateConfiguration = getTestConfiguration();
@@ -256,6 +286,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateConfigurationThrowsWhenDescriptionTooLong() throws Exception {
+        log.info("Test update_configuration fails when description is too long");
+
         // Given
         Configuration initialConfiguration = configurationRepository.addConfiguration(getTestConfiguration());
         Configuration updateConfiguration = getTestConfiguration();
@@ -271,6 +303,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test
     public void testDeleteConfigurationWithParametersWorks() throws Exception {
+        log.info("Test delete_configuration with parameters deletes configuration");
+
         // Given
         Configuration configuration = getTestConfiguration();
 
@@ -293,6 +327,8 @@ public class ConfigurationRepositoryTest {
     @Transactional
     @Test
     public void testDeleteConfigurationWithoutParametersWontDeleteAll() throws Exception {
+        log.info("Test delete_configuration without parameters doesn't delete all configurations");
+
         // When
         configurationRepository.addConfiguration(getTestConfiguration());
         Collection<Configuration> resultsBefore = configurationRepository.getConfigurations(null, null);
