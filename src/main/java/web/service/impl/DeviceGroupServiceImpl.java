@@ -118,14 +118,14 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
     }
 
     @Override
-    public ResponseWrapper getGroupsDevices(Integer id) {
+    public ResponseWrapper getGroupsDevices(Integer id, Integer deviceTypeId, Integer configurationId) {
         try {
             FilterValidator.checkForMinimumFilters(id);
             validateGroupExists(id, null);
-            Collection<Device> devices = deviceRepository.getDevices(null, null, null, id, null, null);
+            Collection<Device> devices = deviceRepository.getDevices(null, null, deviceTypeId, id, configurationId, null);
 
             if(CollectionUtils.isEmpty(devices)) {
-                throwNotFoundException(String.format("[deviceGroupId: %d]",id));
+                throwNotFoundException(String.format("[deviceGroupId: %d, deviceTypeId: %d, configurationId: %d]", id, deviceTypeId, configurationId));
             }
 
             return new ResponseWrapper(DeviceMapper.mapToCollection(devices));

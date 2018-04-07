@@ -62,10 +62,14 @@ public interface DeviceGroupService {
      *
      * @param id
      *      Device group ID used as filter
+     * @param deviceTypeId
+     *      Device type ID used as filter
+     * @param configurationId
+     *      Configuration ID used as filter
      * @return
      *      ResponseWrapper containing payload or errors
      */
-    ResponseWrapper getGroupsDevices(Integer id);
+    ResponseWrapper getGroupsDevices(Integer id, Integer deviceTypeId, Integer configurationId);
 
     /**
      * Add device to group

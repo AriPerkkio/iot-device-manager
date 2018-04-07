@@ -156,12 +156,19 @@ public class DeviceGroupController {
      *
      * @param id
      *      Device group ID used as filter
+     * @param deviceTypeId
+     *      Device type ID used as filter
+     * @param configurationId
+     *      Configuration ID used as filter
      * @return
      *      ResponseWrapper containing payload or errors
      */
     @RequestMapping(value = DEVICES_URI, method = RequestMethod.GET)
-    public ResponseWrapper getGroupsDevices(@PathVariable Integer id) {
-        return deviceGroupService.getGroupsDevices(id);
+    public ResponseWrapper getGroupsDevices(
+        @PathVariable Integer id,
+        @RequestParam(name="deviceTypeId", required = false) Integer deviceTypeId,
+        @RequestParam(name="configurationId", required = false) Integer configurationId) {
+        return deviceGroupService.getGroupsDevices(id, deviceTypeId, configurationId);
     }
 
     /**
