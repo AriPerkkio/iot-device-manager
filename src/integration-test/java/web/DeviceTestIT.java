@@ -19,15 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import web.domain.entity.Device;
 import web.domain.response.ErrorCode;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static web.TestingUtils.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -37,8 +36,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class DeviceTestIT {
 
     private static final String URI = "/api/devices";
-    private static final String APPLICATION_VND_COLLECTION_JSON = "application/vnd.collection+json; charset=utf-8";
-    private static final String APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE = "application/vnd.collection+json;charset=utf-8";
     private final ObjectMapper mapper = new ObjectMapper();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -56,7 +53,7 @@ public class DeviceTestIT {
      */
     @Test
     public void testGetDevicesInitiallyReturnsErrorAndNotFound() throws Exception {
-        log.info("Test get devices returns error with NOT_FOUND status initially, when database is empty");
+        log.info("Test GET /api/devices returns error with NOT_FOUND status initially, when database is empty");
 
         // When
         MockHttpServletResponse response = mockMvc
@@ -65,14 +62,9 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
-
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode collection = jsonNode.get("collection");
-        JsonNode error = collection.get("error");
-
-        assertThat(collection.get("href").toString(), containsString("api/devices"));
-        assertThat(error.get("code").asText(), is(ErrorCode.NO_ITEMS_FOUND.getCode()));
+        assertContentType(response);
+        assertHref(response, URI);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
     }
 
     /**
@@ -80,7 +72,7 @@ public class DeviceTestIT {
      */
     @Test
     public void testGetDevicesReturnsErrorWhenRequestParameterInvalid() throws Exception {
-        log.info("Test get devices returns error when request parameter is invalid type");
+        log.info("Test GET /api/devices returns error when request parameter is invalid type");
 
         // When
         String id = "string-instead-of-integer";
@@ -90,14 +82,9 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
-
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode collection = jsonNode.get("collection");
-        JsonNode error = collection.get("error");
-
-        assertThat(collection.get("href").toString(), containsString("api/devices"));
-        assertThat(error.get("code").asText(), is(ErrorCode.PARAMETER_VALIDATION_ERROR.getCode()));
+        assertContentType(response);
+        assertHref(response, URI);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
 
     /**
@@ -105,24 +92,19 @@ public class DeviceTestIT {
      */
     @Test
     public void testGetDeviceReturnsErrorWhenPathParameterInvalid() throws Exception {
-        log.info("Test get device by id returns parameter validation error when id is invalid type");
+        log.info("Test GET /api/devices/{id} returns parameter validation error when id is invalid type");
 
         // When
-        String idUri = "/string-instead-of-integer";
+        String idUri = URI + "/string-instead-of-integer";
         MockHttpServletResponse response = mockMvc
-                .perform(get(URI + idUri).with(httpBasic(user,password)))
+                .perform(get(idUri).with(httpBasic(user,password)))
                 .andReturn().getResponse();
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
-
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode collection = jsonNode.get("collection");
-        JsonNode error = collection.get("error");
-
-        assertThat(collection.get("href").toString(), containsString("api/devices" + idUri));
-        assertThat(error.get("code").asText(), is(ErrorCode.PARAMETER_VALIDATION_ERROR.getCode()));
+        assertContentType(response);
+        assertHref(response, idUri);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
 
     /**
@@ -131,7 +113,7 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testGetDevicesWithoutParametersReturnsAllDevices() throws Exception {
-        log.info("Test get devices without parameters returns all devices");
+        log.info("Test GET /api/devices without parameters returns all devices");
 
         // Given
         Device deviceOne = getTestDevice();
@@ -148,10 +130,10 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
+        assertContentType(response);
+        assertHref(response, URI);
 
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode items = jsonNode.get("collection").get("items");
+        JsonNode items = parseToItems(response);
         assertThat(items.size(), is(2));
 
         for(JsonNode item : items) {
@@ -169,28 +151,29 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testGetDeviceByIdReturnsOnlyOneDevice() throws Exception {
-        log.info("Test get device by id returns only one device");
+        log.info("Test GET /api/devices/{id} returns only one device");
 
         // Given
-        Device expected = getTestDevice();
-        expected.setName("device-one");
         Device extraDevice = getTestDevice();
         extraDevice.setName("device-two");
         addDevice(extraDevice);
+
+        Device expected = getTestDevice();
+        expected.setName("device-one");
         Integer id = addDevice(expected);
-        String idUri = String.format("/%d", id);
+        String idUri = URI + String.format("/%d", id);
 
         // When
         MockHttpServletResponse response = mockMvc
-                .perform(get(URI + idUri).with(httpBasic(user,password)))
+                .perform(get(idUri).with(httpBasic(user,password)))
                 .andReturn().getResponse();
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
+        assertContentType(response);
+        assertHref(response, idUri);
 
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode items = jsonNode.get("collection").get("items");
+        JsonNode items = parseToItems(response);
         assertThat(items.size(), is(1));
 
         Map<String, String> data = dataToMap(items.get(0).get("data"));
@@ -203,7 +186,7 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testAddDeviceReturnsInsertedDeviceAndOk() throws Exception {
-        log.info("Test add device returns inserted device with autogenerated id and authentication key, and status is OK");
+        log.info("Test POST /api/devices returns inserted device with autogenerated id and authentication key, and status is OK");
 
         // Given
         Device expected = getTestDevice();
@@ -218,20 +201,14 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
+        assertContentType(response);
+        assertHref(response, URI);
 
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode items = jsonNode.get("collection").get("items");
-
+        JsonNode items = parseToItems(response);
         assertThat(items.size(), is(1));
-        Map<String, String> data = dataToMap(items.get(0).get("data"));
 
-        assertNotNull(data.get("id"));
-        assertData(data.get("name"), expected.getName());
-        assertData(data.get("deviceTypeId"), expected.getDeviceTypeId());
-        assertData(data.get("deviceGroupId"), expected.getDeviceGroupId());
-        assertData(data.get("configurationId"), expected.getConfigurationId());
-        assertNotNull(data.get("authenticationKey"));
+        Map<String, String> data = dataToMap(items.get(0).get("data"));
+        assertDevice(data, expected);
     }
 
     /**
@@ -240,7 +217,7 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testAddDeviceReturnsErrorWhenNameConflicts() throws Exception {
-        log.info("Test add device returns parameter conflict error when inserting device with duplicate name");
+        log.info("Test POST /api/devices returns parameter conflict error when inserting device with duplicate name");
 
         // Given
         Device device = getTestDevice();
@@ -256,12 +233,8 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
-
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode error = jsonNode.get("collection").get("error");
-
-        assertThat(error.get("code").asText(), is(ErrorCode.PARAMETER_CONFLICT.getCode()));
+        assertContentType(response);
+        assertError(response, ErrorCode.PARAMETER_CONFLICT);
     }
 
     /**
@@ -270,7 +243,7 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testAddDeviceReturnsErrorRequestBodyMissing() throws Exception {
-        log.info("Test add device returns parameter validation error when request body is missing");
+        log.info("Test POST /api/devices returns parameter validation error when request body is missing");
 
         // When
         MockHttpServletResponse response = mockMvc
@@ -281,12 +254,8 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
-
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode error = jsonNode.get("collection").get("error");
-
-        assertThat(error.get("code").asText(), is(ErrorCode.PARAMETER_VALIDATION_ERROR.getCode()));
+        assertContentType(response);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
 
     /**
@@ -295,7 +264,7 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testAddDeviceReturnsErrorWhenRequestBodyContainsInvalidParameter() throws Exception {
-        log.info("Test add device returns parameter conflict error when inserting device invalid attribute");
+        log.info("Test POST /api/devices returns parameter conflict error when inserting device invalid attribute");
 
         // Given
         Device device = getTestDevice();
@@ -312,12 +281,8 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
-
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode error = jsonNode.get("collection").get("error");
-
-        assertThat(error.get("code").asText(), is(ErrorCode.PARAMETER_VALIDATION_ERROR.getCode()));
+        assertContentType(response);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
 
     /**
@@ -325,7 +290,7 @@ public class DeviceTestIT {
      */
     @Test
     public void testUpdateDevice() throws Exception {
-        log.info("Test update device modifies given device");
+        log.info("Test PUT /api/devices modifies given device");
 
         // Given
         Device initialDevice = getTestDevice();
@@ -349,10 +314,9 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
+        assertContentType(response);
 
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode items = jsonNode.get("collection").get("items");
+        JsonNode items = parseToItems(response);
         assertThat(items.size(), is(1));
 
         Map<String, String> data = dataToMap(items.get(0).get("data"));
@@ -367,16 +331,16 @@ public class DeviceTestIT {
      */
     @Test
     public void testUpdateDeviceReturnsErrorWhenDeviceNotFound() throws Exception {
-        log.info("Test update device by ID returns error when device not found");
+        log.info("Test PUT /api/devices/{id} returns error when device not found");
 
         // Given
         Integer randomId = 123456;
-        String idUri = String.format("/%d", randomId);
+        String idUri = URI + String.format("/%d", randomId);
         Device device = getTestDevice();
 
         // When
         MockHttpServletResponse response = mockMvc
-                .perform(put(URI + idUri)
+                .perform(put(idUri)
                     .content(mapper.writeValueAsString(device))
                     .contentType(MediaType.APPLICATION_JSON)
                     .with(httpBasic(user, password)))
@@ -384,12 +348,9 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
-        assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
-
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode error = jsonNode.get("collection").get("error");
-
-        assertThat(error.get("code").asText(), is(ErrorCode.NO_ITEMS_FOUND.getCode()));
+        assertContentType(response);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
+        assertHref(response, idUri);
     }
 
     // Add device to database, returns generated ID. Should be used as helper method - not to test adding device itself.
@@ -401,8 +362,7 @@ public class DeviceTestIT {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode items = jsonNode.get("collection").get("items");
+        JsonNode items = parseToItems(response);
         Map<String, String> data = dataToMap(items.get(0).get("data"));
 
         return Integer.parseInt(data.get("id"));
@@ -412,38 +372,15 @@ public class DeviceTestIT {
         mockMvc.perform(delete(URI).param("id", id).with(httpBasic(user, password)));
     }
 
-    private void assertData(String jsonValue, Object value) {
-        assertThat(jsonValue, is(String.format("%s", value)));
-    }
-
     // Helper method to delete all devices. Update operations do not work as @Transactional.
     private void clearDatabase() throws Exception {
         MockHttpServletResponse response = mockMvc
                 .perform(get(URI).with(httpBasic(user,password)))
                 .andReturn().getResponse();
 
-        JsonNode jsonNode = mapper.readTree(response.getContentAsString());
-        JsonNode items = jsonNode.get("collection").get("items");
-
-        for(JsonNode item : items) {
+        for(JsonNode item : parseToItems(response)) {
             Map<String, String> data = dataToMap(item.get("data"));
             removeDevice(data.get("id"));
         }
-    }
-
-    private Map<String, String> dataToMap(JsonNode data) {
-        Map<String, String> fieldValuePairs = new HashMap<>();
-
-        for(JsonNode field : data) {
-            fieldValuePairs.put(field.get("name").asText(), field.get("value").asText());
-        }
-
-        return fieldValuePairs;
-    }
-
-    private Device getTestDevice() {
-        Device device = new Device();
-        device.setName("test-device");
-        return device;
     }
 }
