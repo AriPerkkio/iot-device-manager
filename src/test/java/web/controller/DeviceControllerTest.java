@@ -6,6 +6,8 @@ import net.hamnaberg.json.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -59,6 +61,8 @@ public class DeviceControllerTest {
     @Value("${iotdevicemanager.password}")
     String password;
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     @Before
     public void setup() {
         // Set request attributes for mappers URI building
@@ -70,6 +74,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testGetDevices() throws Exception {
+        log.info("Test get devices returns devices with correct content-type");
+
         // Given
         Collection jsonContent = DeviceMapper.mapToCollection(getTestDevice());
         ResponseWrapper responseWrapper = new ResponseWrapper(jsonContent);
@@ -88,6 +94,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testGetDevicesReturnsErrorWhenRequestParameterInvalid() throws Exception {
+        log.info("Test get devices returns error when request parameter is invalid type");
+
         // Given
         String deviceGroupId = "string-instead-of-integer";
 
@@ -106,6 +114,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testGetDevicesReturnsErrorWhenServiceThrows() throws Exception {
+        log.info("Test get devices returns error when service throws");
+
         // Given
         ExceptionWrapper exceptionWrapper = new ExceptionWrapper("test-exception", "test", ErrorCode.INTERNAL_ERROR);
 
@@ -127,6 +137,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testGetDevice() throws Exception {
+        log.info("Test get device returns device with correct content-type");
+
         // Given
         Collection jsonContent = DeviceMapper.mapToCollection(getTestDevice());
         ResponseWrapper responseWrapper = new ResponseWrapper(jsonContent);
@@ -145,6 +157,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testGetDeviceReturnsErrorWhenPathParameterInvalid() throws Exception {
+        log.info("Test get device returns error when path parameter is invalid type");
+
         // Given
         Collection jsonContent = DeviceMapper.mapToCollection(getTestDevice());
         ResponseWrapper responseWrapper = new ResponseWrapper(jsonContent);
@@ -165,6 +179,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testAddDevice() throws Exception {
+        log.info("Test add device returns device with correct content-type");
+
         // Given
         Device expected = getTestDevice();
         Collection jsonContent = DeviceMapper.mapToCollection(expected);
@@ -184,6 +200,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testAddDeviceReturnsErrorMissingDeviceName() throws Exception {
+        log.info("Test add device returns error when request body is missing device name");
+
         // Given
         Device expected = getTestDevice();
         expected.setName(null);
@@ -203,6 +221,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testAddDeviceReturnsErrorWhenServiceThrows() throws Exception {
+        log.info("Test add device returns error when service throws");
+
         // Given
         ExceptionWrapper exceptionWrapper = new ExceptionWrapper("test-exception", "test", ErrorCode.INTERNAL_ERROR);
 
@@ -225,6 +245,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testUpdateDevice() throws Exception {
+        log.info("Test update device returns device with correct content-type");
+
         // Given
         Device expected = getTestDevice();
         Collection jsonContent = DeviceMapper.mapToCollection(expected);
@@ -245,6 +267,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testUpdateDeviceReturnsErrorMissingDeviceName() throws Exception {
+        log.info("Test update device returns error when request body is missing device name");
+
         // Given
         Device expected = getTestDevice();
         expected.setName(null);
@@ -265,6 +289,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testUpdateDeviceReturnsErrorWhenRequestParameterInvalidType() throws Exception {
+        log.info("Test update device returns error when request parameter is invalid type");
+
         // Given
         String id = "string-instead-of-integer";
 
@@ -288,6 +314,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testDeleteDevice() throws Exception {
+        log.info("Test delete device returns correct responseWrapper with correct content-type");
+
         // When
         when(deviceService.deleteDevice(any(Integer.class), any(String.class), any(String.class)))
                 .thenReturn(new ResponseWrapper("", HttpStatus.NO_CONTENT));
@@ -304,6 +332,8 @@ public class DeviceControllerTest {
      */
     @Test
     public void testDeleteDeviceReturnsErrorWhenRequestParameterInvalid() throws Exception {
+        log.info("Test delete device returns error when request parameter is invalid type");
+
         // Given
         String id = "string-instead-of-integer";
 

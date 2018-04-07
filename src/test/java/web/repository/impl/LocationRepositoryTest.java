@@ -4,6 +4,8 @@ import org.hamcrest.core.IsCollectionContaining;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,6 +38,8 @@ public class LocationRepositoryTest {
 
     private Integer deviceId;
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     /**
      * Add new device before each test. Location has dependency on device_icon.id
      * Manual teardown not required - @Transactional tests already take care of rollback
@@ -53,6 +57,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testAddLocationReturnsAddedLocation() {
+        log.info("Test add_location returns added location");
+
         // Given
         Location expected = getTestLocation();
 
@@ -69,6 +75,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddLocationThrowsWhenForeignKeyConflicts() {
+        log.info("Test add_location fails when foreign key device_id conflicts");
+
         // Given
         Location location = getTestLocation();
         location.setDeviceId(999);
@@ -83,6 +91,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddLocationThrowsWhenDeviceIdNull() {
+        log.info("Test add_location fails when device_id is null");
+
         // Given
         Location location = getTestLocation();
         location.setDeviceId(null);
@@ -97,6 +107,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddLocationThrowsWhenLatitudeNull() {
+        log.info("Test add_location fails when latitude is null");
+
         // Given
         Location location = getTestLocation();
         location.setLatitude(null);
@@ -111,6 +123,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddLocationThrowsWhenLongitudeNull() {
+        log.info("Test add_location fails when longitude is null");
+
         // Given
         Location location = getTestLocation();
         location.setLongitude(null);
@@ -125,6 +139,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testAddLocationGeneratesTimeWhenTimeNull() {
+        log.info("Test add_location auto-generates time when time is null");
+
         // Given
         Location location = getTestLocation();
         location.setTime(null);
@@ -142,6 +158,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testGetLocationsWithoutParametersReturnsInsertedLocation() {
+        log.info("Test get_locations without parameters finds inserted location");
+
         // Given
         Location expected = locationRepository.addLocation(getTestLocation());
 
@@ -158,6 +176,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testGetLocationsWithExactTimeReturnsInsertedLocation() {
+        log.info("Test get_locations with device_id and exact_time finds inserted location");
+
         // Given
         Location expected = locationRepository.addLocation(getTestLocation());
 
@@ -175,6 +195,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testGetLocationsWithStartTimeReturnsInsertedLocation() throws Exception {
+        log.info("Test get_locations with start_time finds inserted location");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date exactTime = formatTime("01-01-2000 00:00:01");
@@ -197,6 +219,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testGetLocationsWithEndTimeReturnsInsertedLocation() throws Exception {
+        log.info("Test get_locations with end_time finds inserted location");
+
         // Given
         Date exactTime = formatTime("01-01-2000 00:00:01");
         Date endTime = formatTime("01-01-2000 00:00:02");
@@ -219,6 +243,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testGetLocationsWithStartAndEndTimeReturnsInsertedLocation() throws Exception {
+        log.info("Test get_locations with start_time and end_time finds inserted location");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date exactTime = formatTime("01-01-2000 00:00:01");
@@ -244,6 +270,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testGetLocationsWithStartAndEndTimeWontFindLocationOutsideTimeWindow() throws Exception {
+        log.info("Test get_locations with start_time and end_time wont find location outside search time window");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date endTime = formatTime("01-01-2000 00:00:01");
@@ -265,6 +293,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testDeleteLocationsWithDeviceIdAndExactTimeDeletesAll() {
+        log.info("Test delete_locations with device_id and exact_time deletes all locations");
+
         // Given
         Location location = getTestLocation();
 
@@ -287,6 +317,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testDeleteLocationsWithStartTimeDeletesAll() throws Exception {
+        log.info("Test delete_locations with start_time deletes all locations");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date exactTime = formatTime("01-01-2000 00:00:01");
@@ -312,6 +344,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testDeleteLocationsWithEndTimeDeletesAll() throws Exception {
+        log.info("Test delete_locations with end_time deletes all locations");
+
         // Given
         Date exactTime = formatTime("01-01-2000 00:00:00");
         Date endTime = formatTime("01-01-2000 00:00:01");
@@ -337,6 +371,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testDeleteLocationsWithStartAndEndTimeDeletesAll() throws Exception {
+        log.info("Test delete_locations with start_time and end_time deletes all locations");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date exactTime = formatTime("01-01-2000 00:00:01");
@@ -364,6 +400,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testDeleteLocationsWithStartAndEndTimeWontDeleteLocationOutsideTimeWindow() throws Exception {
+        log.info("Test delete_locations with start_time and end_time wont delete location outside search time window");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date endTime = formatTime("01-01-2000 00:00:01");
@@ -389,6 +427,8 @@ public class LocationRepositoryTest {
     @Transactional
     @Test
     public void testDeleteLocationsWithoutParametersWontDeleteAll() throws Exception {
+        log.info("Test delete_locations without parameters wont delete all");
+
         // Given
         Location location = getTestLocation();
 

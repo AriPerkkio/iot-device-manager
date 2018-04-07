@@ -4,6 +4,8 @@ import org.hamcrest.core.IsCollectionContaining;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -34,6 +36,8 @@ public class MeasurementRepositoryTest {
 
     private Integer deviceId;
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     /**
      * Add new device before each test. Measurement has dependency on device_icon.id
      * Manual teardown not required - @Transactional tests already take care of rollback
@@ -51,6 +55,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testAddMeasurementReturnsAddedMeasurement() throws Exception {
+        log.info("Test add_measurement returns added measurement");
+
         // Given
         Measurement expected = getTestMeasurement();
 
@@ -67,6 +73,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddMeasurementThrowsWhenForeignKeyConflicts() throws Exception {
+        log.info("Test add_measurement fails when foreign key device_id conflicts");
+
         // Given
         Measurement measurement = getTestMeasurement();
         measurement.setDeviceId(999);
@@ -81,6 +89,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddMeasurementThrowsWhenDeviceIdNull() throws Exception {
+        log.info("Test add_measurement fails when device_id is null");
+
         // Given
         Measurement measurement = getTestMeasurement();
         measurement.setDeviceId(null);
@@ -96,6 +106,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddMeasurementThrowsWhenLongitudeNull() throws Exception {
+        log.info("Test add_measurement fails when content is null");
+
         // Given
         Measurement measurement = getTestMeasurement();
         measurement.setContent(null);
@@ -110,6 +122,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testAddMeasurementGeneratesTimeWhenTimeNull() throws Exception {
+        log.info("Test add_measurement auto-generates time when time is null");
+
         // Given
         Measurement measurement = getTestMeasurement();
         measurement.setTime(null);
@@ -127,6 +141,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testGetMeasurementsWithoutParametersReturnsInsertedMeasurement() throws Exception {
+        log.info("Test get_measurements without parameters finds inserted measurement");
+
         // Given
         Measurement expected = measurementRepository.addMeasurement(getTestMeasurement());
 
@@ -143,6 +159,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testGetMeasurementsWithExactTimeReturnsInsertedMeasurement() throws Exception {
+        log.info("Test get_measurements with device_id and exact_time finds inserted measurement");
+
         // Given
         Measurement expected = measurementRepository.addMeasurement(getTestMeasurement());
 
@@ -160,6 +178,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testGetMeasurementsWithStartTimeReturnsInsertedMeasurement() throws Exception {
+        log.info("Test get_measurements with start_time finds inserted measurement");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date exactTime = formatTime("01-01-2000 00:00:01");
@@ -180,6 +200,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testGetMeasurementsWithEndTimeReturnsInsertedMeasurement() throws Exception {
+        log.info("Test get_measurements with end_time finds inserted measurement");
+
         // Given
         Date exactTime = formatTime("01-01-2000 00:00:01");
         Date endTime = formatTime("01-01-2000 00:00:02");
@@ -200,6 +222,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testGetMeasurementsWithStartAndEndTimeReturnsInsertedMeasurement() throws Exception {
+        log.info("Test get_measurements with start_time and end_time finds inserted measurement");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date exactTime = formatTime("01-01-2000 00:00:01");
@@ -222,6 +246,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testGetMeasurementsWithStartAndEndTimeWontFindMeasurementOutsideTimeWindow() throws Exception {
+        log.info("Test get_measurements with start_time and end_time wont find measurement outside search time window");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date endTime = formatTime("01-01-2000 00:00:01");
@@ -243,6 +269,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testDeleteMeasurementsWithDeviceIdAndExactTimeDeletesAll() throws Exception {
+        log.info("Test delete_measurements with device_id and exact_time deletes all measurements");
+
         // Given
         Measurement measurement = getTestMeasurement();
 
@@ -265,6 +293,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testDeleteMeasurementsWithStartTimeDeletesAll() throws Exception {
+        log.info("Test delete_measurements with start_time deletes all measurements");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date exactTime = formatTime("01-01-2000 00:00:01");
@@ -290,6 +320,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testDeleteMeasurementsWithEndTimeDeletesAll() throws Exception {
+        log.info("Test delete_measurements with end_time deletes all measurements");
+
         // Given
         Date exactTime = formatTime("01-01-2000 00:00:00");
         Date endTime = formatTime("01-01-2000 00:00:01");
@@ -315,6 +347,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testDeleteMeasurementsWithStartAndEndTimeDeletesAll() throws Exception {
+        log.info("Test delete_measurements with start_time and end_time deletes all measurements");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date exactTime = formatTime("01-01-2000 00:00:01");
@@ -342,6 +376,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testDeleteMeasurementsWithStartAndEndTimeWontDeleteMeasurementOutsideTimeWindow() throws Exception {
+        log.info("Test delete_measurements with start_time and end_time wont delete measurement outside search time window");
+
         // Given
         Date startTime = formatTime("01-01-2000 00:00:00");
         Date endTime = formatTime("01-01-2000 00:00:01");
@@ -367,6 +403,8 @@ public class MeasurementRepositoryTest {
     @Transactional
     @Test
     public void testDeleteMeasurementsWithoutParametersWontDeleteAll() throws Exception {
+        log.info("Test delete_measurements without parameters wont delete all");
+
         // Given
         Measurement measurement = getTestMeasurement();
 

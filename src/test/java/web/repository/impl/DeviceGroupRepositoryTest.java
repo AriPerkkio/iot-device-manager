@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.core.IsCollectionContaining;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,12 +30,16 @@ public class DeviceGroupRepositoryTest {
     @Autowired
     DeviceGroupRepository deviceGroupRepository;
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     /**
      * Test add_device_group returns added device group
      */
     @Transactional
     @Test
     public void testAddDeviceGroupReturnsAddedDeviceGroup() {
+        log.info("Test add_device_group returns added device group");
+
         // Given
         DeviceGroup expected = getTestDeviceGroup();
 
@@ -51,6 +57,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceGroupThrowsWhenNameNotUnique() {
+        log.info("Test add_device_group fails when device group with duplicate name is used");
+
         // Given
         DeviceGroup deviceGroup = getTestDeviceGroup();
 
@@ -65,6 +73,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceGroupThrowsWhenNameNull() {
+        log.info("Test add_device_group fails when name is null");
+
         // Given
         DeviceGroup deviceGroupWithNameNull = getTestDeviceGroup();
         deviceGroupWithNameNull.setName(null);
@@ -79,6 +89,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceGroupThrowsWhenNameTooLong() {
+        log.info("Test add_device_group fails when name is too long");
+
         // Given
         DeviceGroup deviceGroupWithTooLongName = getTestDeviceGroup();
         deviceGroupWithTooLongName.setName(StringUtils.repeat("A", 51));
@@ -93,6 +105,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceGroupThrowsWhenDescriptionTooLong() {
+        log.info("testAddDeviceGroupThrowsWhenDescriptionTooLong");
+
         // Given
         DeviceGroup deviceGroupWithTooLongDescription = getTestDeviceGroup();
         deviceGroupWithTooLongDescription.setDescription(StringUtils.repeat("A", 101));
@@ -107,6 +121,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test
     public void testGetDeviceGroupsWithoutParametersReturnsInsertedDeviceGroup() {
+        log.info("Test get_device_groups without parameters finds inserted device group");
+
         // Given
         DeviceGroup expected = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
 
@@ -125,6 +141,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test
     public void testGetDeviceGroupsWithParametersReturnsInsertedDeviceGroup() {
+        log.info("Test get_device_groups with parameters finds inserted device group");
+
         // Given
         DeviceGroup expected = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
 
@@ -142,6 +160,8 @@ public class DeviceGroupRepositoryTest {
      */
     @Test
     public void testUpdateDeviceGroupWithParametersWorks() {
+        log.info("Test update_device_group with parameters works");
+
         // Given
         DeviceGroup initialDeviceGroup = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         DeviceGroup expected = getTestDeviceGroup();
@@ -166,6 +186,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = InvalidDataAccessApiUsageException.class)
     public void testUpdateDeviceGroupWithoutParametersThrows() {
+        log.info("Test update_device_group without parameters fails");
+
         // When
         deviceGroupRepository.updateDeviceGroup(null, null, getTestDeviceGroup());
     }
@@ -176,6 +198,8 @@ public class DeviceGroupRepositoryTest {
      */
     @Test
     public void testUpdateDeviceGroupReturnsUpdatedDeviceGroup() {
+        log.info("Test update_device_group returns updated device group");
+
         // Given
         DeviceGroup initialDeviceGroup = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         DeviceGroup expected = getTestDeviceGroup();
@@ -199,6 +223,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenNameNull() {
+        log.info("Test update_device_group fails when name is null");
+
         // Given
         DeviceGroup initialDevice = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         DeviceGroup deviceGroupWithNameNull = getTestDeviceGroup();
@@ -214,6 +240,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceGroupThrowsWhenNameNotUnique() {
+        log.info("Test update_device_group fails when unique key conflicts");
+
         // Given
         DeviceGroup initialDeviceGroup = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         DeviceGroup updateDeviceGroup = getTestDeviceGroup();
@@ -230,6 +258,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceGroupThrowsWhenNameTooLong() {
+        log.info("Test update_device_group fails when name is too long");
+
         // Given
         DeviceGroup initialDeviceGroup = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         DeviceGroup updateDeviceGroup = getTestDeviceGroup();
@@ -245,6 +275,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceGroupThrowsWhenDescriptionTooLong() {
+        log.info("Test update_device_group fails when description is too long");
+
         // Given
         DeviceGroup initialDeviceGroup = deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         DeviceGroup updateDeviceGroup = getTestDeviceGroup();
@@ -260,6 +292,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test
     public void testDeleteDeviceGroupWithParametersWorks() {
+        log.info("Test delete_device_group with parameters deletes device group");
+
         // Given
         DeviceGroup deviceGroup = getTestDeviceGroup();
 
@@ -281,6 +315,8 @@ public class DeviceGroupRepositoryTest {
     @Transactional
     @Test
     public void testDeleteDeviceGroupWithoutParametersWontDeleteAll() {
+        log.info("Test delete_device_group without parameters doesn't delete all device groups");
+
         // When
         deviceGroupRepository.addDeviceGroup(getTestDeviceGroup());
         Collection<DeviceGroup> resultsBefore = deviceGroupRepository.getDeviceGroups(null, null);

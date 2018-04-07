@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.core.IsCollectionContaining;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,12 +28,16 @@ public class DeviceRepositoryTest {
     @Autowired
     DeviceRepository deviceRepository;
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     /**
      * Test add_device returns added device. Validate authentication key is generated
      */
     @Transactional
     @Test
     public void testAddDeviceReturnsAddedDeviceWithAuthenticationKey() {
+        log.info("Test add_device returns added device. Validate authentication key is generated");
+
         // Given
         Device expected = getTestDevice();
 
@@ -50,6 +56,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceThrowsWhenNameNotUnique() {
+        log.info("Test add_device fails when device with duplicate name is used");
+
         // Given
         Device device = getTestDevice();
 
@@ -64,6 +72,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceThrowsWhenNameNull() {
+        log.info("Test add_device fails when name is null");
+
         // Given
         Device deviceWithNullName = getTestDevice();
         deviceWithNullName.setName(null);
@@ -78,6 +88,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceThrowsWhenNameTooLong() {
+        log.info("Test add_device fails when name is too long");
+
         // Given
         Device deviceWithLongName = getTestDevice();
         deviceWithLongName.setName(StringUtils.repeat("A", 51));
@@ -92,6 +104,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceThrowsWhenConfigurationIdConflicts() {
+        log.info("Test add_device fails when foreign key configuration_id conflicts");
+
         // Given
         Device deviceWithConflict = getTestDevice();
         deviceWithConflict.setConfigurationId(999);
@@ -106,6 +120,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceThrowsWhenDeviceGroupIdConflicts() {
+        log.info("Test add_device fails when foreign key device_group_id conflicts");
+
         // Given
         Device deviceWithConflict = getTestDevice();
         deviceWithConflict.setDeviceGroupId(999);
@@ -120,6 +136,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testAddDeviceThrowsWhenDeviceTypeIdConflicts() {
+        log.info("Test add_device fails when foreign key device_type_id conflicts");
+
         // Given
         Device deviceWithConflict = getTestDevice();
         deviceWithConflict.setDeviceTypeId(999);
@@ -134,6 +152,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test
     public void testGetDevicesWithoutParametersReturnsInsertedDevice() {
+        log.info("Test get_devices without parameters finds inserted device");
+
         // Given
         Device expected = deviceRepository.addDevice(getTestDevice());
 
@@ -151,6 +171,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test
     public void testGetDevicesWithParametersReturnsInsertedDevice() {
+        log.info("Test get_devices with parameters finds inserted device");
+
         // Given
         Device expected = deviceRepository.addDevice(getTestDevice());
 
@@ -169,6 +191,8 @@ public class DeviceRepositoryTest {
      */
     @Test
     public void testUpdateDeviceWithParametersWorks() {
+        log.info("Test update device with parameters works");
+
         // Given
         Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device expected = getTestDevice();
@@ -192,6 +216,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = InvalidDataAccessApiUsageException.class)
     public void testUpdateDeviceWithoutParametersThrows() {
+        log.info("Test update_device without parameters fails");
+
         // When
         deviceRepository.updateDevice(null, null, null, getTestDevice());
     }
@@ -202,6 +228,8 @@ public class DeviceRepositoryTest {
      */
     @Test
     public void testUpdateDeviceReturnsUpdatedDevice() {
+        log.info("Test update device returns updated device");
+
         // Given
         Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device expected = getTestDevice();
@@ -224,6 +252,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenConfigurationIdConflicts() {
+        log.info("Test update device fails when foreign key configuration_id conflicts");
+
         // Given
         Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device deviceWithConflict = getTestDevice();
@@ -239,6 +269,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenDeviceGroupIdConflicts() {
+        log.info("Test update device fails when foreign key device_group_id conflicts");
+
         // Given
         Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device deviceWithConflict = getTestDevice();
@@ -254,6 +286,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenDeviceTypeIdConflicts() {
+        log.info("Test update device fails when foreign key device_type_id conflicts");
+
         // Given
         Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device deviceWithConflict = getTestDevice();
@@ -269,6 +303,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenNameNull() {
+        log.info("Test update device fails when name is null");
+
         // Given
         Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device updateDevice = getTestDevice();
@@ -284,6 +320,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenNameNotUnique() {
+        log.info("Test update device fails when unique key conflicts");
+
         // Given
         Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device updateDevice = getTestDevice();
@@ -300,6 +338,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test(expected = DataIntegrityViolationException.class)
     public void testUpdateDeviceThrowsWhenNameTooLong() {
+        log.info("Test update device fails when name is too long");
+
         // Given
         Device initialDevice = deviceRepository.addDevice(getTestDevice());
         Device deviceWithLongName = getTestDevice();
@@ -315,6 +355,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test
     public void testDeleteDeviceWithParametersWorks() {
+        log.info("Test delete_device with parameters deletes devices");
+
         // Given
         Device device = getTestDevice();
 
@@ -336,6 +378,8 @@ public class DeviceRepositoryTest {
     @Transactional
     @Test
     public void testDeleteDeviceWithoutParametersWontDeleteAll() {
+        log.info("Test delete_device without parameters doesn't delete anything");
+
         // When
         deviceRepository.addDevice(getTestDevice());
         Collection<Device> resultsBefore = deviceRepository.getDevices(null, null, null, null, null, null);
