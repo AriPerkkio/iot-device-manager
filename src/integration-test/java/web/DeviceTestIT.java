@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import web.domain.entity.Device;
+import web.domain.entity.DeviceGroup;
 import web.domain.response.ErrorCode;
 
 import java.util.Map;
@@ -24,7 +24,6 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static web.TestingUtils.*;
 
@@ -36,14 +35,9 @@ import static web.TestingUtils.*;
 public class DeviceTestIT {
 
     private static final String URI = "/api/devices";
+    private static final String GROUP_URI = URI + "/%d/group";
     private final ObjectMapper mapper = new ObjectMapper();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-    @Value("${iotdevicemanager.username}")
-    String user;
-
-    @Value("${iotdevicemanager.password}")
-    String password;
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,7 +51,7 @@ public class DeviceTestIT {
 
         // When
         MockHttpServletResponse response = mockMvc
-                .perform(get(URI).with(httpBasic(user,password)))
+                .perform(get(URI).with(getBasicAuth()))
                 .andReturn().getResponse();
 
         // Then
@@ -77,7 +71,7 @@ public class DeviceTestIT {
         // When
         String id = "string-instead-of-integer";
         MockHttpServletResponse response = mockMvc
-                .perform(get(URI).param("id", id).with(httpBasic(user,password)))
+                .perform(get(URI).param("id", id).with(getBasicAuth()))
                 .andReturn().getResponse();
 
         // Then
@@ -97,7 +91,7 @@ public class DeviceTestIT {
         // When
         String idUri = URI + "/string-instead-of-integer";
         MockHttpServletResponse response = mockMvc
-                .perform(get(idUri).with(httpBasic(user,password)))
+                .perform(get(idUri).with(getBasicAuth()))
                 .andReturn().getResponse();
 
         // Then
@@ -117,13 +111,13 @@ public class DeviceTestIT {
 
         // Given
         Device deviceOne = getTestDevice("device-one");
-        addDevice(deviceOne);
+        addDevice(deviceOne, mockMvc);
         Device deviceTwo = getTestDevice("device-two");
-        addDevice(deviceTwo);
+        addDevice(deviceTwo, mockMvc);
 
         // When
         MockHttpServletResponse response = mockMvc
-                .perform(get(URI).with(httpBasic(user,password)))
+                .perform(get(URI).with(getBasicAuth()))
                 .andReturn().getResponse();
 
         // Then
@@ -153,15 +147,15 @@ public class DeviceTestIT {
 
         // Given
         Device extraDevice = getTestDevice("device-two");
-        addDevice(extraDevice);
+        addDevice(extraDevice, mockMvc);
 
         Device expected = getTestDevice("device-one");
-        Integer id = addDevice(expected);
+        Integer id = addDevice(expected, mockMvc);
         String idUri = URI + String.format("/%d", id);
 
         // When
         MockHttpServletResponse response = mockMvc
-                .perform(get(idUri).with(httpBasic(user,password)))
+                .perform(get(idUri).with(getBasicAuth()))
                 .andReturn().getResponse();
 
         // Then
@@ -190,7 +184,7 @@ public class DeviceTestIT {
         // When
         MockHttpServletResponse response = mockMvc
                 .perform(post(URI)
-                        .with(httpBasic(user,password))
+                        .with(getBasicAuth())
                         .content(mapper.writeValueAsString(expected))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -219,10 +213,10 @@ public class DeviceTestIT {
         Device device = getTestDevice();
 
         // When
-        addDevice(device);
+        addDevice(device, mockMvc);
         MockHttpServletResponse response = mockMvc
                 .perform(post(URI)
-                        .with(httpBasic(user,password))
+                        .with(getBasicAuth())
                         .content(mapper.writeValueAsString(device))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -245,7 +239,7 @@ public class DeviceTestIT {
         // When
         MockHttpServletResponse response = mockMvc
                 .perform(post(URI)
-                        .with(httpBasic(user,password))
+                        .with(getBasicAuth())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
@@ -272,7 +266,7 @@ public class DeviceTestIT {
         // When
         MockHttpServletResponse response = mockMvc
                 .perform(post(URI)
-                        .with(httpBasic(user,password))
+                        .with(getBasicAuth())
                         .content(body)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -296,18 +290,18 @@ public class DeviceTestIT {
         Device updateDevice = getTestDevice("updated-name");
 
         // When
-        addDevice(initialDevice);
+        addDevice(initialDevice, mockMvc);
         mockMvc
                 .perform(put(URI)
                         .param("name", initialDevice.getName())
                         .content(mapper.writeValueAsString(updateDevice))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(httpBasic(user, password)));
+                        .with(getBasicAuth()));
 
         MockHttpServletResponse response = mockMvc
                 .perform(get(URI)
                         .param("name", updateDevice.getName())
-                        .with(httpBasic(user,password)))
+                        .with(getBasicAuth()))
                 .andReturn().getResponse();
 
         // Then
@@ -322,7 +316,7 @@ public class DeviceTestIT {
         assertData(data.get("name"), updateDevice.getName());
 
         // Update operations do not work as @Transactional
-        clearDatabase();
+        clearDatabase(mockMvc);
     }
 
     /**
@@ -342,7 +336,7 @@ public class DeviceTestIT {
                 .param("name", initialDevice.getName())
                 .content(mapper.writeValueAsString(initialDevice))
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(httpBasic(user, password)))
+                .with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -365,15 +359,15 @@ public class DeviceTestIT {
         Device updatedDevice = getTestDevice("update-device");
 
         // When
-        addDevice(initialDevice);
-        addDevice(updatedDevice);
+        addDevice(initialDevice, mockMvc);
+        addDevice(updatedDevice, mockMvc);
 
         MockHttpServletResponse response = mockMvc
             .perform(put(URI)
                 .param("name", initialDevice.getName())
                 .content(mapper.writeValueAsString(updatedDevice))
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(httpBasic(user, password)))
+                .with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -395,19 +389,19 @@ public class DeviceTestIT {
         Device updateDevice = getTestDevice("updated-name");
 
         // When
-        Integer id = addDevice(initialDevice);
+        Integer id = addDevice(initialDevice, mockMvc);
         String idUri = URI + "/" + id;
 
         mockMvc
             .perform(put(idUri)
                 .content(mapper.writeValueAsString(updateDevice))
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(httpBasic(user, password)));
+                .with(getBasicAuth()));
 
         MockHttpServletResponse response = mockMvc
             .perform(get(idUri)
                 .param("name", updateDevice.getName())
-                .with(httpBasic(user,password)))
+                .with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -422,7 +416,7 @@ public class DeviceTestIT {
         assertData(data.get("name"), updateDevice.getName());
 
         // Update operations do not work as @Transactional
-        clearDatabase();
+        clearDatabase(mockMvc);
     }
 
     /**
@@ -442,7 +436,7 @@ public class DeviceTestIT {
             .perform(put(idUri)
                 .content(mapper.writeValueAsString(device))
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(httpBasic(user, password)))
+                .with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -468,7 +462,7 @@ public class DeviceTestIT {
             .perform(put(idUri)
                 .content(mapper.writeValueAsString(device))
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(httpBasic(user, password)))
+                .with(getBasicAuth()))
             .andReturn().getResponse();
 
 
@@ -492,16 +486,16 @@ public class DeviceTestIT {
         Device device = getTestDevice();
 
         // When
-        addDevice(device);
+        addDevice(device, mockMvc);
 
         MockHttpServletResponse response = mockMvc
             .perform(delete(URI)
                 .param("name", device.getName())
-                .with(httpBasic(user, password)))
+                .with(getBasicAuth()))
             .andReturn().getResponse();
 
         MockHttpServletResponse getResponse = mockMvc
-            .perform(get(URI).with(httpBasic(user,password)))
+            .perform(get(URI).with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -521,7 +515,7 @@ public class DeviceTestIT {
         MockHttpServletResponse response = mockMvc
             .perform(delete(URI)
                 .param("name", "test-name")
-                .with(httpBasic(user, password)))
+                .with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -542,7 +536,7 @@ public class DeviceTestIT {
         MockHttpServletResponse response = mockMvc
             .perform(delete(URI)
                 .param("id", "string-instead-of-integer")
-                .with(httpBasic(user, password)))
+                .with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -564,15 +558,15 @@ public class DeviceTestIT {
         Device device = getTestDevice();
 
         // When
-        Integer id = addDevice(device);
+        Integer id = addDevice(device, mockMvc);
         String idUri = URI + "/" + id;
 
         MockHttpServletResponse response = mockMvc
-            .perform(delete(idUri).with(httpBasic(user, password)))
+            .perform(delete(idUri).with(getBasicAuth()))
             .andReturn().getResponse();
 
         MockHttpServletResponse getResponse = mockMvc
-            .perform(get(URI).with(httpBasic(user,password)))
+            .perform(get(URI).with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -593,7 +587,7 @@ public class DeviceTestIT {
 
         // When
         MockHttpServletResponse response = mockMvc
-            .perform(delete(idUri).with(httpBasic(user, password)))
+            .perform(delete(idUri).with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -615,7 +609,7 @@ public class DeviceTestIT {
 
         // When
         MockHttpServletResponse response = mockMvc
-            .perform(delete(idUri).with(httpBasic(user, password)))
+            .perform(delete(idUri).with(getBasicAuth()))
             .andReturn().getResponse();
 
         // Then
@@ -625,34 +619,250 @@ public class DeviceTestIT {
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
 
-    // Add device to database, returns generated ID. Should be used as helper method - not to test adding device itself.
-    private Integer addDevice(Device device) throws Exception {
+    /**
+     * Test get device's group returns group
+     */
+    @Transactional
+    @Test
+    public void testGetDevicesGroup() throws Exception {
+        log.info("Test GET /api/devices/{id}/group returns device's group");
+
+        // Given
+        DeviceGroup deviceGroup = getTestGroup();
+        Device device = getTestDevice();
+
+        // When
+        Integer deviceGroupId = addGroup(deviceGroup, mockMvc);
+        device.setDeviceGroupId(deviceGroupId);
+        Integer deviceId = addDevice(device, mockMvc);
+        String groupUri = String.format(GROUP_URI, deviceId);
+
         MockHttpServletResponse response = mockMvc
-                .perform(post(URI)
-                        .with(httpBasic(user,password))
-                        .content(mapper.writeValueAsString(device))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+            .perform(get(groupUri).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertHref(response, groupUri);
+        assertContentType(response);
 
         JsonNode items = parseToItems(response);
+        assertThat(items.size(), is(1));
+
         Map<String, String> data = dataToMap(items.get(0).get("data"));
-
-        return Integer.parseInt(data.get("id"));
+        assertData(data.get("name"), deviceGroup.getName());
+        assertData(data.get("id"), deviceGroupId);
     }
 
-    private void removeDevice(String id) throws Exception {
-        mockMvc.perform(delete(URI).param("id", id).with(httpBasic(user, password)));
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testGetDevicesGroupReturnsErrorWhenDeviceNotFound() throws Exception {
+        log.info("Test GET /api/devices/{id}/group ");
+        // Given
+
+        // When
+
+        // Then
     }
 
-    // Helper method to delete all devices. Update operations do not work as @Transactional.
-    private void clearDatabase() throws Exception {
-        MockHttpServletResponse response = mockMvc
-                .perform(get(URI).with(httpBasic(user,password)))
-                .andReturn().getResponse();
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testGetDevicesGroupReturnsErrorWhenGroupNotFound() throws Exception {
+        log.info("Test GET /api/devices/{id}/group ");
+        // Given
 
-        for(JsonNode item : parseToItems(response)) {
-            Map<String, String> data = dataToMap(item.get("data"));
-            removeDevice(data.get("id"));
-        }
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testAddGroupForDevice() throws Exception {
+        log.info("Test GET /api/devices/{id}/group ");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testAddGroupForDeviceReturnsErrorWhenDeviceNotFound() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testAddGroupForDeviceReturnsErrorWhenRequestBodyMissing() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testAddGroupForDeviceReturnsErrorWhenGroupNameDuplicate() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testAddGroupForDeviceReturnsErrorWhenDeviceAlreadyInGroup() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testUpdateDevicesGroup() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testUpdateDevicesGroupReturnsErrorWhenDeviceNotFound() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testUpdateDevicesGroupReturnsErrorWhenDeviceNotInGroup() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testUpdateDevicesGroupReturnsErrorWhenRequestBodyMissing() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testUpdateDevicesGroupReturnsErrorWhenGroupNameDuplicate() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testDeleteDevicesGroup() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testDeleteDevicesGroupReturnsErrorWhenDeviceNotFound() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    //@Test
+    public void testDeleteDevicesGroupReturnsErrorWhenDeviceNotInGroup() throws Exception {
+        log.info("");
+        // Given
+
+        // When
+
+        // Then
     }
 }
