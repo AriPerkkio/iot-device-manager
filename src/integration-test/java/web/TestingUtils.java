@@ -12,10 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.Measurement;
 import web.domain.response.ErrorCode;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -37,6 +37,7 @@ class TestingUtils {
 
     private static final String DEVICES_URI = "/api/devices";
     private static final String GROUPS_URI = "/api/device-groups";
+    private static final String MEASUREMENTS_URI = "/api/measurements";
 
     static String USER;
     static String PASSWORD;
@@ -162,6 +163,29 @@ class TestingUtils {
         Map<String, String> data = dataToMap(items.get(0).get("data"));
 
         return Integer.parseInt(data.get("id"));
+    }
+
+    // Add measurement to database. Should be used as helper method - not to test adding measurement itself.
+    static void addMeasurement(Measurement measurement, MockMvc mockMvc) throws Exception {
+        mockMvc.perform(
+            post(MEASUREMENTS_URI)
+                .content(mapper.writeValueAsString(measurement))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()));
+    }
+
+    static Measurement getTestMeasurement(Integer deviceId) {
+        Measurement measurement = new Measurement();
+        measurement.setDeviceId(deviceId);
+        measurement.setTime(new Date());
+
+        HashMap<String, Object> content = new HashMap<>();
+        content.put("test-string-key", "test-string-value");
+        content.put("test-array-key", Arrays.asList("test-array-value-one", "test-array-value-two"));
+        content.put("test-object-key", Collections.singletonMap("object-key", "object-value"));
+
+        measurement.setContent(content);
+        return measurement;
     }
 
     static void removeDevice(String id, MockMvc mockMvc) throws Exception {
