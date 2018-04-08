@@ -2,6 +2,7 @@ package web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -41,6 +42,11 @@ public class DeviceTestIT {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Before
+    public void logEmptyRowBeforeEachTest() {
+        log.info("");
+    }
 
     /**
      * Test get devices returns error with NOT_FOUND status initially, when database is empty
@@ -752,7 +758,7 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testAddGroupForDeviceReturnsErrorWhenDeviceNotFound() throws Exception {
-        log.info("Test POST /devices/{id}/group returns error when device is not found");
+        log.info("Test POST /api/devices/{id}/group returns error when device is not found");
 
         // Given
         DeviceGroup deviceGroup = getTestGroup();
@@ -779,7 +785,7 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testAddGroupForDeviceReturnsErrorWhenRequestBodyMissing() throws Exception {
-        log.info("Test POST /devices/{id}/group returns error when request body is missing");
+        log.info("Test POST /api/devices/{id}/group returns error when request body is missing");
 
         // Given
         String idUri = String.format(GROUP_URI, 1);
@@ -804,7 +810,7 @@ public class DeviceTestIT {
     @Transactional
     @Test
     public void testAddGroupForDeviceReturnsErrorWhenGroupNameDuplicate() throws Exception {
-        log.info("Test POST /device/{id}/group returns error when group name is not unique");
+        log.info("Test POST /api/device/{id}/group returns error when group name is not unique");
 
         // Given
         DeviceGroup deviceGroup = getTestGroup();
@@ -828,88 +834,191 @@ public class DeviceTestIT {
     }
 
     /**
-     *
+     * Test add group for device returns error when device is already in a group
      */
     @Transactional
-    //@Test
+    @Test
     public void testAddGroupForDeviceReturnsErrorWhenDeviceAlreadyInGroup() throws Exception {
-        log.info("");
+        log.info("Test POST /api/devices/{id}/group returns error when device is already in a group");
+
         // Given
+        Integer initialGroupId = addGroup(getTestGroup(), mockMvc);
+        DeviceGroup deviceGroup = getTestGroup("unique-name");
+        Device device = getTestDevice();
+        device.setDeviceGroupId(initialGroupId);
+        Integer deviceId = addDevice(device, mockMvc);
+        String idUri = String.format(GROUP_URI, deviceId);
 
         // When
+        MockHttpServletResponse response = mockMvc
+            .perform(post(idUri)
+                .content(mapper.writeValueAsString(deviceGroup))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertContentType(response);
+        assertHref(response, idUri);
+        assertError(response, ErrorCode.PARAMETER_CONFLICT);
     }
 
-
     /**
-     *
+     * Test update devices group modifies group
      */
-    @Transactional
-    //@Test
+    @Test
     public void testUpdateDevicesGroup() throws Exception {
-        log.info("");
+        log.info("Test PUT /api/devices/{id}/group modifies group");
+
         // Given
+        DeviceGroup deviceGroup = getTestGroup();
+        DeviceGroup updateGroup = getTestGroup("updated-group");
+        Integer deviceGroupId = addGroup(deviceGroup, mockMvc);
+        Device device = getTestDevice();
+        device.setDeviceGroupId(deviceGroupId);
+        Integer deviceId = addDevice(device, mockMvc);
+        String idUri = String.format(GROUP_URI, deviceId);
 
         // When
+        MockHttpServletResponse putResponse = mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(updateGroup))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getResponse = mockMvc
+            .perform(get(idUri).with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(putResponse.getStatus(), HttpStatus.OK.value());
+        assertHref(putResponse, idUri);
+        assertContentType(putResponse);
+
+        assertEquals(getResponse.getStatus(), HttpStatus.OK.value());
+        JsonNode items = parseToItems(getResponse);
+        Map<String, String> data = dataToMap(items.get(0).get("data"));
+
+        assertData(data.get("id"), deviceGroupId);
+        assertData(data.get("name"), updateGroup.getName());
+
+        clearDatabase(mockMvc);
     }
 
     /**
-     *
+     * Test update device's group returns error when device is not found
      */
     @Transactional
-    //@Test
+    @Test
     public void testUpdateDevicesGroupReturnsErrorWhenDeviceNotFound() throws Exception {
-        log.info("");
+        log.info("Test PUT /api/devices/{id}/group returns error when device is not found");
+
         // Given
+        DeviceGroup deviceGroup = getTestGroup();
+        String idUri = String.format(GROUP_URI, 1);
 
         // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(deviceGroup))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertContentType(response);
+        assertHref(response, idUri);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
     }
 
     /**
-     *
+     * Test update device's group returns error when device is not in a group
      */
     @Transactional
-    //@Test
+    @Test
     public void testUpdateDevicesGroupReturnsErrorWhenDeviceNotInGroup() throws Exception {
-        log.info("");
+        log.info("Test PUT /api/devices/{id}/group returns error when device is not in a group");
+
         // Given
+        DeviceGroup deviceGroup = getTestGroup();
+        Integer deviceId = addDevice(getTestDevice(), mockMvc);
+        String idUri = String.format(GROUP_URI, deviceId);
 
         // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(deviceGroup))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertContentType(response);
+        assertHref(response, idUri);
+        assertError(response, ErrorCode.PARAMETER_CONFLICT);
     }
 
     /**
-     *
+     * Test update device's group returns error when request body is missing
      */
     @Transactional
-    //@Test
+    @Test
     public void testUpdateDevicesGroupReturnsErrorWhenRequestBodyMissing() throws Exception {
-        log.info("");
+        log.info("Test PUT /api/devices/{id}/group returns error when request body is missing");
+
         // Given
+        Integer deviceId = addDevice(getTestDevice(), mockMvc);
+        String idUri = String.format(GROUP_URI, deviceId);
 
         // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(idUri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertContentType(response);
+        assertHref(response, idUri);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
 
     /**
-     *
+     * Test update device's group returns error when group name is not unique
      */
     @Transactional
-    //@Test
+    @Test
     public void testUpdateDevicesGroupReturnsErrorWhenGroupNameDuplicate() throws Exception {
-        log.info("");
+        log.info("Test PUT /api/devices/{id}/group returns error when group name is not unique");
+
         // Given
+        Integer deviceGroupId = addGroup(getTestGroup(), mockMvc);
+        Device device = getTestDevice();
+        device.setDeviceGroupId(deviceGroupId);
+        Integer deviceId = addDevice(device, mockMvc);
+        String idUri = String.format(GROUP_URI, deviceId);
+
+        DeviceGroup updateGroup = getTestGroup("update-group");
+        addGroup(updateGroup, mockMvc);
 
         // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(updateGroup))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertContentType(response);
+        assertHref(response, idUri);
+        assertError(response, ErrorCode.PARAMETER_CONFLICT);
     }
 
 
@@ -919,7 +1028,8 @@ public class DeviceTestIT {
     @Transactional
     //@Test
     public void testDeleteDevicesGroup() throws Exception {
-        log.info("");
+        log.info("Test DELETE /api/devices/{id}/group ");
+
         // Given
 
         // When
@@ -933,7 +1043,8 @@ public class DeviceTestIT {
     @Transactional
     //@Test
     public void testDeleteDevicesGroupReturnsErrorWhenDeviceNotFound() throws Exception {
-        log.info("");
+        log.info("Test DELETE /api/devices/{id}/group ");
+
         // Given
 
         // When
@@ -947,7 +1058,8 @@ public class DeviceTestIT {
     @Transactional
     //@Test
     public void testDeleteDevicesGroupReturnsErrorWhenDeviceNotInGroup() throws Exception {
-        log.info("");
+        log.info("Test DELETE /api/devices/{id}/group ");
+
         // Given
 
         // When
