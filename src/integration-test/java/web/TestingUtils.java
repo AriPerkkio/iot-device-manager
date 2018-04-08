@@ -74,8 +74,12 @@ class TestingUtils {
     }
 
     static Device getTestDevice() {
+        return getTestDevice("test-device");
+    }
+
+    static Device getTestDevice(String name) {
         Device device = new Device();
-        device.setName("test-device");
+        device.setName(name);
         return device;
     }
 }

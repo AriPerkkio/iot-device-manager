@@ -116,11 +116,9 @@ public class DeviceTestIT {
         log.info("Test GET /api/devices without parameters returns all devices");
 
         // Given
-        Device deviceOne = getTestDevice();
-        deviceOne.setName("device-one");
+        Device deviceOne = getTestDevice("device-one");
         addDevice(deviceOne);
-        Device deviceTwo = getTestDevice();
-        deviceTwo.setName("device-two");
+        Device deviceTwo = getTestDevice("device-two");
         addDevice(deviceTwo);
 
         // When
@@ -154,12 +152,10 @@ public class DeviceTestIT {
         log.info("Test GET /api/devices/{id} returns only one device");
 
         // Given
-        Device extraDevice = getTestDevice();
-        extraDevice.setName("device-two");
+        Device extraDevice = getTestDevice("device-two");
         addDevice(extraDevice);
 
-        Device expected = getTestDevice();
-        expected.setName("device-one");
+        Device expected = getTestDevice("device-one");
         Integer id = addDevice(expected);
         String idUri = URI + String.format("/%d", id);
 
@@ -233,6 +229,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertHref(response, URI);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
     }
@@ -254,6 +251,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertHref(response, URI);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
@@ -281,6 +279,7 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertHref(response, URI);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
@@ -294,8 +293,7 @@ public class DeviceTestIT {
 
         // Given
         Device initialDevice = getTestDevice();
-        Device updateDevice = getTestDevice();
-        updateDevice.setName("updated-name");
+        Device updateDevice = getTestDevice("updated-name");
 
         // When
         addDevice(initialDevice);
@@ -314,7 +312,108 @@ public class DeviceTestIT {
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertHref(response, URI);
         assertContentType(response);
+
+        JsonNode items = parseToItems(response);
+        assertThat(items.size(), is(1));
+
+        Map<String, String> data = dataToMap(items.get(0).get("data"));
+        assertData(data.get("name"), updateDevice.getName());
+
+        // Update operations do not work as @Transactional
+        clearDatabase();
+    }
+
+    /**
+     * Test update device returns error when device not found
+     */
+    @Transactional
+    @Test
+    public void testUpdateDeviceReturnsErrorWhenDeviceNotFound() throws Exception {
+        log.info("Test PUT /api/devices returns error when device not found");
+
+        // Given
+        Device initialDevice = getTestDevice();
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(URI)
+                .param("name", initialDevice.getName())
+                .content(mapper.writeValueAsString(initialDevice))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertContentType(response);
+        assertHref(response, URI);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
+    }
+
+    /**
+     * Test update device returns error when device name is duplicate
+     */
+    @Transactional
+    @Test
+    public void testUpdateDeviceReturnsErrorWhenDeviceNameDuplicate() throws Exception {
+        log.info("Test PUT /api/devices returns error when device name is duplicate");
+
+        // Given
+        Device initialDevice = getTestDevice();
+        Device updatedDevice = getTestDevice("update-device");
+
+        // When
+        addDevice(initialDevice);
+        addDevice(updatedDevice);
+
+        MockHttpServletResponse response = mockMvc
+            .perform(put(URI)
+                .param("name", initialDevice.getName())
+                .content(mapper.writeValueAsString(updatedDevice))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertHref(response, URI);
+        assertContentType(response);
+        assertError(response, ErrorCode.PARAMETER_CONFLICT);
+    }
+
+    /**
+     * Test update device by ID modifies given device
+     */
+    @Test
+    public void testUpdateDeviceById() throws Exception {
+        log.info("Test PUT /api/devices/{id} modifies given device");
+
+        // Given
+        Device initialDevice = getTestDevice();
+        Device updateDevice = getTestDevice("updated-name");
+
+        // When
+        Integer id = addDevice(initialDevice);
+        String idUri = URI + "/" + id;
+
+        mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(updateDevice))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(httpBasic(user, password)));
+
+        MockHttpServletResponse response = mockMvc
+            .perform(get(idUri)
+                .param("name", updateDevice.getName())
+                .with(httpBasic(user,password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertContentType(response);
+        assertHref(response, idUri);
 
         JsonNode items = parseToItems(response);
         assertThat(items.size(), is(1));
@@ -330,7 +429,7 @@ public class DeviceTestIT {
      * Test update device by ID returns error when device not found
      */
     @Test
-    public void testUpdateDeviceReturnsErrorWhenDeviceNotFound() throws Exception {
+    public void testUpdateDeviceByIdReturnsErrorWhenDeviceNotFound() throws Exception {
         log.info("Test PUT /api/devices/{id} returns error when device not found");
 
         // Given
@@ -340,17 +439,190 @@ public class DeviceTestIT {
 
         // When
         MockHttpServletResponse response = mockMvc
-                .perform(put(idUri)
-                    .content(mapper.writeValueAsString(device))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .with(httpBasic(user, password)))
-                .andReturn().getResponse();
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(device))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(httpBasic(user, password)))
+            .andReturn().getResponse();
 
         // Then
         assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
         assertContentType(response);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
         assertHref(response, idUri);
+    }
+
+    /**
+     * Test update device by ID returns error when ID is invalid format
+     */
+    @Test
+    public void testUpdateDeviceByIdReturnsErrorIdInvalidFormat() throws Exception {
+        log.info("Test PUT /api/devices/{id} returns error when ID is invalid format");
+
+        // Given
+        String idUri = URI + "/string-instead-of-integer";
+        Device device = getTestDevice();
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(device))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertContentType(response);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
+        assertHref(response, idUri);
+    }
+
+    /**
+     * Test delete device removes device
+     */
+    @Test
+    @Transactional
+    public void testDeleteDevice() throws Exception {
+        log.info("Test DELETE /api/devices removes device");
+
+        // Given
+        Device device = getTestDevice();
+
+        // When
+        addDevice(device);
+
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(URI)
+                .param("name", device.getName())
+                .with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getResponse = mockMvc
+            .perform(get(URI).with(httpBasic(user,password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
+        assertContentType(response);
+        assertEquals(getResponse.getStatus(), HttpStatus.NOT_FOUND.value());
+    }
+
+    /**
+     * Test delete device returns error when device not found
+     */
+    @Test
+    public void testDeleteDeviceReturnsErrorWhenDevicesNotFound() throws Exception {
+        log.info("Test DELETE /api/devices returns error when device not found");
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(URI)
+                .param("name", "test-name")
+                .with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertContentType(response);
+        assertHref(response, URI);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
+    }
+
+    /**
+     * Test delete device returns error request parameter invalid type
+     */
+    @Test
+    public void testDeleteDeviceReturnsErrorWhenRequestParameterInvalidType() throws Exception {
+        log.info("Test DELETE /api/devices returns error when device not found");
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(URI)
+                .param("id", "string-instead-of-integer")
+                .with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertContentType(response);
+        assertHref(response, URI);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
+    }
+
+    /**
+     * Test delete device by ID removes device
+     */
+    @Test
+    @Transactional
+    public void testDeleteDeviceById() throws Exception {
+        log.info("Test DELETE /api/devices/{id} removes device");
+
+        // Given
+        Device device = getTestDevice();
+
+        // When
+        Integer id = addDevice(device);
+        String idUri = URI + "/" + id;
+
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(idUri).with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getResponse = mockMvc
+            .perform(get(URI).with(httpBasic(user,password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
+        assertContentType(response);
+        assertEquals(getResponse.getStatus(), HttpStatus.NOT_FOUND.value());
+    }
+
+    /**
+     * Test delete device by ID returns error when device not found
+     */
+    @Test
+    public void testDeleteDeviceByIdReturnsErrorWhenDevicesNotFound() throws Exception {
+        log.info("Test DELETE /api/devices/{id} returns error when device not found");
+
+        // Given
+        String idUri = URI + "/123456";
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(idUri).with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertContentType(response);
+        assertHref(response, idUri);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
+    }
+
+    /**
+     * Test delete device by ID returns error when ID invalid type
+     */
+    @Test
+    public void testDeleteDeviceByIdReturnsErrorWhenIdInvalidType() throws Exception {
+        log.info("Test DELETE /api/devices/{id} returns error when ID is invalid type");
+
+        // Given
+        String idUri = URI + "/string-instead-of-integer";
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(idUri).with(httpBasic(user, password)))
+            .andReturn().getResponse();
+
+        // Then
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertContentType(response);
+        assertHref(response, idUri);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
 
     // Add device to database, returns generated ID. Should be used as helper method - not to test adding device itself.
