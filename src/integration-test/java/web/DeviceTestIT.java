@@ -1023,47 +1023,91 @@ public class DeviceTestIT {
 
 
     /**
-     *
+     * Test delete device's group removes group and sets deviceGroupId null
      */
-    @Transactional
-    //@Test
+    @Test
     public void testDeleteDevicesGroup() throws Exception {
-        log.info("Test DELETE /api/devices/{id}/group ");
+        log.info("Test DELETE /api/devices/{id}/group removes group and sets device's deviceGroupId null");
 
         // Given
+        Integer deviceGroupId = addGroup(getTestGroup(), mockMvc);
+        Device device = getTestDevice();
+        device.setDeviceGroupId(deviceGroupId);
+        Integer deviceId = addDevice(device, mockMvc);
+        String idUri = String.format(GROUP_URI, deviceId);
 
         // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(idUri).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getGroupResponse = mockMvc
+            .perform(get(idUri).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getDeviceResponse = mockMvc
+            .perform(get(URI + "/" + deviceId).with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
+        assertContentType(response);
+
+        assertEquals(getGroupResponse.getStatus(), HttpStatus.CONFLICT.value());
+        assertEquals(getDeviceResponse.getStatus(), HttpStatus.OK.value());
+
+        JsonNode deviceItems = parseToItems(getDeviceResponse);
+        Map<String, String> data = dataToMap(deviceItems.get(0).get("data"));
+        assertData(data.get("name"), device.getName());
+        assertData(data.get("deviceGroupId"), "null");
+
+        clearDatabase(mockMvc);
     }
 
     /**
-     *
+     * Test delete device's group returns error when device is not found
      */
     @Transactional
-    //@Test
+    @Test
     public void testDeleteDevicesGroupReturnsErrorWhenDeviceNotFound() throws Exception {
-        log.info("Test DELETE /api/devices/{id}/group ");
+        log.info("Test DELETE /api/devices/{id}/group returns error when device is not found");
 
         // Given
+        String idUri = String.format(GROUP_URI, 1);
 
         // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(idUri).with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertHref(response, idUri);
+        assertContentType(response);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
     }
 
     /**
-     *
+     * Test delete device's group returns error when device is not in a group
      */
     @Transactional
-    //@Test
+    @Test
     public void testDeleteDevicesGroupReturnsErrorWhenDeviceNotInGroup() throws Exception {
-        log.info("Test DELETE /api/devices/{id}/group ");
+        log.info("Test DELETE /api/devices/{id}/group returns error when device is not in a group");
 
         // Given
+        Integer deviceId = addDevice(getTestDevice(), mockMvc);
+        String idUri = String.format(GROUP_URI, deviceId);
 
         // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(idUri).with(getBasicAuth()))
+            .andReturn().getResponse();
 
         // Then
+        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertHref(response, idUri);
+        assertContentType(response);
+        assertError(response, ErrorCode.PARAMETER_CONFLICT);
     }
 }
