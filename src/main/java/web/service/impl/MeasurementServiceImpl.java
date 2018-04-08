@@ -58,7 +58,7 @@ public class MeasurementServiceImpl implements MeasurementService {
             deviceService.validateDeviceExists(measurement.getDeviceId(), null, null);
             Measurement addedMeasurement = measurementRepository.addMeasurement(measurement);
 
-            return new ResponseWrapper(mapToCollection(addedMeasurement));
+            return new ResponseWrapper(mapToCollection(addedMeasurement), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add measurement failed");
         }

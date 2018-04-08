@@ -80,14 +80,14 @@ class TestingUtils {
     }
 
     static void assertHref(MockHttpServletResponse response, String href) throws Exception {
-        log.debug("\nAssert href is " + href);
+        log.debug("Assert href is " + href);
 
         JsonNode collection = parseToCollection(response);
         assertThat(collection.get("href").toString(), containsString(href));
     }
 
     static void assertError(MockHttpServletResponse response, ErrorCode errorCode) throws Exception {
-        log.debug("\nAssert error code is " + errorCode.getCode());
+        log.debug("Assert error code is " + errorCode);
 
         JsonNode error = parseToError(response);
         assertThat(error.get("code").asText(), is(errorCode.getCode()));
@@ -104,7 +104,7 @@ class TestingUtils {
     }
 
     static void assertData(String jsonValue, Object value) {
-        log.debug("\nAssert %s matches %s", jsonValue, value);
+        log.debug(String.format("Assert %s matches %s", jsonValue, value));
 
         assertThat(jsonValue, is(String.format("%s", value)));
     }

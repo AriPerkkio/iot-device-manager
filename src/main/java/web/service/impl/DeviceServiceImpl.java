@@ -79,7 +79,7 @@ public class DeviceServiceImpl implements DeviceService {
         try {
             Device addedDevice = deviceRepository.addDevice(device);
 
-            return new ResponseWrapper(mapToCollection(addedDevice));
+            return new ResponseWrapper(mapToCollection(addedDevice), HttpStatus.CREATED);
         } catch(Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device failed");
         }
@@ -172,7 +172,7 @@ public class DeviceServiceImpl implements DeviceService {
             device.setDeviceGroupId(addedDeviceGroup.getId());
             deviceRepository.updateDevice(id, null, null, device);
 
-            return new ResponseWrapper(DeviceGroupMapper.mapToCollection(addedDeviceGroup));
+            return new ResponseWrapper(DeviceGroupMapper.mapToCollection(addedDeviceGroup), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add group for device failed");
         }
@@ -270,7 +270,7 @@ public class DeviceServiceImpl implements DeviceService {
             device.setDeviceTypeId(addedDeviceType.getId());
             deviceRepository.updateDevice(id, null, null, device);
 
-            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(addedDeviceType));
+            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(addedDeviceType), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add type for device failed");
         }
@@ -422,7 +422,7 @@ public class DeviceServiceImpl implements DeviceService {
             device.setConfigurationId(addedConfiguration.getId());
             deviceRepository.updateDevice(id, null, null, device);
 
-            return new ResponseWrapper(ConfigurationMapper.mapToCollection(addedConfiguration));
+            return new ResponseWrapper(ConfigurationMapper.mapToCollection(addedConfiguration), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add configuration for device failed");
         }

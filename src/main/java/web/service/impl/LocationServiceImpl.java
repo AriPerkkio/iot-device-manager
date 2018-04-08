@@ -58,7 +58,7 @@ public class LocationServiceImpl implements LocationService {
             deviceService.validateDeviceExists(location.getDeviceId(), null, null);
             Location addedLocation = locationRepository.addLocation(location);
 
-            return new ResponseWrapper(mapToCollection(addedLocation));
+            return new ResponseWrapper(mapToCollection(addedLocation), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add location failed");
         }
