@@ -64,7 +64,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         try {
             DeviceType addedDeviceType = deviceTypeRepository.addDeviceType(deviceType);
 
-            return new ResponseWrapper(mapToCollection(addedDeviceType));
+            return new ResponseWrapper(mapToCollection(addedDeviceType), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device type failed");
         }
@@ -156,7 +156,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 
             DeviceType updatedDeviceType = deviceTypeRepository.updateDeviceType(id, null, deviceType);
 
-            return new ResponseWrapper(mapToCollection(updatedDeviceType));
+            return new ResponseWrapper(mapToCollection(updatedDeviceType), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add icon for type failed");
         }

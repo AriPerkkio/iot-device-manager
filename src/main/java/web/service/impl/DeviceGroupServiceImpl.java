@@ -69,7 +69,7 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
         try {
             DeviceGroup addedDeviceGroup = deviceGroupRepository.addDeviceGroup(deviceGroup);
 
-            return new ResponseWrapper(mapToCollection(addedDeviceGroup));
+            return new ResponseWrapper(mapToCollection(addedDeviceGroup), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device group failed");
         }
@@ -144,7 +144,7 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
             device.setDeviceGroupId(id);
             Device addedDevice = deviceRepository.addDevice(device);
 
-            return new ResponseWrapper(DeviceMapper.mapToCollection(addedDevice));
+            return new ResponseWrapper(DeviceMapper.mapToCollection(addedDevice), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device to group failed");
         }

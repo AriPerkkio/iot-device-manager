@@ -75,7 +75,7 @@ public class ExceptionController {
         Error error = Error.create("HTTP request error", ErrorCode.INTERNAL_ERROR.getCode(), message);
         URI href = new URI(request.getRequestURL().toString());
 
-        return new ResponseWrapper(error.toCollection(href), httpHeaders, BAD_REQUEST);
+        return new ResponseWrapper(error.toCollection(href), httpHeaders, NOT_IMPLEMENTED);
     }
 
     private HttpStatus resolveHttpStatus(ErrorCode errorCode) {

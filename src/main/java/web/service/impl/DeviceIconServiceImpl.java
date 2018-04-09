@@ -79,7 +79,7 @@ public class DeviceIconServiceImpl implements DeviceIconService {
             DeviceIcon addedDeviceIcon = deviceIconRepository.addDeviceIcon(deviceIcon);
             Files.copy(icon.getInputStream(), path.resolve(deviceIcon.getName()));
 
-            return new ResponseWrapper(mapToCollection(addedDeviceIcon));
+            return new ResponseWrapper(mapToCollection(addedDeviceIcon), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add device icon failed");
         }
@@ -176,7 +176,7 @@ public class DeviceIconServiceImpl implements DeviceIconService {
             deviceType.setDeviceIconId(id);
             DeviceType addedDeviceType = deviceTypeRepository.addDeviceType(deviceType);
 
-            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(addedDeviceType));
+            return new ResponseWrapper(DeviceTypeMapper.mapToCollection(addedDeviceType), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add type with icon failed");
         }

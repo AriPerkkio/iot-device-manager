@@ -52,7 +52,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         try {
             Configuration addedConfiguration = configurationRepository.addConfiguration(configuration);
 
-            return new ResponseWrapper(mapToCollection(addedConfiguration));
+            return new ResponseWrapper(mapToCollection(addedConfiguration), HttpStatus.CREATED);
         } catch (Exception e) {
             ExceptionHandlingUtils.validateRepositoryExceptions(e, "Add configuration failed");
         }
