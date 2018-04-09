@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -15,11 +16,14 @@ import web.domain.entity.DeviceGroup;
 import web.domain.entity.Measurement;
 import web.domain.response.ErrorCode;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -78,6 +82,12 @@ class TestingUtils {
         assertData(data.get("deviceGroupId"), expected.getDeviceGroupId());
         assertData(data.get("configurationId"), expected.getConfigurationId());
         assertNotNull(data.get("authenticationKey"));
+    }
+
+    static void assertStatus(MockHttpServletResponse response, HttpStatus httpStatus) {
+        log.info(String.format("Assert HTTP status is %s (%d)", httpStatus.name(), httpStatus.value()));
+
+        assertEquals(response.getStatus(), httpStatus.value());
     }
 
     static void assertHref(MockHttpServletResponse response, String href) throws Exception {
@@ -207,5 +217,10 @@ class TestingUtils {
             removeDevice(data.get("id"), mockMvc);
             removeGroup(data.get("deviceGroupId"), mockMvc);
         }
+    }
+
+    static Date stringToDate(String time) throws Exception{
+        return new Timestamp(
+            new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse(time).getTime());
     }
 }

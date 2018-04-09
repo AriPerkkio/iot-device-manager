@@ -61,7 +61,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertContentType(response);
         assertHref(response, URI);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
@@ -81,7 +81,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertContentType(response);
         assertHref(response, URI);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
@@ -101,7 +101,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertContentType(response);
         assertHref(response, idUri);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
@@ -127,7 +127,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertStatus(response, HttpStatus.OK);
         assertContentType(response);
         assertHref(response, URI);
 
@@ -165,7 +165,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertStatus(response, HttpStatus.OK);
         assertContentType(response);
         assertHref(response, idUri);
 
@@ -196,7 +196,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CREATED.value());
+        assertStatus(response, HttpStatus.CREATED);
         assertContentType(response);
         assertHref(response, URI);
 
@@ -228,7 +228,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertStatus(response, HttpStatus.CONFLICT);
         assertHref(response, URI);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
@@ -250,19 +250,19 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertHref(response, URI);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
 
     /**
-     * Test add device returns parameter conflict error when inserting device invalid attribute
+     * Test add device returns parameter conflict error when inserting device with invalid attribute
      */
     @Transactional
     @Test
     public void testAddDeviceReturnsErrorWhenRequestBodyContainsInvalidParameter() throws Exception {
-        log.info("Test POST /api/devices returns parameter conflict error when inserting device invalid attribute");
+        log.info("Test POST /api/devices returns parameter conflict error when inserting device with invalid attribute");
 
         // Given
         Device device = getTestDevice();
@@ -278,7 +278,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertHref(response, URI);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
@@ -311,7 +311,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertStatus(response, HttpStatus.OK);
         assertHref(response, URI);
         assertContentType(response);
 
@@ -346,7 +346,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertContentType(response);
         assertHref(response, URI);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
@@ -377,7 +377,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertStatus(response, HttpStatus.CONFLICT);
         assertHref(response, URI);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
@@ -411,7 +411,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertStatus(response, HttpStatus.OK);
         assertContentType(response);
         assertHref(response, idUri);
 
@@ -446,7 +446,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertContentType(response);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
         assertHref(response, idUri);
@@ -474,7 +474,7 @@ public class DeviceTestIT {
 
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
         assertHref(response, idUri);
@@ -505,9 +505,9 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
+        assertStatus(response, HttpStatus.NO_CONTENT);
         assertContentType(response);
-        assertEquals(getResponse.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(getResponse, HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -525,7 +525,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertContentType(response);
         assertHref(response, URI);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
@@ -546,7 +546,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertContentType(response);
         assertHref(response, URI);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
@@ -576,9 +576,9 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
+        assertStatus(response, HttpStatus.NO_CONTENT);
         assertContentType(response);
-        assertEquals(getResponse.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(getResponse, HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -597,7 +597,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertContentType(response);
         assertHref(response, idUri);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
@@ -619,7 +619,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertContentType(response);
         assertHref(response, idUri);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
@@ -648,7 +648,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertStatus(response, HttpStatus.OK);
         assertHref(response, groupUri);
         assertContentType(response);
 
@@ -677,7 +677,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertHref(response, idUri);
         assertContentType(response);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
@@ -701,7 +701,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertStatus(response, HttpStatus.CONFLICT);
         assertHref(response, idUri);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
@@ -737,9 +737,9 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(postResponse.getStatus(), HttpStatus.CREATED.value());
-        assertEquals(getGroupResponse.getStatus(), HttpStatus.OK.value());
-        assertEquals(getDeviceResponse.getStatus(), HttpStatus.OK.value());
+        assertStatus(postResponse, HttpStatus.CREATED);
+        assertStatus(getGroupResponse, HttpStatus.OK);
+        assertStatus(getDeviceResponse, HttpStatus.OK);
 
         JsonNode createdGroup = parseToItems(getGroupResponse);
         JsonNode updatedDevice = parseToItems(getDeviceResponse);
@@ -773,7 +773,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertHref(response, idUri);
         assertContentType(response);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
@@ -798,7 +798,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertHref(response, idUri);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
@@ -827,7 +827,7 @@ public class DeviceTestIT {
                 .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertStatus(response, HttpStatus.CONFLICT);
         assertHref(response, idUri);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
@@ -858,7 +858,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertStatus(response, HttpStatus.CONFLICT);
         assertContentType(response);
         assertHref(response, idUri);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
@@ -893,11 +893,11 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(putResponse.getStatus(), HttpStatus.OK.value());
+        assertStatus(putResponse, HttpStatus.OK);
         assertHref(putResponse, idUri);
         assertContentType(putResponse);
 
-        assertEquals(getResponse.getStatus(), HttpStatus.OK.value());
+        assertStatus(getResponse, HttpStatus.OK);
         JsonNode items = parseToItems(getResponse);
         Map<String, String> data = dataToMap(items.get(0).get("data"));
 
@@ -928,7 +928,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertContentType(response);
         assertHref(response, idUri);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
@@ -956,7 +956,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertStatus(response, HttpStatus.CONFLICT);
         assertContentType(response);
         assertHref(response, idUri);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
@@ -982,7 +982,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertStatus(response, HttpStatus.BAD_REQUEST);
         assertContentType(response);
         assertHref(response, idUri);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
@@ -1015,7 +1015,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertStatus(response, HttpStatus.CONFLICT);
         assertContentType(response);
         assertHref(response, idUri);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
@@ -1050,11 +1050,11 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
+        assertStatus(response, HttpStatus.NO_CONTENT);
         assertContentType(response);
 
-        assertEquals(getGroupResponse.getStatus(), HttpStatus.CONFLICT.value());
-        assertEquals(getDeviceResponse.getStatus(), HttpStatus.OK.value());
+        assertStatus(getGroupResponse, HttpStatus.CONFLICT);
+        assertStatus(getDeviceResponse, HttpStatus.OK);
 
         JsonNode deviceItems = parseToItems(getDeviceResponse);
         Map<String, String> data = dataToMap(deviceItems.get(0).get("data"));
@@ -1081,7 +1081,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+        assertStatus(response, HttpStatus.NOT_FOUND);
         assertHref(response, idUri);
         assertContentType(response);
         assertError(response, ErrorCode.NO_ITEMS_FOUND);
@@ -1105,7 +1105,7 @@ public class DeviceTestIT {
             .andReturn().getResponse();
 
         // Then
-        assertEquals(response.getStatus(), HttpStatus.CONFLICT.value());
+        assertStatus(response, HttpStatus.CONFLICT);
         assertHref(response, idUri);
         assertContentType(response);
         assertError(response, ErrorCode.PARAMETER_CONFLICT);
