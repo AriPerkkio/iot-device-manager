@@ -2,30 +2,35 @@ package web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.core.AnyOf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
+import web.domain.entity.DeviceIcon;
 import web.domain.entity.Measurement;
 import web.domain.response.ErrorCode;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.sun.org.apache.xerces.internal.utils.SecuritySupport.getResourceAsStream;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
@@ -42,6 +47,7 @@ class TestingUtils {
     private static final String DEVICES_URI = "/api/devices";
     private static final String GROUPS_URI = "/api/device-groups";
     private static final String MEASUREMENTS_URI = "/api/measurements";
+    private static final String DEVICE_ICONS_URI = "/api/device-icons";
 
     static String USER;
     static String PASSWORD;
@@ -54,6 +60,19 @@ class TestingUtils {
     @Value("${iotdevicemanager.password}")
     public void setPassword(String password) {
         PASSWORD = password;
+    }
+
+    static String FILE_UPLOAD_ROOT;
+    static String ITEMS_LOCATION;
+
+    @Value("${deviceicon.upload.location.root}")
+    public void setFileUploadRoot(String root) {
+        FILE_UPLOAD_ROOT = root;
+    }
+
+    @Value("${deviceicon.upload.location.icons}")
+    public void setItemsLocation(String iconsLocation) {
+        ITEMS_LOCATION = iconsLocation;
     }
 
     static void assertContentType(MockHttpServletResponse response) {
@@ -112,6 +131,12 @@ class TestingUtils {
         }
 
         return fieldValuePairs;
+    }
+
+    static void assertData(String jsonValue, AnyOf<String> matcher) {
+        log.debug(String.format("Assert %s with matcher %s", jsonValue, matcher));
+
+        assertThat(jsonValue, matcher);
     }
 
     static void assertData(String jsonValue, Object value) {
@@ -182,6 +207,47 @@ class TestingUtils {
                 .content(mapper.writeValueAsString(measurement))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(getBasicAuth()));
+    }
+
+    static DeviceIcon getTestIcon() {
+        return getTestIcon("test-icon.png");
+    }
+
+    static DeviceIcon getTestIcon(String name) {
+        DeviceIcon deviceIcon = new DeviceIcon();
+        deviceIcon.setName(name);
+        return deviceIcon;
+    }
+
+    static MockMultipartFile getTestIconFile() throws Exception {
+        return new MockMultipartFile("icon", "test-icon", "image/png", getResourceAsStream("/resources/test-icon.png"));
+    }
+
+    static void addIcon(DeviceIcon deviceIcon, MockMultipartFile iconFile, MockMvc mockMvc) throws Exception {
+        mockMvc.perform(fileUpload(DEVICE_ICONS_URI)
+                .file(iconFile)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param("name", deviceIcon.getName())
+                .with(getBasicAuth()));
+    }
+
+    static void assertIconExists(String name) {
+        String location = FILE_UPLOAD_ROOT + ITEMS_LOCATION;
+        Path path = Paths.get(location);
+
+        log.info(String.format("Assert file called %s exists at %s", name, location));
+
+        Boolean exists = Files.exists(path.resolve(name));
+        assertTrue(exists);
+    }
+
+    static void removeTestIcon(String name) throws Exception {
+        String location = FILE_UPLOAD_ROOT + ITEMS_LOCATION;
+        Path path = Paths.get(location);
+        if(Files.exists(path.resolve(name))) {
+            log.info(String.format("Cleaning icons. Found %s. Removing...", name));
+            Files.delete(path.resolve(name));
+        }
     }
 
     static Measurement getTestMeasurement(Integer deviceId) {
