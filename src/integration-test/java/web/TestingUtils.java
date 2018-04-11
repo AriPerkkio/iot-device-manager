@@ -26,10 +26,10 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.sun.org.apache.xerces.internal.utils.SecuritySupport.getResourceAsStream;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hibernate.internal.util.ConfigHelper.getResourceAsStream;
 import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -64,6 +64,7 @@ class TestingUtils {
 
     static String FILE_UPLOAD_ROOT;
     static String ITEMS_LOCATION;
+    static String TEST_ICON_NAME;
 
     @Value("${deviceicon.upload.location.root}")
     public void setFileUploadRoot(String root) {
@@ -75,10 +76,21 @@ class TestingUtils {
         ITEMS_LOCATION = iconsLocation;
     }
 
+    @Value("${deviceicon.test.icon.name}")
+    public void setTestIconName(String testIconName) {
+        TEST_ICON_NAME = testIconName;
+    }
+
     static void assertContentType(MockHttpServletResponse response) {
         log.debug("Assert content type is " + APPLICATION_VND_COLLECTION_JSON);
 
         assertThat(response.getContentType(), anyOf(is(APPLICATION_VND_COLLECTION_JSON), is(APPLICATION_VND_COLLECTION_JSON_WITHOUT_SPACE)));
+    }
+
+    static void assertContentType(MockHttpServletResponse response, String contentType) {
+        log.debug("Assert content type is " + contentType);
+
+        assertEquals(response.getContentType(), contentType);
     }
 
     static JsonNode parseToCollection(MockHttpServletResponse response) throws Exception {
@@ -104,7 +116,7 @@ class TestingUtils {
     }
 
     static void assertStatus(MockHttpServletResponse response, HttpStatus httpStatus) {
-        log.info(String.format("Assert HTTP status is %s (%d)", httpStatus.name(), httpStatus.value()));
+        log.debug(String.format("Assert HTTP status is %s (%d)", httpStatus.name(), httpStatus.value()));
 
         assertEquals(response.getStatus(), httpStatus.value());
     }
@@ -220,22 +232,36 @@ class TestingUtils {
     }
 
     static MockMultipartFile getTestIconFile() throws Exception {
-        return new MockMultipartFile("icon", "test-icon", "image/png", getResourceAsStream("/resources/test-icon.png"));
+        return new MockMultipartFile("icon", "test-icon", "image/png", getResourceAsStream(TEST_ICON_NAME));
     }
 
-    static void addIcon(DeviceIcon deviceIcon, MockMultipartFile iconFile, MockMvc mockMvc) throws Exception {
-        mockMvc.perform(fileUpload(DEVICE_ICONS_URI)
+    // Assert icons by comparing content
+    static void assertIcons(MockHttpServletResponse response, MockMultipartFile expected) throws Exception {
+        log.debug(String.format("Assert response contains icon file with length of %d.", expected.getSize() ));
+
+        assertEquals(new String(expected.getBytes()), new String(response.getContentAsByteArray()));
+    }
+
+    static Integer addIcon(DeviceIcon deviceIcon, MockMultipartFile iconFile, MockMvc mockMvc) throws Exception {
+        MockHttpServletResponse response = mockMvc
+            .perform(fileUpload(DEVICE_ICONS_URI)
                 .file(iconFile)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .param("name", deviceIcon.getName())
-                .with(getBasicAuth()));
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        JsonNode items = parseToItems(response);
+        Map<String, String> data = dataToMap(items.get(0).get("data"));
+
+        return Integer.parseInt(data.get("id"));
     }
 
     static void assertIconExists(String name) {
         String location = FILE_UPLOAD_ROOT + ITEMS_LOCATION;
         Path path = Paths.get(location);
 
-        log.info(String.format("Assert file called %s exists at %s", name, location));
+        log.debug(String.format("Assert file called %s exists at %s", name, location));
 
         Boolean exists = Files.exists(path.resolve(name));
         assertTrue(exists);
@@ -245,7 +271,7 @@ class TestingUtils {
         String location = FILE_UPLOAD_ROOT + ITEMS_LOCATION;
         Path path = Paths.get(location);
         if(Files.exists(path.resolve(name))) {
-            log.info(String.format("Cleaning icons. Found %s. Removing...", name));
+            log.debug(String.format("Cleaning icons. Found %s. Removing...", name));
             Files.delete(path.resolve(name));
         }
     }

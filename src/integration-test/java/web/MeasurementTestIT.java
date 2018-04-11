@@ -83,7 +83,7 @@ public class MeasurementTestIT {
 
             assertNotNull(data.get("deviceId"));
             assertData(data.get("content"), mapper.writeValueAsString(measurement.getContent()));
-            assertThat(data.get("time"), anyOf(is(formatTime(measurement.getTime())), is(formatTime(measurementTwo.getTime()))));
+            assertData(data.get("time"), anyOf(is(formatTime(measurement.getTime())), is(formatTime(measurementTwo.getTime()))));
         }
     }
 

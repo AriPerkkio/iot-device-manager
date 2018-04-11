@@ -138,7 +138,7 @@ public class DeviceTestIT {
             Map<String, String> data = dataToMap(item.get("data"));
 
             assertNotNull(data.get("id"));
-            assertThat(data.get("name"), anyOf(is(deviceOne.getName()), is(deviceTwo.getName())));
+            assertData(data.get("name"), anyOf(is(deviceOne.getName()), is(deviceTwo.getName())));
             assertNotNull(data.get("authenticationKey"));
         }
     }
