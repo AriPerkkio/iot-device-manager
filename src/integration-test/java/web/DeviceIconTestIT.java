@@ -1,6 +1,7 @@
 package web;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +41,7 @@ public class DeviceIconTestIT {
     private static final String ID_URI = URI + "/%d";
     private static final String SECOND_ICON_NAME = "second-icon.png";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,8 +53,7 @@ public class DeviceIconTestIT {
 
     @After
     public void cleanTestIcons() throws Exception {
-        removeTestIcon(getTestIcon().getName());
-        removeTestIcon(SECOND_ICON_NAME);
+        removeTestIcons();
     }
 
     /**
@@ -371,4 +372,400 @@ public class DeviceIconTestIT {
         assertHref(response, URI);
         assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
     }
+
+
+    /**
+     * Test renamed device icon modifies icon in database and file system
+     */
+    @Test
+    @Transactional
+    public void testRenameDeviceIconModifiesDatabaseAndFileSystem() throws Exception {
+        log.info("Test PUT /api/device-icons modifies icon in database and file system");
+
+        // Given
+        DeviceIcon expected = getTestIcon("renamed-device-icon.png");
+        DeviceIcon initialDeviceIcon = getTestIcon();
+        addIcon(initialDeviceIcon, getTestIconFile(), mockMvc);
+
+        // When
+        MockHttpServletResponse putResponse = mockMvc
+            .perform(put(URI)
+                .param("name", initialDeviceIcon.getName())
+                .content(mapper.writeValueAsString(expected))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getResponse = mockMvc
+            .perform(get(URI).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(putResponse, HttpStatus.OK);
+        assertContentType(putResponse);
+        assertHref(putResponse, URI);
+        assertIconExists(expected.getName());
+
+        assertStatus(getResponse, HttpStatus.OK);
+
+        JsonNode items = parseToItems(getResponse);
+        assertEquals(items.size(), 1);
+
+        Map<String, String> data = dataToMap(items.get(0).get("data"));
+        assertData(data.get("name"), expected.getName());
+    }
+
+    /**
+     * Test renamed device icon by ID modifies icon in database and file system
+     */
+    @Test
+    @Transactional
+    public void testRenameDeviceIconByIdModifiesDatabaseAndFileSystem() throws Exception {
+        log.info("Test PUT /api/device-icons/{id} modifies icon in database and file system");
+
+        // Given
+        DeviceIcon expected = getTestIcon("renamed-device-icon.png");
+        DeviceIcon initialDeviceIcon = getTestIcon();
+        Integer deviceIconId = addIcon(initialDeviceIcon, getTestIconFile(), mockMvc);
+        String idUri = String.format(ID_URI, deviceIconId);
+
+        // When
+        MockHttpServletResponse putResponse = mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(expected))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getResponse = mockMvc
+            .perform(get(URI).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(putResponse, HttpStatus.OK);
+        assertContentType(putResponse);
+        assertHref(putResponse, idUri);
+        assertIconExists(expected.getName());
+
+        assertStatus(getResponse, HttpStatus.OK);
+
+        JsonNode items = parseToItems(getResponse);
+        assertEquals(items.size(), 1);
+
+        Map<String, String> data = dataToMap(items.get(0).get("data"));
+        assertData(data.get("name"), expected.getName());
+    }
+
+
+    /**
+     * Test rename device icon returns error when icon is not found
+     */
+    @Test
+    @Transactional
+    public void testRenameDeviceIconReturnsErrorWhenIconNotFound() throws Exception {
+        log.info("Test PUT /api/device-icons returns error when icon is not found");
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(URI)
+                .param("name", "unknown-name.png")
+                .content(mapper.writeValueAsString(getTestIcon()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response , HttpStatus.NOT_FOUND);
+        assertContentType(response );
+        assertHref(response , URI);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
+    }
+
+    /**
+     * Test rename device icon by ID returns error when icon is not found
+     */
+    @Test
+    @Transactional
+    public void testRenameDeviceIconByIdReturnsErrorWhenIconNotFound() throws Exception {
+        log.info("Test PUT /api/device-icons/{id} returns error when icon is not found");
+
+        // Given
+        String idUri = String.format(ID_URI, 1);
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(getTestIcon()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response , HttpStatus.NOT_FOUND);
+        assertContentType(response );
+        assertHref(response , idUri);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
+    }
+
+    /**
+     * Test rename device icon returns error when request parameters not used
+     */
+    @Test
+    @Transactional
+    public void testRenameDeviceIconReturnsErrorWhenRequestParametersNotUsed() throws Exception {
+        log.info("Test PUT /api/device-icons returns error when request parameters not used");
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(URI)
+                .content(mapper.writeValueAsString(getTestIcon()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response , HttpStatus.BAD_REQUEST);
+        assertContentType(response );
+        assertHref(response , URI);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
+    }
+
+    /**
+     * Test rename device icon returns error when request body is missing
+     */
+    @Test
+    @Transactional
+    public void testRenameDeviceIconReturnsErrorWhenRequestBodyMissing() throws Exception {
+        log.info("Test PUT /api/device-icons returns error when request body is missing");
+
+        // Given
+        DeviceIcon deviceIcon = getTestIcon();
+        addIcon(deviceIcon, getTestIconFile(), mockMvc);
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(URI)
+                .param("name", deviceIcon.getName())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response , HttpStatus.BAD_REQUEST);
+        assertContentType(response );
+        assertHref(response , URI);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
+    }
+
+    /**
+     * Test rename device icon returns error when request body contains invalid name
+     */
+    @Test
+    @Transactional
+    public void testRenameDeviceIconReturnsErrorWhenRequestBodyContainsInvalidName() throws Exception {
+        log.info("Test PUT /api/device-icons returns error when request body contains invalid name");
+
+        // Given
+        DeviceIcon deviceIcon = getTestIcon();
+        addIcon(deviceIcon, getTestIconFile(), mockMvc);
+
+        String originalName = deviceIcon.getName();
+        deviceIcon.setName("script.sh");
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(URI)
+                .param("name", originalName)
+                .content(mapper.writeValueAsString(deviceIcon))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response , HttpStatus.BAD_REQUEST);
+        assertContentType(response );
+        assertHref(response , URI);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
+    }
+
+    /**
+     * Test rename device icon returns error when request body contains invalid name
+     */
+    @Test
+    @Transactional
+    public void testRenameDeviceIconByIdReturnsErrorWhenIdInvalidType() throws Exception {
+        log.info("Test PUT /api/device-icons returns error when ID is invalid type");
+
+        // Given
+        DeviceIcon deviceIcon = getTestIcon();
+        addIcon(deviceIcon, getTestIconFile(), mockMvc);
+
+        String idUri = URI + "/string-instead-of-integer";
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(put(idUri)
+                .content(mapper.writeValueAsString(deviceIcon))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response , HttpStatus.BAD_REQUEST);
+        assertContentType(response );
+        assertHref(response , idUri);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
+    }
+
+    /**
+     * Test delete device icon removes icon in database and file system
+     */
+    @Test
+    @Transactional
+    public void testDeleteDeviceIconRemovesIconInDatabaseAndFileSystem() throws Exception {
+        log.info("Test DELETE /api/device-icons removes icon in database and file system");
+
+        // Given
+        DeviceIcon deviceIcon = getTestIcon();
+        addIcon(deviceIcon, getTestIconFile(), mockMvc);
+
+        // When
+        MockHttpServletResponse deleteResponse = mockMvc
+            .perform(delete(URI)
+                .param("name", deviceIcon.getName())
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getResponse = mockMvc
+            .perform(get(URI).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(deleteResponse, HttpStatus.NO_CONTENT);
+
+        assertStatus(getResponse, HttpStatus.NOT_FOUND);
+        assertError(getResponse, ErrorCode.NO_ITEMS_FOUND);
+        assertNoIconExists(deviceIcon.getName());
+    }
+
+    /**
+     * Test delete device icon by ID removes icon in database and file system
+     */
+    @Test
+    @Transactional
+    public void testDeleteDeviceIconByIdRemovesIconInDatabaseAndFileSystem() throws Exception {
+        log.info("Test DELETE /api/device-icons/{id} removes icon in database and file system");
+
+        // Given
+        DeviceIcon deviceIcon = getTestIcon();
+        Integer deviceIconId = addIcon(deviceIcon, getTestIconFile(), mockMvc);
+        String idUri = String.format(ID_URI, deviceIconId);
+
+        // When
+        MockHttpServletResponse deleteResponse = mockMvc
+            .perform(delete(idUri)
+                .param("name", deviceIcon.getName())
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse getResponse = mockMvc
+            .perform(get(URI).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(deleteResponse, HttpStatus.NO_CONTENT);
+
+        assertStatus(getResponse, HttpStatus.NOT_FOUND);
+        assertError(getResponse, ErrorCode.NO_ITEMS_FOUND);
+        assertNoIconExists(deviceIcon.getName());
+    }
+
+    /**
+     * Test delete device icon returns error when icon not found
+     */
+    @Test
+    @Transactional
+    public void testDeleteDeviceIconReturnsErrorWhenIconNotFound() throws Exception {
+        log.info("Test DELETE /api/device-icons returns error when icon not found");
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(URI)
+                .param("name", getTestIcon().getName())
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response, HttpStatus.NOT_FOUND);
+        assertHref(response, URI);
+        assertContentType(response);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
+    }
+
+    /**
+     * Test delete device icon by ID returns error when icon not found
+     */
+    @Test
+    @Transactional
+    public void testDeleteDeviceIconByIdReturnsErrorWhenIconNotFound() throws Exception {
+        log.info("Test DELETE /api/device-icons returns error when icon not found");
+
+        // Given
+        String idUri = String.format(ID_URI, 1);
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(idUri).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response, HttpStatus.NOT_FOUND);
+        assertHref(response, idUri);
+        assertContentType(response);
+        assertError(response, ErrorCode.NO_ITEMS_FOUND);
+    }
+
+    /**
+     * Test delete device icon by ID returns error when ID is invalid type
+     */
+    @Test
+    @Transactional
+    public void testDeleteDeviceIconByIdReturnsErrorWhenIdInvalidType() throws Exception {
+        log.info("Test DELETE /api/device-icons returns error when ID is invalid type");
+
+        // Given
+        String idUri = URI + "/string-instead-of-integer";
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(idUri).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response, HttpStatus.BAD_REQUEST);
+        assertHref(response, idUri);
+        assertContentType(response);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
+    }
+
+    /**
+     * Test delete device icon returns error when no request parameters used
+     */
+    @Test
+    @Transactional
+    public void testDeleteDeviceIconReturnsErrorWhenNoRequestParameters() throws Exception {
+        log.info("Test DELETE /api/device-icons returns error when no request parameters used");
+
+        // When
+        MockHttpServletResponse response = mockMvc
+            .perform(delete(URI).with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response, HttpStatus.BAD_REQUEST);
+        assertHref(response, URI);
+        assertContentType(response);
+        assertError(response, ErrorCode.PARAMETER_VALIDATION_ERROR);
+    }
+
 }

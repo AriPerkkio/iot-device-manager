@@ -2,6 +2,7 @@ package web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.hamcrest.core.AnyOf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import web.domain.entity.DeviceIcon;
 import web.domain.entity.Measurement;
 import web.domain.response.ErrorCode;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -267,12 +269,31 @@ class TestingUtils {
         assertTrue(exists);
     }
 
-    static void removeTestIcon(String name) throws Exception {
+    static void assertNoIconExists(String name) {
         String location = FILE_UPLOAD_ROOT + ITEMS_LOCATION;
         Path path = Paths.get(location);
-        if(Files.exists(path.resolve(name))) {
-            log.debug(String.format("Cleaning icons. Found %s. Removing...", name));
-            Files.delete(path.resolve(name));
+
+        log.debug(String.format("Assert file called %s doesn't exists at %s", name, location));
+
+        Boolean exists = Files.exists(path.resolve(name));
+        assertFalse(exists);
+    }
+
+    static void removeTestIcons() throws Exception {
+        String location = FILE_UPLOAD_ROOT + ITEMS_LOCATION;
+        Path path = Paths.get(location);
+        String[] iconNames = new File(location).list((dir, file) -> file.endsWith(".png"));
+
+
+        if(ArrayUtils.isEmpty(iconNames)) {
+            return;
+        }
+
+        log.debug(String.format("Cleaning icons. Found %s", String.join(", ", iconNames)));
+
+        for(String iconName: iconNames) {
+            log.debug(String.format("Removing %s", iconName));
+            Files.delete(path.resolve(iconName));
         }
     }
 
