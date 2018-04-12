@@ -35,19 +35,25 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     git
 
-# Download sources, replace passwords, build api docs, build app, run tests, launch app.
-CMD mkdir /home/user && \
+# Download sources, build api documentation
+RUN mkdir /home/user && \
     cd /home/user && \
     git clone https://github.com/AriPerkkio/iot-device-manager.git && \
     cd iot-device-manager && \
+    npm install && \
+    echo -e "\n\n##########################################\nBuilding api-doc. This may take 10-15 mins\n##########################################\n\n" && \
+    npm run api-doc
+
+# Update sources, replace passwords, build api docs, build app, run tests, launch app.
+CMD cd /home/user/iot-device-manager && \
+    git checkout . && \
+    git pull && \
     sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/main/resources/application.properties && \
     sed -i -- 's/spring.datasource.password=client/spring.datasource.password='$DB_PASS'/g' src/test/resources/application.properties && \
     sed -i -- 's/iotdevicemanager.password=default-password/iotdevicemanager.password='$APP_PASS'/g' src/main/resources/application.properties && \
     sed -i -- 's/iotdevicemanager.password=default-password/iotdevicemanager.password='$APP_PASS'/g' src/test/resources/application.properties && \
     npm install && \
     npm run build && \
-    echo -e "\n\n##########################################\nBuilding api-doc. This may take 10-15 mins\n##########################################\n\n" && \
-    npm run api-doc && \
     mvn clean package -DskipTests && \
     mvn test && \
     mvn failsafe:integration-test && \
