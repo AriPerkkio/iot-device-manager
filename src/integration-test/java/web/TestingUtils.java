@@ -14,13 +14,11 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import web.domain.entity.Device;
-import web.domain.entity.DeviceGroup;
-import web.domain.entity.DeviceIcon;
-import web.domain.entity.Measurement;
+import web.domain.entity.*;
 import web.domain.response.ErrorCode;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,6 +47,7 @@ class TestingUtils {
     private static final String DEVICES_URI = "/api/devices";
     private static final String GROUPS_URI = "/api/device-groups";
     private static final String MEASUREMENTS_URI = "/api/measurements";
+    private static final String LOCATIONS_URI = "/api/locations";
     private static final String DEVICE_ICONS_URI = "/api/device-icons";
 
     static String USER;
@@ -223,6 +222,15 @@ class TestingUtils {
                 .with(getBasicAuth()));
     }
 
+    // Add location update to database. Should be used as helper method - not to test adding location itself.
+    static void addLocation(Location location, MockMvc mockMvc) throws Exception {
+        mockMvc.perform(
+                post(LOCATIONS_URI)
+                        .content(mapper.writeValueAsString(location))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(getBasicAuth()));
+    }
+
     static DeviceIcon getTestIcon() {
         return getTestIcon("test-icon.png");
     }
@@ -309,6 +317,16 @@ class TestingUtils {
 
         measurement.setContent(content);
         return measurement;
+    }
+
+    static Location getTestLocation(Integer deviceId) {
+        Location location = new Location();
+        location.setDeviceId(deviceId);
+        location.setLatitude(new BigDecimal(123.456));
+        location.setLongitude(new BigDecimal(789.012));
+        location.setTime(new Date());
+
+        return location;
     }
 
     static void removeDevice(String id, MockMvc mockMvc) throws Exception {
