@@ -303,11 +303,45 @@ public class DeviceIconTestIT {
     }
 
     /**
-     * Test add device without name returns error
+     * Test add device icon returns error when name is not unique
      */
     @Test
     @Transactional
-    public void testAddDeviceWithoutNameReturnsError() throws Exception {
+    public void testAddDevicIconReturnsErrorWhenNameIsDuplicate() throws Exception {
+        log.info("Test POST /api/device-icons returns error when name is not unique");
+
+        // Given
+        DeviceIcon deviceIcon = getTestIcon();
+        MockMultipartFile deviceIconFile = getTestIconFile();
+
+        // When
+        mockMvc
+            .perform(fileUpload(URI)
+                .file(deviceIconFile)
+                .param("name", deviceIcon.getName())
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        MockHttpServletResponse response = mockMvc
+            .perform(fileUpload(URI)
+                .file(deviceIconFile)
+                .param("name", deviceIcon.getName())
+                .with(getBasicAuth()))
+            .andReturn().getResponse();
+
+        // Then
+        assertStatus(response, HttpStatus.CONFLICT);
+        assertContentType(response);
+        assertHref(response, URI);
+        assertError(response, ErrorCode.PARAMETER_CONFLICT);
+    }
+
+    /**
+     * Test add device icon without name returns error
+     */
+    @Test
+    @Transactional
+    public void testAddDeviceIconWithoutNameReturnsError() throws Exception {
         log.info("Test POST /api/device-icons without name returns error");
 
         // When
@@ -325,11 +359,11 @@ public class DeviceIconTestIT {
     }
 
     /**
-     * Test add device without icon returns error
+     * Test add device icon without icon returns error
      */
     @Test
     @Transactional
-    public void testAddDeviceWithoutIconReturnsError() throws Exception {
+    public void testAddDeviceIconWithoutIconReturnsError() throws Exception {
         log.info("Test POST /api/device-icons without icon returns error");
 
         // When
@@ -347,11 +381,11 @@ public class DeviceIconTestIT {
     }
 
     /**
-     * Test add device with name returns error
+     * Test add device icon with name returns error
      */
     @Test
     @Transactional
-    public void testAddDeviceWithInvalidNameReturnsError() throws Exception {
+    public void testAddDeviceIconWithInvalidNameReturnsError() throws Exception {
         log.info("Test POST /api/device-icons with invalid name returns error");
 
         // Given

@@ -287,6 +287,7 @@ public class DeviceTestIT {
     /**
      * Test update device modifies given device
      */
+    @Transactional
     @Test
     public void testUpdateDevice() throws Exception {
         log.info("Test PUT /api/devices modifies given device");
@@ -320,9 +321,6 @@ public class DeviceTestIT {
 
         Map<String, String> data = dataToMap(items.get(0).get("data"));
         assertData(data.get("name"), updateDevice.getName());
-
-        // Update operations do not work as @Transactional
-        clearDatabase(mockMvc);
     }
 
     /**
@@ -386,6 +384,7 @@ public class DeviceTestIT {
     /**
      * Test update device by ID modifies given device
      */
+    @Transactional
     @Test
     public void testUpdateDeviceById() throws Exception {
         log.info("Test PUT /api/devices/{id} modifies given device");
@@ -420,9 +419,6 @@ public class DeviceTestIT {
 
         Map<String, String> data = dataToMap(items.get(0).get("data"));
         assertData(data.get("name"), updateDevice.getName());
-
-        // Update operations do not work as @Transactional
-        clearDatabase(mockMvc);
     }
 
     /**
