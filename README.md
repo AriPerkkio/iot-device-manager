@@ -5,6 +5,11 @@
 ### Option 1:
 
 #### 1. Database
+Build arguments:
+- \<add-client-pass> = Password for mysql user. This user has only access to 27 procedures.
+- \<add-root-password> = Password for mysql root user. Base image requires changing of root user password. 
+
+Steps:
 - Install Docker (https://docs.docker.com/install/)
 - cd iot-device-manager/database/
 - docker build -t mysql-idm . --build-arg CLIENT_PASS=<add-client-pass>
@@ -12,12 +17,22 @@
 - (Optional - Verify container starts up properly before moving on) watch docker ps
 ##### Example: 
 ```bash
+# cd to database directory
+$ cd iot-device-manager/database
+
+# Build image, create and run container, check container status
 $ docker build -t mysql-idm . --build-arg CLIENT_PASS=my-db-secret && \
      docker run --name mysql-idm -e MYSQL_ROOT_PASSWORD=my-root-secret -d mysql-idm && \
      watch docker ps
 ```
 
 #### 2. Server
+Build arguments:
+- \<add-api/ui-pass> = Password for API and UI
+- \<add-db-pass> = Your mysql user password. Must match with database container's \<add-client-pass>. 
+
+
+Steps:
 - Install Docker (https://docs.docker.com/install/)
 - cd iot-device-manager/
 - docker build -t iotdevicemanager .
@@ -25,6 +40,10 @@ $ docker build -t mysql-idm . --build-arg CLIENT_PASS=my-db-secret && \
 - (Optional - Follows process from logs) docker logs -f iotdevicemanager
 ##### Example: 
 ```bash
+# cd to project root
+$ cd iot-device-manager 
+
+# Build image, create and run container, follow logs as container starts
 $ docker build -t iotdevicemanager . && \
      docker run -dit --name iotdevicemanager \
          -e APP_PASS=my-api-secret \
@@ -49,6 +68,5 @@ $ docker build -t iotdevicemanager . && \
 ## Documentation
 - http://ec2-34-207-126-204.compute-1.amazonaws.com/api-doc/index.html
 - database/schema-draw-io.xml
-- database/schema.png <b>TODO</b>
 - doc/iot-device-manager.raml
 
