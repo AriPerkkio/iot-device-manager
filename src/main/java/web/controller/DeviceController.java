@@ -2,17 +2,19 @@ package web.controller;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.*;
 import web.domain.response.ResponseWrapper;
 import web.service.DeviceService;
 
 import javax.validation.Valid;
-
+import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 import static web.validators.FilterValidator.validateErrors;
 
+@Validated
 @RestController
 @RequestMapping(value = "/api", produces = "application/vnd.collection+json; charset=utf-8")
 public class DeviceController {
@@ -52,11 +54,11 @@ public class DeviceController {
     @RequestMapping(value = URI, method = RequestMethod.GET)
     public ResponseWrapper getDevices(
             @RequestParam(name="id", required = false) Integer id,
-            @RequestParam(name="name", required = false) String name,
+            @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(name="name", required = false) String name,
             @RequestParam(name="deviceTypeId", required = false) Integer deviceTypeId,
             @RequestParam(name="deviceGroupId", required = false) Integer deviceGroupId,
             @RequestParam(name="configurationId", required = false) Integer configurationId,
-            @RequestParam(name="authenticationKey", required = false) String authenticationKey) {
+            @Valid @Pattern(regexp = "[A-Za-z0-9]{1,32}") @RequestParam(name="authenticationKey", required = false) String authenticationKey) {
         return deviceService.getDevices(id, name, deviceTypeId, deviceGroupId, configurationId, authenticationKey);
     }
 
@@ -104,8 +106,8 @@ public class DeviceController {
     @RequestMapping(value = URI, method = RequestMethod.PUT)
     public ResponseWrapper updateDevice(
             @RequestParam(name="id", required = false) Integer id,
-            @RequestParam(name="name", required = false) String name,
-            @RequestParam(name="authenticationKey", required = false) String authenticationKey,
+            @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(name="name", required = false) String name,
+            @Valid @Pattern(regexp = "[A-Za-z0-9]{1,32}") @RequestParam(name="authenticationKey", required = false) String authenticationKey,
             @Valid @RequestBody Device device,
             Errors errors) {
         validateErrors(errors);
@@ -146,8 +148,8 @@ public class DeviceController {
     @RequestMapping(value = URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDevice(
             @RequestParam(name="id", required = false) Integer id,
-            @RequestParam(name="name", required = false) String name,
-            @RequestParam(name="authenticationKey", required = false) String authenticationKey) {
+            @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(name="name", required = false) String name,
+            @Valid @Pattern(regexp = "[A-Za-z0-9]{1,32}") @RequestParam(name="authenticationKey", required = false) String authenticationKey) {
         return deviceService.deleteDevice(id, name, authenticationKey);
     }
 

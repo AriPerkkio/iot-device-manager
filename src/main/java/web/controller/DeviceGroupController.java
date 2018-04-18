@@ -2,6 +2,7 @@ package web.controller;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Device;
 import web.domain.entity.DeviceGroup;
@@ -9,12 +10,14 @@ import web.domain.response.ResponseWrapper;
 import web.service.DeviceGroupService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 import java.util.Date;
 
 import static web.validators.FilterValidator.validateErrors;
 
 @RestController
+@Validated
 @RequestMapping(value = "/api", produces = "application/vnd.collection+json; charset=utf-8")
 public class DeviceGroupController {
 
@@ -42,7 +45,7 @@ public class DeviceGroupController {
     @RequestMapping(value = URI, method = RequestMethod.GET)
     public ResponseWrapper getDeviceGroups(
             @RequestParam(value = "id", required = false) Integer id,
-            @RequestParam(value = "name", required = false) String name) {
+            @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(value = "name", required = false) String name) {
         return deviceGroupService.getDeviceGroups(id, name);
     }
 
@@ -92,7 +95,7 @@ public class DeviceGroupController {
     @RequestMapping(value = URI, method = RequestMethod.PUT)
     public ResponseWrapper updateDeviceGroup(
             @RequestParam(value = "id", required = false) Integer id,
-            @RequestParam(value = "name", required = false) String name,
+            @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}")  @RequestParam(value = "name", required = false) String name,
             @Valid @RequestBody DeviceGroup deviceGroup,
             Errors errors) {
         validateErrors(errors);
@@ -133,7 +136,7 @@ public class DeviceGroupController {
     @RequestMapping(value = URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDeviceGroup(
             @RequestParam(value = "id", required = false) Integer id,
-            @RequestParam(value = "name", required = false) String name) {
+            @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(value = "name", required = false) String name) {
         return deviceGroupService.deleteDeviceGroup(id, name);
     }
 

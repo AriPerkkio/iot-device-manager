@@ -1,6 +1,7 @@
 package web.controller;
 
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web.domain.entity.Device;
@@ -10,10 +11,12 @@ import web.domain.response.ResponseWrapper;
 import web.service.DeviceTypeService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 import static web.validators.FilterValidator.validateErrors;
 
 @RestController
+@Validated
 @RequestMapping(value = "/api", produces = "application/vnd.collection+json; charset=utf-8")
 public class DeviceTypeController {
 
@@ -42,7 +45,7 @@ public class DeviceTypeController {
     @RequestMapping(value = URI, method = RequestMethod.GET)
     public ResponseWrapper getDeviceTypes(
         @RequestParam(value="id", required = false) Integer id,
-        @RequestParam(value="name", required = false) String name,
+        @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(name="name", required = false) String name,
         @RequestParam(value="deviceIconId", required = false) Integer deviceIconId) {
         return deviceTypeService.getDeviceTypes(id, name, deviceIconId);
     }
@@ -91,7 +94,7 @@ public class DeviceTypeController {
     @RequestMapping(value = URI, method = RequestMethod.PUT)
     public ResponseWrapper updateDeviceType(
         @RequestParam(value="id", required = false) Integer id,
-        @RequestParam(value="name", required = false) String name,
+        @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(name="name", required = false) String name,
         @Valid @RequestBody DeviceType deviceType,
         Errors errors) {
         validateErrors(errors);
@@ -130,7 +133,7 @@ public class DeviceTypeController {
     @RequestMapping(value = URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDeviceType(
         @RequestParam(value="id", required = false) Integer id,
-        @RequestParam(value="name", required = false) String name) {
+        @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(name="name", required = false) String name) {
         return deviceTypeService.deleteDeviceType(id, name);
     }
 
@@ -214,7 +217,7 @@ public class DeviceTypeController {
     @RequestMapping(value = ICON_URI, method = RequestMethod.POST)
     public ResponseWrapper addIconForType(
         @PathVariable Integer id,
-        @RequestParam("name") String name,
+        @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam("name") String name,
         @Valid @RequestBody MultipartFile icon) {
         return deviceTypeService.addIconForType(id, icon, name);
     }

@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web.domain.entity.DeviceIcon;
@@ -14,10 +15,12 @@ import web.domain.response.ResponseWrapper;
 import web.service.DeviceIconService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 import static web.validators.FilterValidator.validateErrors;
 
 @RestController
+@Validated
 @RequestMapping(value = "/api", produces = "application/vnd.collection+json; charset=utf-8")
 public class DeviceIconController {
 
@@ -43,8 +46,8 @@ public class DeviceIconController {
      */
     @RequestMapping(value = URI, method = RequestMethod.GET)
     public ResponseWrapper getDeviceIcons(
-            @RequestParam(value = "id", required = false) Integer id,
-            @RequestParam(value = "name", required = false) String name) {
+        @RequestParam(value = "id", required = false) Integer id,
+        @Valid @Pattern(regexp = "^[A-Za-z0-9-_]{1,25}.(png)$") @RequestParam(name="name", required = false) String name) {
         return deviceIconService.getDeviceIcons(id, name);
     }
 
@@ -70,7 +73,8 @@ public class DeviceIconController {
      *      Device icon .png file as {@link Resource} wrapper in {@link ResponseEntity}
      */
     @RequestMapping(value = NAME_URI, method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<Resource> getDeviceIconFile(@PathVariable String name) {
+    public ResponseEntity<Resource> getDeviceIconFile(
+        @Valid @Pattern(regexp = "^[A-Za-z0-9-_]{1,25}$") @PathVariable String name) {
 
         // Endpoint matches .png files only - at this point it should be safe to add extension manually
         Resource icon = deviceIconService.getDeviceIconFile(name + ".png");
@@ -93,8 +97,8 @@ public class DeviceIconController {
      */
     @RequestMapping(value = URI, method = RequestMethod.POST)
     public ResponseWrapper uploadDeviceIcon(
-            @RequestParam("name") String name,
-            @Valid @RequestBody MultipartFile icon) {
+        @Valid @Pattern(regexp = "^[A-Za-z0-9-_]{1,25}.(png)$") @RequestParam("name") String name,
+        @Valid @RequestBody MultipartFile icon) {
 
         if(icon == null) {
             throw new HttpMessageNotReadableException("Request body missing");
@@ -118,7 +122,7 @@ public class DeviceIconController {
     @RequestMapping(value = URI, method = RequestMethod.PUT)
     public ResponseWrapper renameDeviceIcon(
             @RequestParam(value = "id", required = false) Integer id,
-            @RequestParam(value = "name", required = false) String name,
+            @Valid @Pattern(regexp = "^[A-Za-z0-9-_]{1,25}.(png)$") @RequestParam(value = "name", required = false) String name,
             @Valid @RequestBody DeviceIcon deviceIcon,
             Errors errors) {
         validateErrors(errors);
@@ -159,7 +163,7 @@ public class DeviceIconController {
     @RequestMapping(value = URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteDeviceIcon(
             @RequestParam(value = "id", required = false) Integer id,
-            @RequestParam(value = "name", required = false) String name) {
+            @Valid @Pattern(regexp = "^[A-Za-z0-9-_]{1,25}.(png)$") @RequestParam(value = "name", required = false) String name) {
 
         return deviceIconService.deleteDeviceIcon(id, name);
     }

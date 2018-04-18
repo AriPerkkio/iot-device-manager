@@ -1,6 +1,7 @@
 package web.controller;
 
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import web.domain.entity.Configuration;
 import web.domain.entity.Device;
@@ -8,10 +9,12 @@ import web.domain.response.ResponseWrapper;
 import web.service.ConfigurationService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 import static web.validators.FilterValidator.validateErrors;
 
 @RestController
+@Validated
 @RequestMapping(value = "/api", produces = "application/vnd.collection+json; charset=utf-8")
 public class ConfigurationController {
 
@@ -37,7 +40,7 @@ public class ConfigurationController {
     @RequestMapping(value = URI, method = RequestMethod.GET)
     public ResponseWrapper getConfigurations(
         @RequestParam(name="id", required = false) Integer id,
-        @RequestParam(name="name", required = false) String name) {
+        @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}") @RequestParam(name="name", required = false) String name) {
         return configurationService.getConfigurations(id, name);
     }
 
@@ -87,7 +90,7 @@ public class ConfigurationController {
     @RequestMapping(value = URI, method = RequestMethod.PUT)
     public ResponseWrapper updateConfiguration(
         @RequestParam(name="id", required = false) Integer id,
-        @RequestParam(name="name", required = false) String name,
+        @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}")  @RequestParam(name="name", required = false) String name,
         @Valid @RequestBody Configuration configuration,
         Errors errors) {
         validateErrors(errors);
@@ -128,7 +131,7 @@ public class ConfigurationController {
     @RequestMapping(value = URI, method = RequestMethod.DELETE)
     public ResponseWrapper deleteConfiguration(
         @RequestParam(name="id", required = false) Integer id,
-        @RequestParam(name="name", required = false) String name) {
+        @Valid @Pattern(regexp = "[A-Za-z0-9_ .,-]{1,50}")  @RequestParam(name="name", required = false) String name) {
         return configurationService.deleteConfiguration(id, name);
     }
 

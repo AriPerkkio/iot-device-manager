@@ -15,6 +15,8 @@ import web.domain.response.ResponseWrapper;
 import web.exception.ExceptionWrapper;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.net.URI;
 
 import static org.springframework.http.HttpStatus.*;
@@ -45,7 +47,7 @@ public class ExceptionController {
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class,
-        HttpMessageNotReadableException.class, MissingServletRequestParameterException.class })
+        HttpMessageNotReadableException.class, MissingServletRequestParameterException.class, ConstraintViolationException.class })
     public ResponseWrapper invalidParameterHandling(Exception ex, HttpServletRequest request) throws Exception {
 
         // TODO remove, leaking internal information
@@ -58,6 +60,12 @@ public class ExceptionController {
             message = String.format("Missing request parameter %s", ((MissingServletRequestParameterException) ex).getParameterName());
         } else if(ex instanceof  HttpMessageNotReadableException) {
             message = "Request body missing or invalid";
+        } else if(ex instanceof ConstraintViolationException) {
+            message = "";
+            for(ConstraintViolation cv: ((ConstraintViolationException) ex).getConstraintViolations()) {
+                message = message.concat(cv.getMessage() + " ");
+            }
+            message = message.trim();
         }
 
         Error error = Error.create("Parameter validation error", ErrorCode.PARAMETER_VALIDATION_ERROR.getCode(), message);
