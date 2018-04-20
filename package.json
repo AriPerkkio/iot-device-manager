@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "main": "webpack.config.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha src/test/js/*.jsx --require babel-core/register --require ignore-styles",
+    "test": "NODE_ENV=test mocha ui/tests/*.jsx --require babel-core/register --require ignore-styles",
     "test:debug": "npm run test -- --inspect-brk",
     "build": "webpack --mode=production",
     "watch": "webpack --mode=development -d --watch",

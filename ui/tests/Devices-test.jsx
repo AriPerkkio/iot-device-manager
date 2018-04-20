@@ -3,7 +3,7 @@ import { render } from 'enzyme';
 import { expect } from 'chai';
 
 
-import Devices from '../../main/js/views/devices/Devices';
+import Devices from '../views/devices/Devices';
 
 describe("Devices", function() {
     it("Initial test", function() {
