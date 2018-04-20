@@ -3,38 +3,36 @@ const path = require('path');
 
 // Plugins
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const extractSass = new ExtractTextPlugin({
-  filename: "style.css",
-  disable: process.env.NODE_ENV === "development"
+  filename: "style.css"
 });
 
 // Store the built bundle into src/main/resources/static/bundle.js
 const BUILD_DIR = path.resolve(__dirname, 'src/main/resources/static');
-const APP_DIR = path.resolve(__dirname, 'src/main/js');
+const APP_DIR = path.resolve(__dirname, 'ui');
 const TARGET_NAME = 'bundle.js';
 const INDEX_HTML_DIR = 'src/main/resources/templates';
 
-const config = {
+module.exports = (env, argv) => ({
   entry: APP_DIR + '/index.jsx',
   output: {
     path: BUILD_DIR,
     filename: TARGET_NAME
   },
-  devtool: "source-map",
+  devtool: argv.mode == "production" ? false : "source-map",
   resolve: {
     extensions: ['.js', '.jsx']
   },
   module : {
-    loaders : [
+    rules : [
       {
         test : /\.jsx?/,
-        include : APP_DIR,
+        exclude: /node_modules/,
         loader : 'babel-loader'
       },
       {
-        test: /\.scss$/,
+        test: /\.(scss|css)$/,
         use: extractSass.extract({
             use: [
               { loader: "css-loader" , options: { sourceMap: true } },
@@ -47,13 +45,13 @@ const config = {
   },
   plugins: [
     new CleanWebpackPlugin(BUILD_DIR + '/*.*'),
-    new UglifyJsPlugin({ sourceMap: true }),
     extractSass
   ],
   devServer: {
     historyApiFallback: true,
+    inline: true,
     port: 8081,
-    contentBase: [ path.join(INDEX_HTML_DIR), path.join(BUILD_DIR)],
+    contentBase: [ path.join(INDEX_HTML_DIR), path.join(BUILD_DIR), path.join(APP_DIR) ],
     overlay: {
       errors: true,
       warnings: true,
@@ -63,7 +61,8 @@ const config = {
         target: "http://localhost:8080"
       }
     }
+  },
+  performance: {
+    hints: false
   }
-};
-
-module.exports = config;
+});

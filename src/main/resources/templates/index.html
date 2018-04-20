@@ -6,15 +6,10 @@
         <title>IoT Device Manager</title>
     </head>
     <body>
-        <h1>Testing</h1>
         <div id="app"></div>
-        <img src="/api/device-icons/bticon.png"/>
-        <img src="/api/device-icons/wifiicon.png"/>
-        <br/>
-        <a href="/api-doc/index.html">API documentation</a>
-        <script src="bundle.js"></script>
         <form th:action="@{/logout}" method="post">
             <input type="submit" value="Sign Out"/>
         </form>
+        <script src="bundle.js"></script>
     </body>
 </html>

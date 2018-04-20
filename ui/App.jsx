@@ -1,4 +1,5 @@
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // State
 import { createStore, combineReducers, applyMiddleware } from 'redux';
@@ -12,6 +13,9 @@ import { Route } from 'react-router';
 // Views
 import Home from './views/home/Home';
 import Devices from './views/devices/Devices';
+
+// Components
+import Header from './components/Header';
 
 const history = createHistory();
 const middleware = routerMiddleware(history);
@@ -30,6 +34,7 @@ export default class App extends React.Component {
             <Provider store={store}>
                 <ConnectedRouter history={history}>
                     <div>
+                        <Header />
                         <Route exact path="/" component={Home}/>
                         <Route path="/devices" component={Devices}/>
                     </div>

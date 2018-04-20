@@ -9,18 +9,21 @@
   "scripts": {
     "test": "NODE_ENV=test mocha src/test/js/*.jsx --require babel-core/register --require ignore-styles",
     "test:debug": "npm run test -- --inspect-brk",
-    "build": "NODE_ENV=production webpack -d",
-    "watch": "NODE_ENV=development webpack -d --watch",
-    "start": "NODE_ENV=development webpack-dev-server",
+    "build": "webpack --mode=production",
+    "watch": "webpack --mode=development -d --watch",
+    "start": "webpack-dev-server --hot --mode=development",
     "api-doc": "api-console build doc/iot-device-manager.raml -o src/main/resources/static/api-doc"
   },
   "dependencies": {
+    "bootstrap": "^4.1.0",
     "history": "^4.7.2",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
+    "npm": "^5.8.0",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.9",
+    "reactstrap": "^5.0.0-beta.3",
     "redux": "^3.7.2"
   },
   "devDependencies": {
@@ -34,14 +37,14 @@
     "css-loader": "^0.28.9",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
-    "extract-text-webpack-plugin": "^3.0.2",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "ignore-styles": "^5.0.1",
     "mocha": "^4.1.0",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.1",
-    "uglifyjs-webpack-plugin": "^1.1.6",
-    "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.11.0"
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.14",
+    "webpack-dev-server": "^3.1.3"
   }
 }
