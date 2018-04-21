@@ -2,12 +2,11 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // State
-import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
+import { store, history } from './reducers/store';
 
 // Router
-import createHistory from 'history/createBrowserHistory';
-import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
+import { ConnectedRouter } from 'react-router-redux';
 import { Route } from 'react-router';
 
 // Views
@@ -21,16 +20,6 @@ import Measurements from './views/measurements/Measurements';
 
 // Components
 import Header from './components/Header';
-
-const history = createHistory();
-const middleware = routerMiddleware(history);
-
-const store = createStore(
-  combineReducers({
-    router: routerReducer
-  }),
-  applyMiddleware(middleware)
-);
 
 export default class App extends React.Component {
 

@@ -27,8 +27,8 @@ module.exports = (env, argv) => ({
   module : {
     rules : [
       {
-        test : /\.jsx?/,
-        exclude: /node_modules/,
+        test : /\.(jsx|js)?/,
+        include: APP_DIR,
         loader : 'babel-loader'
       },
       {
