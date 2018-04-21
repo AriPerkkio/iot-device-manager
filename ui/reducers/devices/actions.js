@@ -25,10 +25,10 @@ function devicesLoadFailed(error) {
     }
 }
 
-export function getDevices(filters) {
-    return dispatch => {
+export function generateGetDevices(dispatch) {
+    return filters => {
         dispatch(devicesLoadStart(filters))
-        return fetchDevices(dispatch)(filters)
+        return fetchDevices(filters)
             .then(json => dispatch(devicesLoadSuccess(json)))
             .catch(error => dispatch(devicesLoadFailed(error)))
     }

@@ -10,9 +10,16 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("index");
         registry.addViewController("/login").setViewName("login");
+
+        // TODO better SPA solution should be studied
+        registry.addViewController("/").setViewName("index");
         registry.addViewController("/devices").setViewName("index");
+        registry.addViewController("/groups").setViewName("index");
+        registry.addViewController("/types").setViewName("index");
+        registry.addViewController("/configurations").setViewName("index");
+        registry.addViewController("/location-updates").setViewName("index");
+        registry.addViewController("/measurements").setViewName("index");
     }
 
     @Override

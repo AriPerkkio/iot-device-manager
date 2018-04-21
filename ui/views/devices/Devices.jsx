@@ -4,12 +4,26 @@ import './devices.scss';
 // State
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { getDevices } from '../../reducers/devices/actions';
+import { generateGetDevices } from '../../reducers/devices/actions';
 
 export class Devices extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+        const { dispatch } = props;
+
+        this.getDevices = generateGetDevices(dispatch);
+    }
+
     componentDidMount() {
-        getDevices()(this.props.dispatch);
+        const filters = {
+            name: "device-one",
+            configurationId: 2,
+            deviceGroupId: 3
+        };
+
+        this.getDevices(filters);
     }
 
     render() {
