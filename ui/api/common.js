@@ -4,12 +4,22 @@ export function handleErrors(response) {
     if(!response.ok) {
 
         // TODO Read error body if available
-
-        const message = response.statusText + " " + response.status;
-        throw new Error(message);
+        
+        return response.json().then(({collection}) => {
+            throw new Error(parseError(collection));
+        })
+        //const message = response.statusText + " " + response.status;
+        //throw new Error(message);
     }
 
     return response;
+}
+
+function parseError(collection) {
+    const { error } = collection;
+    const { title, message } = error;
+
+    return title + ": " + message;
 }
 
 export const fetchOptions = {

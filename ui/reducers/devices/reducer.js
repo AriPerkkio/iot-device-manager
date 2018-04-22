@@ -1,3 +1,5 @@
+import { parseItems, parseLinks } from '../utils';
+
 import {
     DEVICES_LOAD_START,
     DEVICES_LOAD_SUCCESS,
@@ -5,20 +7,24 @@ import {
 } from './actions';
 
 const initialState = {
-    devices: [],
+    items: {},
+    links: {},
+    queries: [],
+    template: {},
     isFetching: false,
     hasFetched: false,
-    error: false
+    error: false,
+    errorMessage: ""
 };
 
 export default function reducer(state = initialState, action) {
-    const { type } = action;
+    const { type, json } = action;
 
     switch(type) {
         case DEVICES_LOAD_START:
-            return handleDevicesLoadStart(state, action);
+            return handleDevicesLoadStart(state);
         case DEVICES_LOAD_SUCCESS:
-            return handleDevicesLoadSuccess(state, action);
+            return handleDevicesLoadSuccess(state, json);
         case DEVICES_LOAD_FAILED:
             return handleDevicesLoadFailed(state, action);
 
@@ -34,12 +40,27 @@ function handleDevicesLoadStart(state) {
     }
 }
 
-function handleDevicesLoadSuccess(state, action) {
+function handleDevicesLoadSuccess(state, { collection }) {
+    const { queries, template } = collection;
+
+    const items = {
+        ...state.items,
+        ...parseItems(collection)
+    };
+
+    const links = {
+        ...state.links,
+        ...parseLinks(collection)
+    };
+
     return {
         ...state,
         isFetching: false,
         hasFetched: true,
-        // TODO devices: 
+        queries,
+        template,
+        items,
+        links
     }
 }
 
@@ -47,6 +68,7 @@ function handleDevicesLoadFailed(state, action) {
     return {
         ...state,
         isFetching: false,
-        error: true
+        error: true,
+        errorMessage: action.error.message
     }
 }

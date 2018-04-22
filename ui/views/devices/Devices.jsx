@@ -17,28 +17,23 @@ export class Devices extends React.Component {
     }
 
     componentDidMount() {
-        const filters = {
-            name: "device-one",
-            configurationId: 2,
-            deviceGroupId: 3
-        };
-
-        this.getDevices(filters);
+        this.getDevices();
     }
 
     render() {
         return (
             <div id="devices">
                 <h1>Devices view</h1>
+                <pre>
+                    {JSON.stringify(this.props, null, 4)}
+                </pre>
             </div>
         );
     }
 }
 
 function mapStateToProps(state) {
-    return {
-        temp: state
-    }
+    return state.devices;
 }
 
 export default connect(mapStateToProps)(Devices);
