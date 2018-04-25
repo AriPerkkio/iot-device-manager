@@ -13,7 +13,7 @@ export default class ErrorAlert extends React.Component {
         const { header, message } = this.props;
 
         return (
-            <Alert color="danger">
+            <Alert color="danger" className="error-alert">
                 <h4 className="alert-heading">
                     {header}
                 </h4>

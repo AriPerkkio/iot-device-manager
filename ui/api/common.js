@@ -1,10 +1,23 @@
 import _ from 'lodash';
 
+const ERROR_SEPARATOR = "::";
+
 export function handleErrors(response) {
     if(!response.ok) {
-        return response.json().then(({collection}) => {
-            throw new Error(parseError(collection));
-        })
+
+        if(isErrorFromApi(response)) {
+            return response.json().then(({collection}) => {
+                throw new Error(parseError(collection))
+            });
+        } else {
+            // Generic client side errors, e.g. connectivity issues
+            throw new Error([
+                "Failed to query API",
+                ERROR_SEPARATOR,
+                response.status,
+                response.statusText
+            ].join(" "));
+        }
     }
 
     return response;
@@ -14,7 +27,16 @@ function parseError(collection) {
     const { error } = collection;
     const { title, message } = error;
 
-    return title + "::" + message;
+    return title + ERROR_SEPARATOR + message;
+}
+
+// Readable errors from API should have correct content type
+function isErrorFromApi(response) {
+    const { headers } = response;
+
+    return headers &&
+        headers.has("Content-Type") &&
+        /application\/vnd.collection\+json/.test(response.headers.get("Content-Type"));
 }
 
 export const fetchOptions = {
