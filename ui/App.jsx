@@ -11,7 +11,7 @@ import { Route } from 'react-router';
 // Views
 import Home from './views/home/Home';
 import Devices from './views/devices/DevicesContainer';
-import Groups from './views/groups/Groups';
+import Groups from './views/groups/GroupsContainer';
 import Types from './views/types/Types';
 import Configurations from './views/configurations/Configurations';
 import Locations from './views/locations/Locations';

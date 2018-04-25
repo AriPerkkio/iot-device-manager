@@ -1,9 +1,9 @@
 import { parseItems, parseLinks } from '../utils';
 
 import {
-    DEVICES_LOAD_START,
-    DEVICES_LOAD_SUCCESS,
-    DEVICES_LOAD_FAILED
+    GROUPS_LOAD_START,
+    GROUPS_LOAD_SUCCESS,
+    GROUPS_LOAD_FAILED
 } from './actions';
 
 const initialState = {
@@ -21,19 +21,19 @@ export default function reducer(state = initialState, action) {
     const { type, json } = action;
 
     switch(type) {
-        case DEVICES_LOAD_START:
-            return handleDevicesLoadStart(state);
-        case DEVICES_LOAD_SUCCESS:
-            return handleDevicesLoadSuccess(state, json);
-        case DEVICES_LOAD_FAILED:
-            return handleDevicesLoadFailed(state, action);
+        case GROUPS_LOAD_START:
+            return handleGroupsLoadStart(state);
+        case GROUPS_LOAD_SUCCESS:
+            return handleGroupsLoadSuccess(state, json);
+        case GROUPS_LOAD_FAILED:
+            return handleGroupsLoadFailed(state, action);
 
         default:
             return state;
     }
 }
 
-function handleDevicesLoadStart(state) {
+function handleGroupsLoadStart(state) {
     return {
         ...state,
         isFetching: true,
@@ -41,7 +41,7 @@ function handleDevicesLoadStart(state) {
     }
 }
 
-function handleDevicesLoadSuccess(state, { collection }) {
+function handleGroupsLoadSuccess(state, { collection }) {
     const { queries, template } = collection;
 
     const items = {
@@ -66,7 +66,7 @@ function handleDevicesLoadSuccess(state, { collection }) {
     }
 }
 
-function handleDevicesLoadFailed(state, action) {
+function handleGroupsLoadFailed(state, action) {
     return {
         ...state,
         isFetching: false,

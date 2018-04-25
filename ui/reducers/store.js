@@ -5,6 +5,7 @@ import { createLogger } from 'redux-logger'
 
 // Reducers
 import DevicesReducer from './devices/reducer';
+import GroupsReducer from './groups/reducer';
 
 export const history = createHistory();
 const middlewares = [
@@ -21,7 +22,8 @@ if (process.env.NODE_ENV === `development`) {
 export const store = createStore(
     combineReducers({
         router: routerReducer,
-        devices: DevicesReducer
+        devices: DevicesReducer,
+        groups: GroupsReducer
     }),
     applyMiddleware(... middlewares)
 );
