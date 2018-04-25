@@ -14,7 +14,7 @@ function parseError(collection) {
     const { error } = collection;
     const { title, message } = error;
 
-    return title + ": " + message;
+    return title + "::" + message;
 }
 
 export const fetchOptions = {

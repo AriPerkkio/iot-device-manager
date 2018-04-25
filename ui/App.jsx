@@ -12,10 +12,10 @@ import { Route } from 'react-router';
 import Home from './views/home/Home';
 import Devices from './views/devices/DevicesContainer';
 import Groups from './views/groups/GroupsContainer';
-import Types from './views/types/Types';
-import Configurations from './views/configurations/Configurations';
-import Locations from './views/locations/Locations';
-import Measurements from './views/measurements/Measurements';
+import Types from './views/types/TypesContainer';
+import Configurations from './views/configurations/ConfigurationsContainer';
+import Locations from './views/locations/LocationsContainer';
+import Measurements from './views/measurements/MeasurementsContainer';
 
 // Components
 import Header from './components/Header';

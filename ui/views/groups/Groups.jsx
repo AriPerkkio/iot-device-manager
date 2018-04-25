@@ -2,6 +2,7 @@ import React from 'react';
 import './groups.scss';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
+import ErrorAlert from '../../components/ErrorAlert';
 
 export default class Groups extends React.Component {
 
@@ -21,7 +22,15 @@ export default class Groups extends React.Component {
         if(isFetching) {
             return <p>TODO loading indicator</p>;
         } else if (error) {
-            return <p>{errorMessage}</p>;
+            const header = errorMessage.split("::").shift();
+            const message = errorMessage.split("::").pop();
+
+            return (
+                <ErrorAlert { ...{
+                    header,
+                    message
+                }} />
+            );
         } else if(hasFetched) {
             return (
                 <DataTable { ...{
