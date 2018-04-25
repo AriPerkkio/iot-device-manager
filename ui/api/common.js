@@ -2,14 +2,9 @@ import _ from 'lodash';
 
 export function handleErrors(response) {
     if(!response.ok) {
-
-        // TODO Read error body if available
-        
         return response.json().then(({collection}) => {
             throw new Error(parseError(collection));
         })
-        //const message = response.statusText + " " + response.status;
-        //throw new Error(message);
     }
 
     return response;

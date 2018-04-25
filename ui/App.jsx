@@ -1,5 +1,4 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 // State
 import { Provider } from 'react-redux';
@@ -11,7 +10,7 @@ import { Route } from 'react-router';
 
 // Views
 import Home from './views/home/Home';
-import Devices from './views/devices/Devices';
+import Devices from './views/devices/DevicesContainer';
 import Groups from './views/groups/Groups';
 import Types from './views/types/Types';
 import Configurations from './views/configurations/Configurations';

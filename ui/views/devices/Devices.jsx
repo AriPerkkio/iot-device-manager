@@ -1,39 +1,39 @@
 import React from 'react';
 import './devices.scss';
 
-// State
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux';
-import { generateGetDevices } from '../../reducers/devices/actions';
+import DataTable from '../../components/DataTable/DataTableContainer';
 
-export class Devices extends React.Component {
-
-    constructor(props) {
-        super(props);
-
-        const { dispatch } = props;
-
-        this.getDevices = generateGetDevices(dispatch);
-    }
-
-    componentDidMount() {
-        this.getDevices();
-    }
+export default class Devices extends React.Component {
 
     render() {
         return (
             <div id="devices">
                 <h1>Devices view</h1>
-                <pre>
-                    {JSON.stringify(this.props, null, 4)}
-                </pre>
+                { this.renderTable() }
             </div>
         );
     }
-}
 
-function mapStateToProps(state) {
-    return state.devices;
-}
+    renderTable() {
+        const { items, links, queries, template, getDevices,
+            isFetching, hasFetched, error, errorMessage } = this.props;
 
-export default connect(mapStateToProps)(Devices);
+        if(isFetching) {
+            return <p>TODO loading indicator</p>;
+        } else if (error) {
+            return <p>{errorMessage}</p>;
+        } else if(hasFetched) {
+            return (
+                <DataTable { ...{
+                    items,
+                    links,
+                    queries,
+                    template,
+                    search: getDevices
+                }} />
+            );
+        }
+
+        return null;
+    }
+}
