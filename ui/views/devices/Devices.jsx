@@ -1,22 +1,34 @@
 import React from 'react';
+import { Container, Row, Col } from 'reactstrap';
 import './devices.scss';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
+import DataForm from '../../components/DataForm';
 import ErrorAlert from '../../components/ErrorAlert';
 
 export default class Devices extends React.Component {
 
     render() {
+        const { selectedRow } = this.props;
+
         return (
-            <div id="devices">
-                <h1>Devices view</h1>
-                { this.renderTable() }
-            </div>
+            <Container fluid>
+                <Row>
+                    <Col lg={12} xl={6}>
+                        { this.renderTable() }
+                    </Col>
+
+                    <Col md={12} lg={6}>
+                        { selectedRow && <DataForm dataRow={selectedRow} /> }
+                    </Col>
+
+                </Row>
+            </Container>
         );
     }
 
     renderTable() {
-        const { items, links, queries, template, getDevices,
+        const { items, links, queries, template, getDevices, onRowSelect,
             isFetching, hasFetched, error, errorMessage } = this.props;
 
         if(isFetching) {
@@ -38,7 +50,9 @@ export default class Devices extends React.Component {
                     links,
                     queries,
                     template,
-                    search: getDevices
+                    search: getDevices,
+                    onRowSelect,
+                    size: "sm"
                 }} />
             );
         }

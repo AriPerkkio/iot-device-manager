@@ -1,20 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './datatable.scss';
 
 import { Table } from 'reactstrap';
 import Column from './Column';
 
 export default class DataTable extends React.Component {
     static propTypes = {
-        rows: PropTypes.array.isRequired
+        rows: PropTypes.array.isRequired,
+        onRowSelect: PropTypes.func,
+        selectedRowIndex: PropTypes.number
     }
 
     render() {
+        const { rows, onRowSelect, selectedRowIndex, ...restProps } = this.props;
+
         return (
-            <Table className="table-striped">
-                { this.renderHeader() }
-                { this.renderRows() }
-          </Table>
+            <div className="data-table-wrapper">
+                <Table responsive hover
+                    { ... restProps }
+                    className="data-table">
+
+                    { this.renderHeader() }
+                    { this.renderRows() }
+                </Table>
+          </div>
         );
     }
 
@@ -33,15 +43,18 @@ export default class DataTable extends React.Component {
     }
 
     renderRows() {
-        const { rows } = this.props;
+        const { rows, onRowSelect, selectedRowIndex } = this.props;
 
         return (
             <tbody>
-                {rows.map((row, key) =>
-                    <tr key={key}>
-                        {row.map(({value, link}, subKey) =>
+                {rows.map((row, rowIndex) =>
+                    <tr key={rowIndex}
+                        onClick={() => onRowSelect(row, rowIndex)}
+                        className={rowIndex === selectedRowIndex ? "selected" : ""}>
+
+                        {row.map(({value, link}, key) =>
                             <Column
-                                key={subKey}
+                                key={key}
                                 text={value}
                                 link={link}
                             />

@@ -8,6 +8,9 @@ import { bindActionCreators } from 'redux';
 import { generateGetDevices } from '../../reducers/devices/actions';
 
 export class DevicesContainer extends React.Component {
+    state = {
+        selectedRow: null
+    }
 
     constructor(props) {
         super(props);
@@ -21,9 +24,16 @@ export class DevicesContainer extends React.Component {
         this.getDevices();
     }
 
+    onRowSelect(selectedRow) {
+        this.setState({
+            selectedRow
+        });
+    }
+
     render() {
         const { items, links, queries, template, isFetching, hasFetched, error, errorMessage } = this.props;
-        const { getDevices } = this;
+        const { selectedRow } = this.state;
+        const { getDevices, onRowSelect } = this;
 
         return (
             <Devices { ...{
@@ -35,7 +45,9 @@ export class DevicesContainer extends React.Component {
                 hasFetched,
                 error,
                 errorMessage,
-                getDevices
+                getDevices,
+                onRowSelect: onRowSelect.bind(this),
+                selectedRow
             }} />
         );
     }

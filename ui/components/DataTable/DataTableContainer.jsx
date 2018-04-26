@@ -8,18 +8,42 @@ export default class DataTableContainer extends React.Component {
         items: PropTypes.object.isRequired,
         links: PropTypes.object.isRequired,
         queries: PropTypes.array.isRequired,
-        template: PropTypes.object
+        template: PropTypes.object,
+        search: PropTypes.func
+    }
+
+    state = {
+        selectedRowIndex: null
     }
 
     render() {
-        const { queries, template } = this.props;
+        const { items, links, queries, template, search, ...restProps } = this.props;
+        const { selectedRowIndex } = this.state;
         const rows = this.generateRows();
 
         return (
             <DataTable { ...{
-                rows
+                ... restProps,
+                rows,
+                onRowSelect: this.onRowSelect.bind(this),
+                selectedRowIndex
             }} />
         );
+    }
+
+    // Set selected row index into state and pass row to prop function
+    onRowSelect(row, index) {
+        const { onRowSelect } = this.props;
+
+        this.setState(({selectedRowIndex}) => {
+            // Selecting same row twice disables selection
+            const isDisable = selectedRowIndex === index;
+
+            onRowSelect && onRowSelect(isDisable ? null : row);
+            return {
+                selectedRowIndex: isDisable ? null : index
+            };
+        });
     }
 
     generateRows() {
