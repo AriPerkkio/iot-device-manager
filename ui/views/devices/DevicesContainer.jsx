@@ -9,7 +9,8 @@ import { generateGetDevices } from '../../reducers/devices/actions';
 
 export class DevicesContainer extends React.Component {
     state = {
-        selectedRow: null
+        selectedRow: null,
+        selectedRowId: null
     }
 
     constructor(props) {
@@ -24,15 +25,16 @@ export class DevicesContainer extends React.Component {
         this.getDevices();
     }
 
-    onRowSelect(selectedRow) {
+    onRowSelect(selectedRow, selectedRowId) {
         this.setState({
-            selectedRow
+            selectedRow,
+            selectedRowId
         });
     }
 
     render() {
         const { items, links, queries, template, isFetching, hasFetched, error, errorMessage } = this.props;
-        const { selectedRow } = this.state;
+        const { selectedRow, selectedRowId } = this.state;
         const { getDevices, onRowSelect } = this;
 
         return (
@@ -47,7 +49,8 @@ export class DevicesContainer extends React.Component {
                 errorMessage,
                 getDevices,
                 onRowSelect: onRowSelect.bind(this),
-                selectedRow
+                selectedRow,
+                selectedRowId
             }} />
         );
     }

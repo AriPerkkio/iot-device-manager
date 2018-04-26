@@ -39,7 +39,7 @@ export default class DataTableContainer extends React.Component {
             // Selecting same row twice disables selection
             const isDisable = selectedRowIndex === index;
 
-            onRowSelect && onRowSelect(isDisable ? null : row);
+            onRowSelect && onRowSelect(isDisable ? null : row, isDisable ? null : index);
             return {
                 selectedRowIndex: isDisable ? null : index
             };

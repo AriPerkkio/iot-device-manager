@@ -8,6 +8,19 @@ export default class DataForm extends React.Component {
         this.state = { ...props };
     }
 
+    componentWillReceiveProps(newProps) {
+        const { index, dataRow } = newProps;
+        const { index: sIndex } = this.state;
+
+        // Apply props when row changes
+        if(index !== sIndex) {
+            this.setState({
+                index,
+                dataRow
+            });
+        }
+    }
+
     render() {
         const { dataRow } = this.state;
 

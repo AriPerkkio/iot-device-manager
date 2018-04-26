@@ -9,7 +9,7 @@ import ErrorAlert from '../../components/ErrorAlert';
 export default class Devices extends React.Component {
 
     render() {
-        const { selectedRow } = this.props;
+        const { selectedRow, selectedRowId } = this.props;
 
         return (
             <Container fluid>
@@ -19,7 +19,7 @@ export default class Devices extends React.Component {
                     </Col>
 
                     <Col md={12} lg={6}>
-                        { selectedRow && <DataForm dataRow={selectedRow} /> }
+                        { selectedRow && <DataForm dataRow={selectedRow} index={selectedRowId} /> }
                     </Col>
 
                 </Row>
