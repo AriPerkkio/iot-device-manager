@@ -14,14 +14,16 @@ export default class Devices extends React.Component {
         return (
             <Container fluid>
                 <Row>
-                    <Col lg={12} xl={6}>
+                    <Col md={12} lg={8}>
                         { this.renderTable() }
                     </Col>
 
-                    <Col md={12} lg={6}>
-                        { selectedRow && <DataForm dataRow={selectedRow} index={selectedRowId} /> }
+                    <Col md={12} lg={4}>
+                        { selectedRow &&
+                        <DataForm
+                            dataRow={selectedRow}
+                            index={selectedRowId} /> }
                     </Col>
-
                 </Row>
             </Container>
         );
