@@ -1,4 +1,6 @@
-// Parse items into id - item map
+/**
+ * Parse application/vnd.collection+json response into item - id map
+*/
 export function parseItems(collection) {
     const items = {}
 
@@ -13,7 +15,9 @@ export function parseItems(collection) {
     return items;
 }
 
-// Parse links into rel - link map
+/**
+ * Parse application/vnd.collection+json response into rel - link map
+*/
 export function parseLinks(collection) {
     const links = {};
 

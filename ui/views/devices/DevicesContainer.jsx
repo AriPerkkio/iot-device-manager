@@ -1,10 +1,8 @@
 import React from 'react';
-
 import Devices from './Devices';
 
 // State
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux';
 import { generateGetDevices, generateModifyDevice } from '../../reducers/devices/actions';
 
 export class DevicesContainer extends React.Component {
@@ -17,7 +15,6 @@ export class DevicesContainer extends React.Component {
         super(props);
 
         const { dispatch } = props;
-
         this.getDevices = generateGetDevices(dispatch);
         this.modifyDevice = generateModifyDevice(dispatch);
     }
@@ -69,7 +66,7 @@ export class DevicesContainer extends React.Component {
 }
 
 function mapStateToProps(state) {
-    return  state.devices;
+    return state.devices;
 }
 
 export default connect(mapStateToProps)(DevicesContainer);

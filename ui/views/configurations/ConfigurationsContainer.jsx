@@ -4,7 +4,6 @@ import Configurations from './Configurations';
 
 // State
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux';
 import { generateGetConfigurations } from '../../reducers/configurations/actions';
 
 export class ConfigurationsContainer extends React.Component {
@@ -13,7 +12,6 @@ export class ConfigurationsContainer extends React.Component {
         super(props);
 
         const { dispatch } = props;
-
         this.getConfigurations = generateGetConfigurations(dispatch);
     }
 
@@ -22,7 +20,7 @@ export class ConfigurationsContainer extends React.Component {
     }
 
     render() {
-        const { items, links, queries, template, isFetching, hasFetched, error, errorMessage } = this.props;
+        const { items, links, queries, template, isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
         const { getConfigurations } = this;
 
         return (
@@ -33,8 +31,8 @@ export class ConfigurationsContainer extends React.Component {
                 template,
                 isFetching,
                 hasFetched,
-                error,
-                errorMessage,
+                fetchingError,
+                fetchingErrorMessage,
                 getConfigurations
             }} />
         );

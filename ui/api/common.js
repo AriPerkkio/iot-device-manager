@@ -2,6 +2,9 @@ import _ from 'lodash';
 
 const ERROR_SEPARATOR = "::";
 
+/**
+ * Check fetch response for errors. Thrown error contains detailed description of error.
+ */
 export function handleErrors(response) {
     if(!response.ok) {
 
@@ -23,6 +26,9 @@ export function handleErrors(response) {
     return response;
 }
 
+/**
+ * Parse error from application/vnd.collection+json response. Returns title and message separated by ERROR_SEPARATOR
+ */
 function parseError(collection) {
     const { error } = collection;
     const { title, message } = error;
@@ -30,7 +36,9 @@ function parseError(collection) {
     return title + ERROR_SEPARATOR + message;
 }
 
-// Readable errors from API should have correct content type
+/**
+ * Check if error response is from API. Readable errors from API should have correct content type
+ */
 function isErrorFromApi(response) {
     const { headers } = response;
 
@@ -39,6 +47,9 @@ function isErrorFromApi(response) {
         /application\/vnd.collection\+json/.test(response.headers.get("Content-Type"));
 }
 
+/**
+ * Default options to be used in fetch calls.
+ */
 export const fetchOptions = {
     // By default fetch doesn't include cookies
     credentials: "same-origin",
@@ -48,6 +59,9 @@ export const fetchOptions = {
     }
 }
 
+/**
+ * Construct URL query string from key-value pair object
+ */
 export function queryParameters(params) {
 
     if(_.isEmpty(params)) {
@@ -67,7 +81,10 @@ const queryParameter = param => param.key + "=" + param.val;
 const firstQueryParameter = param => "?" + queryParameter(param);
 const nextQueryParameter = param => "&" + queryParameter(param);
 
-// Convert DataForm's dataRow into request body and url
+/**
+ * Convert application/vnd.collection+json responses collection.item.data array into application/json request body.
+ * Also returns href from response object.
+ */
 export function requestBodyAndUrl(data) {
     const body = {};
     const url = data.concat().pop().href;

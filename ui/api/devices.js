@@ -9,6 +9,7 @@ export function fetchDevices(filters) {
         .then(response => response.json())
 }
 
+// Modify device with new request body
 export function modifyDevice(data) {
     const { body, url } = requestBodyAndUrl(data);
     const options = {

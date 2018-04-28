@@ -22,7 +22,7 @@ export class TypesContainer extends React.Component {
     }
 
     render() {
-        const { items, links, queries, template, isFetching, hasFetched, error, errorMessage } = this.props;
+        const { items, links, queries, template, isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
         const { getTypes } = this;
 
         return (
@@ -33,8 +33,8 @@ export class TypesContainer extends React.Component {
                 template,
                 isFetching,
                 hasFetched,
-                error,
-                errorMessage,
+                fetchingError,
+                fetchingErrorMessage,
                 getTypes
             }} />
         );

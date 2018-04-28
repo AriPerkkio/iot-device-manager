@@ -7,15 +7,21 @@ import ErrorAlert from './ErrorAlert';
 
 export default class DataForm extends React.Component {
     static propTypes = {
-        dataRow: PropTypes.array.isRequired,
+        dataRow: PropTypes.arrayOf(PropTypes.shape({
+            column: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            value: PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+            href: PropTypes.string,
+            link: PropTypes.string,
+            readOnly: PropTypes.bool
+        })).isRequired,
         index: PropTypes.number.isRequired,
         saveButtonText: PropTypes.string,
         deleteButtonText: PropTypes.string,
         hiddenButtons: PropTypes.array,
         onSaveButtonClick: PropTypes.func,
         onDeleteButtonClick: PropTypes.func,
-        isLoading: PropTypes.bool,
-        template: PropTypes.array
+        isLoading: PropTypes.bool
     }
 
     static defaultProps = {
@@ -116,19 +122,11 @@ export default class DataForm extends React.Component {
     renderError() {
         const { error, errorMessage } = this.props;
 
-        if(!error) {
-            return null;
-        }
-
-        const header = errorMessage.split("::").shift();
-        const message = errorMessage.split("::").pop();
-
-        return (
+        return error &&
             <ErrorAlert { ...{
-                header,
-                message
-            }} />
-        );
+                header: errorMessage.split("::").shift(),
+                message: errorMessage.split("::").pop()
+            }} />;
     }
 
     onSaveButtonClick() {

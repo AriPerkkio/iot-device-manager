@@ -1,5 +1,4 @@
 import React from 'react';
-
 import Groups from './Groups';
 
 // State
@@ -12,7 +11,6 @@ export class GroupsContainer extends React.Component {
         super(props);
 
         const { dispatch } = props;
-
         this.getGroups = generateGetGroups(dispatch);
     }
 
@@ -21,7 +19,7 @@ export class GroupsContainer extends React.Component {
     }
 
     render() {
-        const { items, links, queries, template, isFetching, hasFetched, error, errorMessage } = this.props;
+        const { items, links, queries, template, isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
         const { getGroups } = this;
 
         return (
@@ -32,8 +30,8 @@ export class GroupsContainer extends React.Component {
                 template,
                 isFetching,
                 hasFetched,
-                error,
-                errorMessage,
+                fetchingError,
+                fetchingErrorMessage,
                 getGroups
             }} />
         );
@@ -41,7 +39,7 @@ export class GroupsContainer extends React.Component {
 }
 
 function mapStateToProps(state) {
-    return  state.groups;
+    return state.groups;
 }
 
 export default connect(mapStateToProps)(GroupsContainer);

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import LoadingIndicator from 'react-loading-indicator';
-import './devices.scss';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
 import DataForm from '../../components/DataForm';
@@ -36,13 +35,10 @@ export default class Devices extends React.Component {
                     segmentLength={10} />
             );
         } else if (fetchingError) {
-            const header = fetchingErrorMessage.split("::").shift();
-            const message = fetchingErrorMessage.split("::").pop();
-
             return (
                 <ErrorAlert { ...{
-                    header,
-                    message
+                    header: fetchingErrorMessage.split("::").shift(),
+                    message: fetchingErrorMessage.split("::").pop()
                 }} />
             );
         } else if(hasFetched) {

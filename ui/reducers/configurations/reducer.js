@@ -13,8 +13,8 @@ const initialState = {
     template: {},
     isFetching: false,
     hasFetched: false,
-    error: false,
-    errorMessage: ""
+    fetchingError: false,
+    fetchingErrorMessage: ""
 };
 
 export default function reducer(state = initialState, action) {
@@ -37,7 +37,7 @@ function handleConfigurationsLoadStart(state) {
     return {
         ...state,
         isFetching: true,
-        error: false
+        fetchingError: false
     }
 }
 
@@ -58,7 +58,7 @@ function handleConfigurationsLoadSuccess(state, { collection }) {
         ...state,
         isFetching: false,
         hasFetched: true,
-        error: false,
+        fetchingError: false,
         queries,
         template,
         items,
@@ -70,7 +70,7 @@ function handleConfigurationsLoadFailed(state, action) {
     return {
         ...state,
         isFetching: false,
-        error: true,
-        errorMessage: action.error.message
+        fetchingError: true,
+        fetchingErrorMessage: action.error.message
     }
 }

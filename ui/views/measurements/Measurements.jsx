@@ -1,6 +1,6 @@
 import React from 'react';
-import './measurements.scss';
 
+import LoadingIndicator from 'react-loading-indicator';
 import DataTable from '../../components/DataTable/DataTableContainer';
 import ErrorAlert from '../../components/ErrorAlert';
 
@@ -17,13 +17,18 @@ export default class Measurements extends React.Component {
 
     renderTable() {
         const { items, links, queries, template, getMeasurements,
-            isFetching, hasFetched, error, errorMessage } = this.props;
+            isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
 
         if(isFetching) {
-            return <p>TODO loading indicator</p>;
-        } else if (error) {
-            const header = errorMessage.split("::").shift();
-            const message = errorMessage.split("::").pop();
+            return (
+                <ErrorAlert { ...{
+                    header: fetchingErrorMessage.split("::").shift(),
+                    message: fetchingErrorMessage.split("::").pop()
+                }} />
+            );
+        } else if (fetchingError) {
+            const header = fetchingErrorMessage.split("::").shift();
+            const message = fetchingErrorMessage.split("::").pop();
 
             return (
                 <ErrorAlert { ...{

@@ -1,6 +1,6 @@
 import React from 'react';
-import './locations.scss';
 
+import LoadingIndicator from 'react-loading-indicator';
 import DataTable from '../../components/DataTable/DataTableContainer';
 import ErrorAlert from '../../components/ErrorAlert';
 
@@ -17,18 +17,15 @@ export default class Locations extends React.Component {
 
     renderTable() {
         const { items, links, queries, template, getLocations,
-            isFetching, hasFetched, error, errorMessage } = this.props;
+            isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
 
         if(isFetching) {
-            return <p>TODO loading indicator</p>;
-        } else if (error) {
-            const header = errorMessage.split("::").shift();
-            const message = errorMessage.split("::").pop();
-
+            return <LoadingIndicator />;
+        } else if (fetchingError) {
             return (
                 <ErrorAlert { ...{
-                    header,
-                    message
+                    header: fetchingErrorMessage.split("::").shift(),
+                    message: fetchingErrorMessage.split("::").pop()
                 }} />
             );
         } else if(hasFetched) {

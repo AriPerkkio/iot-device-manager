@@ -16,7 +16,7 @@ export default class DataTable extends React.Component {
         const { rows, onRowSelect, selectedRowIndex, ...restProps } = this.props;
 
         return (
-            <div className="data-table-wrapper">
+            <div>
                 <Table responsive hover
                     { ... restProps }
                     className="data-table">
