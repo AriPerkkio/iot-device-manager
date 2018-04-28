@@ -63,7 +63,7 @@ public class ExceptionController {
         } else if(ex instanceof ConstraintViolationException) {
             message = "";
             for(ConstraintViolation cv: ((ConstraintViolationException) ex).getConstraintViolations()) {
-                message = message.concat(cv.getMessage() + " ");
+                message = message.concat(cv.getInvalidValue() + " " + cv.getMessage() + ". ");
             }
             message = message.trim();
         }
