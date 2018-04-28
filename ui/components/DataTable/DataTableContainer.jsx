@@ -39,21 +39,36 @@ export default class DataTableContainer extends React.Component {
             // Selecting same row twice disables selection
             const isDisable = selectedRowIndex === index;
 
-            onRowSelect && onRowSelect(isDisable ? null : row, isDisable ? null : index);
+            onRowSelect && onRowSelect(
+                isDisable ? null : this.rowDataToTemplate(row),
+                isDisable ? null : index);
+
             return {
                 selectedRowIndex: isDisable ? null : index
             };
         });
     }
 
+    // Set columns that are not found in template as read-only
+    rowDataToTemplate(row) {
+        const { template } = this.props;
+        const templateRows = template.data.map(({name}) => name);
+
+        return row.map(col => ({
+            ...col,
+            readOnly: !templateRows.includes(col.name)
+        }));
+    }
+
     generateRows() {
         const { items } = this.props;
 
-        return _.map(items, ({data}, id) => data
+        return _.map(items, ({data, href}, id) => data
             .map(({ prompt, value, name }) => ({
                 column: prompt,
                 value,
                 name,
+                href,
                 link: this.getLinkForColumn(id, prompt)
             }))
         );

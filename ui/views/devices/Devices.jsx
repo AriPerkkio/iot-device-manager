@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Row, Col } from 'reactstrap';
+import LoadingIndicator from 'react-loading-indicator';
 import './devices.scss';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
@@ -9,8 +10,6 @@ import ErrorAlert from '../../components/ErrorAlert';
 export default class Devices extends React.Component {
 
     render() {
-        const { selectedRow, selectedRowId, onSaveButtonClick } = this.props;
-
         return (
             <Container fluid>
                 <Row>
@@ -19,11 +18,7 @@ export default class Devices extends React.Component {
                     </Col>
 
                     <Col md={12} lg={4}>
-                        { selectedRow &&
-                        <DataForm
-                            dataRow={selectedRow}
-                            index={selectedRowId}
-                            onSaveButtonClick={onSaveButtonClick} /> }
+                        { this.renderForm() }
                     </Col>
                 </Row>
             </Container>
@@ -35,7 +30,11 @@ export default class Devices extends React.Component {
             isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
 
         if(isFetching) {
-            return <p>TODO loading indicator</p>;
+            return (
+                <LoadingIndicator
+                    segmentWidth={10}
+                    segmentLength={10} />
+            );
         } else if (fetchingError) {
             const header = fetchingErrorMessage.split("::").shift();
             const message = fetchingErrorMessage.split("::").pop();
@@ -61,5 +60,20 @@ export default class Devices extends React.Component {
         }
 
         return null;
+    }
+
+    renderForm() {
+        const { selectedRow, selectedRowId, onSaveButtonClick,
+            isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
+
+        return selectedRow &&
+            <DataForm { ... {
+                dataRow: selectedRow,
+                index: selectedRowId,
+                onSaveButtonClick,
+                isLoading: isUpdating,
+                error: updateError,
+                errorMessage: updateErrorMessage
+            }} />;
     }
 }

@@ -67,14 +67,16 @@ const queryParameter = param => param.key + "=" + param.val;
 const firstQueryParameter = param => "?" + queryParameter(param);
 const nextQueryParameter = param => "&" + queryParameter(param);
 
-// Convert DataForm's dataRow into request body and item id
-export function requestBodyWithId(data) {
+// Convert DataForm's dataRow into request body and url
+export function requestBodyAndUrl(data) {
     const body = {};
+    const url = data.concat().pop().href;
+
     data.forEach(({ name, value }) =>
         body[name] = value);
 
     return {
-        id: body.id,
+        url,
         body: JSON.stringify(body)
     };
 }

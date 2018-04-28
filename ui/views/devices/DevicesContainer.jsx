@@ -38,7 +38,9 @@ export class DevicesContainer extends React.Component {
     }
 
     render() {
-        const { items, links, queries, template, isFetching, hasFetched, error, errorMessage } = this.props;
+        const { items, links, queries, template,
+            isFetching, hasFetched, fetchingError, fetchingErrorMessage,
+            isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
         const { selectedRow, selectedRowId } = this.state;
         const { getDevices, onRowSelect, onSaveButtonClick } = this;
 
@@ -50,8 +52,12 @@ export class DevicesContainer extends React.Component {
                 template,
                 isFetching,
                 hasFetched,
-                error,
-                errorMessage,
+                fetchingError,
+                fetchingErrorMessage,
+                isUpdating,
+                hasUpdated,
+                updateError,
+                updateErrorMessage,
                 getDevices,
                 onRowSelect: onRowSelect.bind(this),
                 selectedRow,
