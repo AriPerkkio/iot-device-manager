@@ -9,7 +9,7 @@ import ErrorAlert from '../../components/ErrorAlert';
 export default class Devices extends React.Component {
 
     render() {
-        const { selectedRow, selectedRowId } = this.props;
+        const { selectedRow, selectedRowId, onSaveButtonClick } = this.props;
 
         return (
             <Container fluid>
@@ -22,7 +22,8 @@ export default class Devices extends React.Component {
                         { selectedRow &&
                         <DataForm
                             dataRow={selectedRow}
-                            index={selectedRowId} /> }
+                            index={selectedRowId}
+                            onSaveButtonClick={onSaveButtonClick} /> }
                     </Col>
                 </Row>
             </Container>
@@ -31,13 +32,13 @@ export default class Devices extends React.Component {
 
     renderTable() {
         const { items, links, queries, template, getDevices, onRowSelect,
-            isFetching, hasFetched, error, errorMessage } = this.props;
+            isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
 
         if(isFetching) {
             return <p>TODO loading indicator</p>;
-        } else if (error) {
-            const header = errorMessage.split("::").shift();
-            const message = errorMessage.split("::").pop();
+        } else if (fetchingError) {
+            const header = fetchingErrorMessage.split("::").shift();
+            const message = fetchingErrorMessage.split("::").pop();
 
             return (
                 <ErrorAlert { ...{

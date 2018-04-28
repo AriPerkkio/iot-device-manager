@@ -6,8 +6,8 @@ export default class DataForm extends React.Component {
     static propTypes = {
         dataRow: PropTypes.array.isRequired,
         index: PropTypes.number.isRequired,
-        saveButtonText: PropTypes.text,
-        deleteButtonText: PropTypes.text,
+        saveButtonText: PropTypes.string,
+        deleteButtonText: PropTypes.string,
         hiddenButtons: PropTypes.array,
         onSaveButtonClick: PropTypes.func,
         onDeleteButtonClick: PropTypes.func

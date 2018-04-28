@@ -41,7 +41,11 @@ function isErrorFromApi(response) {
 
 export const fetchOptions = {
     // By default fetch doesn't include cookies
-    credentials: "same-origin"
+    credentials: "same-origin",
+    headers: {
+        "Content-Type": "application/json",
+        "Accept": 'application/vnd.collection+json'
+    }
 }
 
 export function queryParameters(params) {
@@ -62,3 +66,15 @@ export function queryParameters(params) {
 const queryParameter = param => param.key + "=" + param.val;
 const firstQueryParameter = param => "?" + queryParameter(param);
 const nextQueryParameter = param => "&" + queryParameter(param);
+
+// Convert DataForm's dataRow into request body and item id
+export function requestBodyWithId(data) {
+    const body = {};
+    data.forEach(({ name, value }) =>
+        body[name] = value);
+
+    return {
+        id: body.id,
+        body: JSON.stringify(body)
+    };
+}

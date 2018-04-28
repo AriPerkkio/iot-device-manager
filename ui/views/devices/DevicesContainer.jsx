@@ -5,7 +5,7 @@ import Devices from './Devices';
 // State
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { generateGetDevices } from '../../reducers/devices/actions';
+import { generateGetDevices, generateModifyDevice } from '../../reducers/devices/actions';
 
 export class DevicesContainer extends React.Component {
     state = {
@@ -19,6 +19,7 @@ export class DevicesContainer extends React.Component {
         const { dispatch } = props;
 
         this.getDevices = generateGetDevices(dispatch);
+        this.modifyDevice = generateModifyDevice(dispatch);
     }
 
     componentDidMount() {
@@ -32,10 +33,14 @@ export class DevicesContainer extends React.Component {
         });
     }
 
+    onSaveButtonClick(data) {
+        this.modifyDevice(data);
+    }
+
     render() {
         const { items, links, queries, template, isFetching, hasFetched, error, errorMessage } = this.props;
         const { selectedRow, selectedRowId } = this.state;
-        const { getDevices, onRowSelect } = this;
+        const { getDevices, onRowSelect, onSaveButtonClick } = this;
 
         return (
             <Devices { ...{
@@ -50,7 +55,8 @@ export class DevicesContainer extends React.Component {
                 getDevices,
                 onRowSelect: onRowSelect.bind(this),
                 selectedRow,
-                selectedRowId
+                selectedRowId,
+                onSaveButtonClick: onSaveButtonClick.bind(this)
             }} />
         );
     }

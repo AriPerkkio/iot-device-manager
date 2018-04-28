@@ -50,9 +50,10 @@ export default class DataTableContainer extends React.Component {
         const { items } = this.props;
 
         return _.map(items, ({data}, id) => data
-            .map(({ prompt, value }) => ({
+            .map(({ prompt, value, name }) => ({
                 column: prompt,
                 value,
+                name,
                 link: this.getLinkForColumn(id, prompt)
             }))
         );
