@@ -1,7 +1,21 @@
-#logout-form {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+div.login-wrapper {
+    display: flex;
+    height: 100%;
+
+    > div {
+        width: 30%;
+        min-width: 250px;
+        margin: auto;
+    }
+}
+
+.logout-btn {
+    margin-top: 5px;
 }
 
 .error-alert {

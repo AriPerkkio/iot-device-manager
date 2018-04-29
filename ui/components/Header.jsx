@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navbar, NavItem, Nav, NavLink, NavbarBrand } from 'reactstrap';
+import { Navbar, NavItem, Nav, NavLink, NavbarBrand, Input, Form } from 'reactstrap';
 import { Link } from 'react-router-dom';
 
 export default class Header extends React.Component {
@@ -27,6 +27,11 @@ export default class Header extends React.Component {
                         <NavLink tag={Link} to="/measurements">Measurements</NavLink>
                     </NavItem>
                     <NavbarBrand tag={Link} to="/">Iot Device Manager</NavbarBrand>
+                    <NavItem>
+                        <Form action="/logout" method="post">
+                            <Input type="submit" value="Log Out" className="btn btn-sm btn-primary logout-btn" />
+                        </Form>
+                    </NavItem>
                 </Nav>
             </Navbar>
         );
