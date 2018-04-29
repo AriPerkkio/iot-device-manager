@@ -6,7 +6,8 @@ import {
     DEVICES_LOAD_FAILED,
     DEVICES_EDIT_START,
     DEVICES_EDIT_SUCCESS,
-    DEVICES_EDIT_FAILED
+    DEVICES_EDIT_FAILED,
+    RESET_DEVICES_EDIT_FAILED
 } from './actions';
 
 const initialState = {
@@ -46,6 +47,8 @@ export default function reducer(state = initialState, action) {
         case DEVICES_EDIT_FAILED:
             return handleDevicesEditFailed(state, action);
 
+        case RESET_DEVICES_EDIT_FAILED:
+            return resetEditErrors(state);
         default:
             return state;
     }
@@ -129,5 +132,13 @@ function handleDevicesEditFailed(state, action) {
         isUpdating: false,
         updateError: true,
         updateErrorMessage: action.error.message
+    }
+}
+
+function resetEditErrors(state) {
+    return {
+        ...state,
+        updateError: false,
+        updateErrorMessage: ""
     }
 }

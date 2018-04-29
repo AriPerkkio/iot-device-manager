@@ -8,6 +8,8 @@ export const DEVICES_EDIT_START = 'DEVICES_EDIT_START';
 export const DEVICES_EDIT_SUCCESS = 'DEVICES_EDIT_SUCCESS';
 export const DEVICES_EDIT_FAILED = 'DEVICES_EDIT_FAILED';
 
+export const RESET_DEVICES_EDIT_FAILED = "RESET_DEVICES_EDIT_FAILED";
+
 function devicesLoadStart(filters) {
     return {
         type: DEVICES_LOAD_START,
@@ -50,6 +52,12 @@ function devicesEditFailed(error) {
     }
 }
 
+function resetDevicesEditFailed() {
+    return {
+        type: RESET_DEVICES_EDIT_FAILED
+    }
+}
+
 export function generateGetDevices(dispatch) {
     return filters => {
         dispatch(devicesLoadStart(filters))
@@ -66,4 +74,8 @@ export function generateModifyDevice(dispatch) {
             .then(json => dispatch(devicesEditSuccess(json)))
             .catch(error => dispatch(devicesEditFailed(error)))
     }
+}
+
+export function resetModifyErrors(dispatch) {
+    dispatch(resetDevicesEditFailed());
 }

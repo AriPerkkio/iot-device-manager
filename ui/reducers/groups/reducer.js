@@ -6,7 +6,8 @@ import {
     GROUPS_LOAD_FAILED,
     GROUPS_EDIT_START,
     GROUPS_EDIT_SUCCESS,
-    GROUPS_EDIT_FAILED
+    GROUPS_EDIT_FAILED,
+    RESET_GROUPS_EDIT_FAILED,
 } from './actions';
 
 const initialState = {
@@ -46,6 +47,8 @@ export default function reducer(state = initialState, action) {
         case GROUPS_EDIT_FAILED:
             return handleGroupEditFailed(state, action);
 
+        case RESET_GROUPS_EDIT_FAILED:
+            return resetHandleGroupEditFailed(state);
         default:
             return state;
     }
@@ -129,5 +132,13 @@ function handleGroupEditFailed(state, action) {
         isUpdating: false,
         updateError: true,
         updateErrorMessage: action.error.message
+    }
+}
+
+function resetHandleGroupEditFailed(state) {
+    return {
+        ...state,
+        updateError: false,
+        updateErrorMessage: ""
     }
 }

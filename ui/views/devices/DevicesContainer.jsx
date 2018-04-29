@@ -3,7 +3,7 @@ import Devices from './Devices';
 
 // State
 import { connect } from 'react-redux'
-import { generateGetDevices, generateModifyDevice } from '../../reducers/devices/actions';
+import { generateGetDevices, generateModifyDevice, resetModifyErrors } from '../../reducers/devices/actions';
 
 export class DevicesContainer extends React.Component {
     state = {
@@ -17,6 +17,7 @@ export class DevicesContainer extends React.Component {
         const { dispatch } = props;
         this.getDevices = generateGetDevices(dispatch);
         this.modifyDevice = generateModifyDevice(dispatch);
+        this.resetModifyErrors = () => resetModifyErrors(dispatch);
     }
 
     componentDidMount() {
@@ -24,6 +25,7 @@ export class DevicesContainer extends React.Component {
     }
 
     onRowSelect(selectedRow, selectedRowId) {
+        this.resetModifyErrors();
         this.setState({
             selectedRow,
             selectedRowId

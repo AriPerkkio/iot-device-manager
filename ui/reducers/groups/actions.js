@@ -8,6 +8,8 @@ export const GROUPS_EDIT_START = 'GROUPS_EDIT_START';
 export const GROUPS_EDIT_SUCCESS = 'GROUPS_EDIT_SUCCESS';
 export const GROUPS_EDIT_FAILED = 'GROUPS_EDIT_FAILED';
 
+export const RESET_GROUPS_EDIT_FAILED = 'RESET_GROUPS_EDIT_FAILED';
+
 function groupsLoadStart(filters) {
     return {
         type: GROUPS_LOAD_START,
@@ -50,6 +52,12 @@ function groupsEditFailed(error) {
     }
 }
 
+function resetGroupEditFailed() {
+    return {
+        type: RESET_GROUPS_EDIT_FAILED
+    }
+}
+
 export function generateGetGroups(dispatch) {
     return filters => {
         dispatch(groupsLoadStart(filters))
@@ -66,4 +74,8 @@ export function generateModifyGroups(dispatch) {
             .then(json => dispatch(groupsEditSuccess(json)))
             .catch(error => dispatch(groupsEditFailed(error)))
     }
+}
+
+export function resetModifyErrors(dispatch) {
+    dispatch(resetGroupEditFailed());
 }

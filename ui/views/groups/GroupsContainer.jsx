@@ -3,7 +3,7 @@ import Groups from './Groups';
 
 // State
 import { connect } from 'react-redux'
-import { generateGetGroups, generateModifyGroups } from '../../reducers/groups/actions';
+import { generateGetGroups, generateModifyGroups, resetModifyErrors } from '../../reducers/groups/actions';
 
 export class GroupsContainer extends React.Component {
     state = {
@@ -17,6 +17,7 @@ export class GroupsContainer extends React.Component {
         const { dispatch } = props;
         this.getGroups = generateGetGroups(dispatch);
         this.modifyGroups = generateModifyGroups(dispatch);
+        this.resetModifyErrors = () => resetModifyErrors(dispatch);
     }
 
     componentDidMount() {
@@ -24,6 +25,7 @@ export class GroupsContainer extends React.Component {
     }
 
     onRowSelect(selectedRow, selectedRowId) {
+        this.resetModifyErrors();
         this.setState({
             selectedRow,
             selectedRowId
