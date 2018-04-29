@@ -3,24 +3,43 @@ import Groups from './Groups';
 
 // State
 import { connect } from 'react-redux'
-import { generateGetGroups } from '../../reducers/groups/actions';
+import { generateGetGroups, generateModifyGroups } from '../../reducers/groups/actions';
 
 export class GroupsContainer extends React.Component {
+    state = {
+        selectedRow: null,
+        selectedRowId: null
+    }
 
     constructor(props) {
         super(props);
 
         const { dispatch } = props;
         this.getGroups = generateGetGroups(dispatch);
+        this.modifyGroups = generateModifyGroups(dispatch);
     }
 
     componentDidMount() {
         this.getGroups();
     }
 
+    onRowSelect(selectedRow, selectedRowId) {
+        this.setState({
+            selectedRow,
+            selectedRowId
+        });
+    }
+
+    onSaveButtonClick(data) {
+        this.modifyGroups(data);
+    }
+
     render() {
-        const { items, links, queries, template, isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
-        const { getGroups } = this;
+        const { items, links, queries, template,
+            isFetching, hasFetched, fetchingError, fetchingErrorMessage,
+            isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
+        const { selectedRow, selectedRowId } = this.state;
+        const { getGroups, onRowSelect, onSaveButtonClick } = this;
 
         return (
             <Groups { ...{
@@ -32,7 +51,15 @@ export class GroupsContainer extends React.Component {
                 hasFetched,
                 fetchingError,
                 fetchingErrorMessage,
-                getGroups
+                isUpdating,
+                hasUpdated,
+                updateError,
+                updateErrorMessage,
+                getGroups,
+                onRowSelect: onRowSelect.bind(this),
+                selectedRow,
+                selectedRowId,
+                onSaveButtonClick: onSaveButtonClick.bind(this)
             }} />
         );
     }

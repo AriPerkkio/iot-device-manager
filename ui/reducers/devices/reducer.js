@@ -103,8 +103,6 @@ function handleDevicesEditStart(state) {
 }
 
 function handleDevicesEditSuccess(state, { collection }) {
-    const { queries, template } = collection;
-
     const items = {
         ...state.items,
         ...parseItems(collection)
@@ -120,13 +118,10 @@ function handleDevicesEditSuccess(state, { collection }) {
         isUpdating: false,
         hasUpdated: true,
         updateError: false,
-        queries,
-        template,
         items,
         links
     }
 }
-
 
 function handleDevicesEditFailed(state, action) {
     return {

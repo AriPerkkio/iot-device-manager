@@ -1,4 +1,4 @@
-import { fetchOptions, handleErrors, queryParameters, requestBodyAndUrl } from './common';
+import { fetchOptions, handleErrors, queryParameters, generatePutRequestFromData } from './common';
 
 // Fetch devices using given filters
 export function fetchDevices(filters) {
@@ -11,14 +11,9 @@ export function fetchDevices(filters) {
 
 // Modify device with new request body
 export function modifyDevice(data) {
-    const { body, url } = requestBodyAndUrl(data);
-    const options = {
-        ... fetchOptions,
-        method: "PUT",
-        body
-    };
+    const request = generatePutRequestFromData(data);
 
-    return fetch(url, options)
+    return request()
         .then(handleErrors)
         .then(response => response.json())
 }

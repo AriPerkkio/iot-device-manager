@@ -85,7 +85,7 @@ const nextQueryParameter = param => "&" + queryParameter(param);
  * Convert application/vnd.collection+json responses collection.item.data array into application/json request body.
  * Also returns href from response object.
  */
-export function requestBodyAndUrl(data) {
+function requestBodyAndUrl(data) {
     const body = {};
     const url = data.concat().pop().href;
 
@@ -96,4 +96,19 @@ export function requestBodyAndUrl(data) {
         url,
         body: JSON.stringify(body)
     };
+}
+
+/**
+ * Generate PUT request from application/vnd.collection+json responses collection.item.data array's item.
+ * Returns function for executing fetch
+ */
+export function generatePutRequestFromData(data) {
+    const { body, url } = requestBodyAndUrl(data);
+    const options = {
+        ... fetchOptions,
+        method: "PUT",
+        body
+    };
+
+    return () => fetch(url, options);
 }

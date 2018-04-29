@@ -3,7 +3,10 @@ import { parseItems, parseLinks } from '../utils';
 import {
     GROUPS_LOAD_START,
     GROUPS_LOAD_SUCCESS,
-    GROUPS_LOAD_FAILED
+    GROUPS_LOAD_FAILED,
+    GROUPS_EDIT_START,
+    GROUPS_EDIT_SUCCESS,
+    GROUPS_EDIT_FAILED
 } from './actions';
 
 const initialState = {
@@ -11,10 +14,18 @@ const initialState = {
     links: {},
     queries: [],
     template: {},
+
+    // GET methods
     isFetching: false,
     hasFetched: false,
     fetchingError: false,
-    fetchingErrorMessage: ""
+    fetchingErrorMessage: "",
+
+    // PUT methods
+    isUpdating: false,
+    hasUpdated: false,
+    updateError: false,
+    updateErrorMessage: "",
 };
 
 export default function reducer(state = initialState, action) {
@@ -27,6 +38,13 @@ export default function reducer(state = initialState, action) {
             return handleGroupsLoadSuccess(state, json);
         case GROUPS_LOAD_FAILED:
             return handleGroupsLoadFailed(state, action);
+
+        case GROUPS_EDIT_START:
+            return handleGroupEditStart(state);
+        case GROUPS_EDIT_SUCCESS:
+            return handleGroupEditSuccess(state, json);
+        case GROUPS_EDIT_FAILED:
+            return handleGroupEditFailed(state, action);
 
         default:
             return state;
@@ -72,5 +90,44 @@ function handleGroupsLoadFailed(state, action) {
         isFetching: false,
         fetchingError: true,
         fetchingErrorMessage: action.error.message
+    }
+}
+
+function handleGroupEditStart(state) {
+    return {
+        ...state,
+        isUpdating: true,
+        hasUpdated: false,
+        updateError: false
+    }
+}
+
+function handleGroupEditSuccess(state, { collection }) {
+    const items = {
+        ...state.items,
+        ...parseItems(collection)
+    };
+
+    const links = {
+        ...state.links,
+        ...parseLinks(collection)
+    };
+
+    return {
+        ...state,
+        isUpdating: false,
+        hasUpdated: true,
+        updateError: false,
+        items,
+        links
+    }
+}
+
+function handleGroupEditFailed(state, action) {
+    return {
+        ...state,
+        isUpdating: false,
+        updateError: true,
+        updateErrorMessage: action.error.message
     }
 }
