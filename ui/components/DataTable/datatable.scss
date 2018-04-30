@@ -1,5 +1,22 @@
 .data-table {
+    margin-bottom: 0px !important;
+
     tr.selected {
         background-color: rgba(0, 0, 0, 0.2) !important;
     }
+
+    tfoot {
+
+        td > div {
+            display: flex;
+        }
+
+        input {
+            margin: 0px 10px;
+        }
+    }
+}
+
+.data-table-container {
+    margin: 1rem 0;
 }

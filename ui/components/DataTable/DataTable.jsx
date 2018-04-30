@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './datatable.scss';
 
-import { Table } from 'reactstrap';
+import { Table, Button, Input, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem  } from 'reactstrap';
 import Column from './Column';
 
 export default class DataTable extends React.Component {
@@ -13,16 +13,12 @@ export default class DataTable extends React.Component {
     }
 
     render() {
-        const { rows, onRowSelect, selectedRowIndex, ...restProps } = this.props;
-
         return (
-            <div>
-                <Table responsive hover
-                    { ... restProps }
-                    className="data-table">
-
+            <div className="data-table-container border">
+                <Table responsive hover bordered className="data-table">
                     { this.renderHeader() }
                     { this.renderRows() }
+                    { this.renderFooter() }
                 </Table>
           </div>
         );
@@ -63,5 +59,55 @@ export default class DataTable extends React.Component {
                 )}
             </tbody>
         );
+    }
+
+    renderFooter() {
+        const { rows } = this.props;
+        const columnCount = rows.concat().pop().length;
+
+        return (
+            <tfoot>
+                <tr>
+                    <td colSpan={columnCount}>
+                        <div>
+                            { this.renderFilterButton() }
+                            <Input type="text" placeholder="Search"/>
+                            <Button color="success" className="border">
+                                Add new item
+                            </Button>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        );
+    }
+
+    renderFilterButton() {
+        const { queries, onFilterDropDownToggle, filterDropDownOpen } = this.props;
+
+        const searchQuery = ((queries || [])
+            .filter(({rel}) => rel.toLowerCase() === 'search') || [])
+            .pop();
+
+        const filters = ((searchQuery || {}).data || [])
+            .map(({name}) => name);
+
+        const disabled = filters.length === 0;
+
+        return (
+            <ButtonDropdown
+                isOpen={filterDropDownOpen}
+                toggle={onFilterDropDownToggle}
+                disabled={disabled}>
+                <DropdownToggle caret color="light" className="border">
+                    Add filter
+                </DropdownToggle>
+                <DropdownMenu>
+                    {filters.map(filter =>
+                        <DropdownItem key={filter}>{filter}</DropdownItem>)}
+                </DropdownMenu>
+            </ButtonDropdown>
+        );
+
     }
 }

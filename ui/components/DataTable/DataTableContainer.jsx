@@ -13,12 +13,13 @@ export default class DataTableContainer extends React.Component {
     }
 
     state = {
-        selectedRowIndex: null
+        selectedRowIndex: null,
+        filterDropDownOpen: false,
     }
 
     render() {
         const { items, links, queries, template, search, ...restProps } = this.props;
-        const { selectedRowIndex } = this.state;
+        const { selectedRowIndex, filterDropDownOpen } = this.state;
         const rows = this.generateRows();
 
         return (
@@ -26,7 +27,10 @@ export default class DataTableContainer extends React.Component {
                 ... restProps,
                 rows,
                 onRowSelect: this.onRowSelect.bind(this),
-                selectedRowIndex
+                onFilterDropDownToggle: this.onFilterDropDownToggle.bind(this),
+                selectedRowIndex,
+                filterDropDownOpen,
+                queries,
             }} />
         );
     }
@@ -47,6 +51,12 @@ export default class DataTableContainer extends React.Component {
                 selectedRowIndex: isDisable ? null : index
             };
         });
+    }
+
+    onFilterDropDownToggle() {
+        this.setState(({filterDropDownOpen}) => ({
+            filterDropDownOpen: !filterDropDownOpen
+        }));
     }
 
     // Set columns that are not found in template as read-only
