@@ -64,7 +64,7 @@ export function setLoadStart(state) {
 }
 
 export function setLoadSuccess(state, { collection }) {
-    const { queries, template } = collection;
+    const { queries, template, href } = collection;
 
     const items = {
         ...state.items,
@@ -76,13 +76,18 @@ export function setLoadSuccess(state, { collection }) {
         ...parseLinks(collection)
     };
 
+    const templateWithHref = {
+        ...template,
+        href,
+    };
+
     return {
         ...state,
         isFetching: false,
         hasFetched: true,
         fetchingError: false,
         queries,
-        template,
+        template: templateWithHref,
         items,
         links
     }

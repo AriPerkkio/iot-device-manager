@@ -62,7 +62,7 @@ export default class DataTable extends React.Component {
     }
 
     renderFooter() {
-        const { rows } = this.props;
+        const { rows, onAddButtonClick } = this.props;
         const columnCount = rows.concat().pop().length;
 
         return (
@@ -72,7 +72,10 @@ export default class DataTable extends React.Component {
                         <div>
                             { this.renderFilterButton() }
                             <Input type="text" placeholder="Search"/>
-                            <Button color="success" className="border">
+                            <Button
+                                color="success"
+                                className="border"
+                                onClick={onAddButtonClick}>
                                 Add new item
                             </Button>
                         </div>

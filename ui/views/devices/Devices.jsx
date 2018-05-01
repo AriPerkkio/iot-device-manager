@@ -3,7 +3,7 @@ import { Container, Row, Col } from 'reactstrap';
 import LoadingIndicator from 'react-loading-indicator';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
-import DataForm from '../../components/DataForm';
+import DataForm from '../../components/DataForm/DataFormContainer';
 import ErrorAlert from '../../components/ErrorAlert';
 
 export default class Devices extends React.Component {
@@ -25,7 +25,8 @@ export default class Devices extends React.Component {
     }
 
     renderTable() {
-        const { items, links, queries, template, getDevices, onRowSelect,
+        const { items, links, queries, template,
+            getDevices, onRowSelect, onTableAddButtonClick,
             isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
 
         if(isFetching) {
@@ -50,7 +51,8 @@ export default class Devices extends React.Component {
                     template,
                     search: getDevices,
                     onRowSelect,
-                    size: "sm"
+                    size: "sm",
+                    onAddButtonClick: onTableAddButtonClick,
                 }} />
             );
         }
@@ -59,17 +61,20 @@ export default class Devices extends React.Component {
     }
 
     renderForm() {
-        const { selectedRow, selectedRowId, onSaveButtonClick,
+        const { template, selectedRow, selectedRowId, onSaveButtonClick, showAddForm, onFormAddButtonClick,
             isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
 
-        return selectedRow &&
+        return (selectedRow || showAddForm) &&
             <DataForm { ... {
                 dataRow: selectedRow,
                 index: selectedRowId,
                 onSaveButtonClick,
                 isLoading: isUpdating,
                 error: updateError,
-                errorMessage: updateErrorMessage
+                errorMessage: updateErrorMessage,
+                template,
+                showAddForm,
+                onAddButtonClick: onFormAddButtonClick,
             }} />;
     }
 }

@@ -3,7 +3,7 @@ import { Container, Row, Col } from 'reactstrap';
 import LoadingIndicator from 'react-loading-indicator';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
-import DataForm from '../../components/DataForm';
+import DataForm from '../../components/DataForm/DataFormContainer';
 import ErrorAlert from '../../components/ErrorAlert';
 
 export default class Groups extends React.Component {

@@ -8,7 +8,8 @@ import { generateGetDevices, generateModifyDevice, resetModifyErrors } from '../
 export class DevicesContainer extends React.Component {
     state = {
         selectedRow: null,
-        selectedRowId: null
+        selectedRowId: null,
+        showAddForm: false,
     }
 
     constructor(props) {
@@ -28,7 +29,8 @@ export class DevicesContainer extends React.Component {
         this.resetModifyErrors();
         this.setState({
             selectedRow,
-            selectedRowId
+            selectedRowId,
+            showAddForm: false
         });
     }
 
@@ -36,12 +38,22 @@ export class DevicesContainer extends React.Component {
         this.modifyDevice(data);
     }
 
+    onTableAddButtonClick() {
+        this.setState({
+            showAddForm: true,
+        });
+    }
+
+    onFormAddButtonClick(data, href) {
+        console.log(data, href);
+    }
+
     render() {
         const { items, links, queries, template,
             isFetching, hasFetched, fetchingError, fetchingErrorMessage,
             isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
-        const { selectedRow, selectedRowId } = this.state;
-        const { getDevices, onRowSelect, onSaveButtonClick } = this;
+        const { selectedRow, selectedRowId, showAddForm } = this.state;
+        const { getDevices, onRowSelect, onSaveButtonClick, onTableAddButtonClick, onFormAddButtonClick } = this;
 
         return (
             <Devices { ...{
@@ -61,7 +73,10 @@ export class DevicesContainer extends React.Component {
                 onRowSelect: onRowSelect.bind(this),
                 selectedRow,
                 selectedRowId,
-                onSaveButtonClick: onSaveButtonClick.bind(this)
+                onSaveButtonClick: onSaveButtonClick.bind(this),
+                onTableAddButtonClick: onTableAddButtonClick.bind(this),
+                onFormAddButtonClick: onFormAddButtonClick.bind(this),
+                showAddForm
             }} />
         );
     }

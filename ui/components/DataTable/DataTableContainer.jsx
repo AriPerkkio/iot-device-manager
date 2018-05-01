@@ -9,7 +9,8 @@ export default class DataTableContainer extends React.Component {
         links: PropTypes.object.isRequired,
         queries: PropTypes.array.isRequired,
         template: PropTypes.object,
-        search: PropTypes.func
+        search: PropTypes.func,
+        onAddButtonClick: PropTypes.func,
     }
 
     state = {
@@ -18,19 +19,19 @@ export default class DataTableContainer extends React.Component {
     }
 
     render() {
-        const { items, links, queries, template, search, ...restProps } = this.props;
+        const { items, links, queries, template, search } = this.props;
         const { selectedRowIndex, filterDropDownOpen } = this.state;
         const rows = this.generateRows();
 
         return (
             <DataTable { ...{
-                ... restProps,
                 rows,
                 onRowSelect: this.onRowSelect.bind(this),
                 onFilterDropDownToggle: this.onFilterDropDownToggle.bind(this),
                 selectedRowIndex,
                 filterDropDownOpen,
                 queries,
+                onAddButtonClick: this.onAddButtonClick.bind(this),
             }} />
         );
     }
@@ -57,6 +58,15 @@ export default class DataTableContainer extends React.Component {
         this.setState(({filterDropDownOpen}) => ({
             filterDropDownOpen: !filterDropDownOpen
         }));
+    }
+
+    onAddButtonClick() {
+        this.setState({
+            selectedRowIndex: null,
+        });
+
+        const { onAddButtonClick } = this.props;
+        onAddButtonClick && onAddButtonClick();
     }
 
     // Set columns that are not found in template as read-only
