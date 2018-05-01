@@ -53,6 +53,7 @@ export default class Devices extends React.Component {
                     onRowSelect,
                     size: "sm",
                     onAddButtonClick: onTableAddButtonClick,
+                    addButtonText: "Add new device",
                 }} />
             );
         }
@@ -62,19 +63,21 @@ export default class Devices extends React.Component {
 
     renderForm() {
         const { template, selectedRow, selectedRowId, onSaveButtonClick, showAddForm, onFormAddButtonClick,
-            isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
+            isUpdating, hasUpdated, updateError, updateErrorMessage,
+            isAdding, hasAdded, addError, addErrorMessage } = this.props;
 
         return (selectedRow || showAddForm) &&
             <DataForm { ... {
                 dataRow: selectedRow,
                 index: selectedRowId,
                 onSaveButtonClick,
-                isLoading: isUpdating,
-                error: updateError,
-                errorMessage: updateErrorMessage,
+                isLoading: (isUpdating || isAdding),
+                error: (updateError || addError),
+                errorMessage: updateErrorMessage || addErrorMessage,
                 template,
                 showAddForm,
                 onAddButtonClick: onFormAddButtonClick,
+                addButtonText: "Add device"
             }} />;
     }
 }

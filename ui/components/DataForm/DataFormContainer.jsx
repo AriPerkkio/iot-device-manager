@@ -43,15 +43,16 @@ export default class DataFormContainer extends React.Component {
     }
 
     componentWillReceiveProps(newProps) {
-        const { index, dataRow, showAddForm, template } = newProps;
+        const { index, dataRow, showAddForm: newShowAddForm, error, template } = newProps;
+        const { showAddForm: prevShowAddForm } = this.props;
         const { index: sIndex } = this.state;
 
-        if(showAddForm) {
+        if(newShowAddForm === true && prevShowAddForm === false) {
             this.setState({
                 dataRow: this.templateToDataRow(template),
                 index
             });
-        } else if(index !== sIndex) {
+        } else if(newShowAddForm === false && index !== sIndex) {
             // Apply props when row changes
             this.setState({
                 index,

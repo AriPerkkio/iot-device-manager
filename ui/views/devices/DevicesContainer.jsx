@@ -3,7 +3,8 @@ import Devices from './Devices';
 
 // State
 import { connect } from 'react-redux'
-import { generateGetDevices, generateModifyDevice, resetModifyErrors } from '../../reducers/devices/actions';
+import { generateGetDevices, generateModifyDevice, generateAddDevice,
+    resetModifyErrors, resetAddingErrors } from '../../reducers/devices/actions';
 
 export class DevicesContainer extends React.Component {
     state = {
@@ -18,15 +19,30 @@ export class DevicesContainer extends React.Component {
         const { dispatch } = props;
         this.getDevices = generateGetDevices(dispatch);
         this.modifyDevice = generateModifyDevice(dispatch);
+        this.addDevice = generateAddDevice(dispatch);
         this.resetModifyErrors = () => resetModifyErrors(dispatch);
+        this.resetAddingErrors = () => resetAddingErrors(dispatch);
     }
 
     componentDidMount() {
         this.getDevices();
     }
 
+    componentWillReceiveProps(newProps) {
+        const { isAdding: newIsAdding, addError } = newProps;
+        const { isAdding: prevIsAdding } = this.props;
+
+        if(addError === false && prevIsAdding === true && newIsAdding === false) {
+            this.setState({
+                showAddForm: false
+            })
+        }
+    }
+
     onRowSelect(selectedRow, selectedRowId) {
         this.resetModifyErrors();
+        this.resetAddingErrors();
+
         this.setState({
             selectedRow,
             selectedRowId,
@@ -45,13 +61,14 @@ export class DevicesContainer extends React.Component {
     }
 
     onFormAddButtonClick(data, href) {
-        console.log(data, href);
+        this.addDevice(data, href);
     }
 
     render() {
         const { items, links, queries, template,
             isFetching, hasFetched, fetchingError, fetchingErrorMessage,
-            isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
+            isUpdating, hasUpdated, updateError, updateErrorMessage,
+            isAdding, hasAdded, addError, addErrorMessage } = this.props;
         const { selectedRow, selectedRowId, showAddForm } = this.state;
         const { getDevices, onRowSelect, onSaveButtonClick, onTableAddButtonClick, onFormAddButtonClick } = this;
 
@@ -76,7 +93,11 @@ export class DevicesContainer extends React.Component {
                 onSaveButtonClick: onSaveButtonClick.bind(this),
                 onTableAddButtonClick: onTableAddButtonClick.bind(this),
                 onFormAddButtonClick: onFormAddButtonClick.bind(this),
-                showAddForm
+                showAddForm,
+                isAdding,
+                hasAdded,
+                addError,
+                addErrorMessage,
             }} />
         );
     }

@@ -42,6 +42,11 @@ export const initialState = {
     fetchingError: false,
     fetchingErrorMessage: "",
 
+    // POST methods
+    isAdding: false,
+    hasAdded: false,
+    addError: false,
+    addErrorMessage: "",
 };
 
 // Initial state for reducers supporting item modification. (All except location and measurements)
@@ -146,5 +151,52 @@ export function resetEditErrors(state) {
         ...state,
         updateError: false,
         updateErrorMessage: ""
+    }
+}
+
+export function setAddStart(state) {
+    return {
+        ...state,
+        isAdding: true,
+        hasAdded: false,
+        addError: false
+    }
+}
+
+export function setAddSuccess(state, { collection }) {
+    const items = {
+        ...state.items,
+        ...parseItems(collection)
+    };
+
+    const links = {
+        ...state.links,
+        ...parseLinks(collection)
+    };
+
+    return {
+        ...state,
+        isAdding: false,
+        hasAdded: true,
+        addError: false,
+        items,
+        links
+    }
+}
+
+export function setAddFailed(state, { error }) {
+    return {
+        ...state,
+        isAdding: false,
+        addError: true,
+        addErrorMessage: error.message
+    }
+}
+
+export function resetAddErrors(state) {
+    return {
+        ...state,
+        addError: false,
+        addErrorMessage: ""
     }
 }

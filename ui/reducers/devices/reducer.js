@@ -7,7 +7,11 @@ import {
     DEVICES_EDIT_START,
     DEVICES_EDIT_SUCCESS,
     DEVICES_EDIT_FAILED,
-    RESET_DEVICES_EDIT_FAILED
+    RESET_DEVICES_EDIT_FAILED,
+    DEVICES_ADD_START,
+    DEVICES_ADD_SUCCESS,
+    DEVICES_ADD_FAILED,
+    RESET_DEVICES_ADD_FAILED,
 } from './actions';
 
 const { initialStateWithUpdate } = stateUtils;
@@ -29,9 +33,18 @@ export default function reducer(state = initialStateWithUpdate, action) {
             return stateUtils.setEditSuccess(state, json);
         case DEVICES_EDIT_FAILED:
             return stateUtils.setEditFailed(state, action);
-
         case RESET_DEVICES_EDIT_FAILED:
             return stateUtils.resetEditErrors(state);
+
+        case DEVICES_ADD_START:
+            return stateUtils.setAddStart(state);
+        case DEVICES_ADD_SUCCESS:
+            return stateUtils.setAddSuccess(state, json);
+        case DEVICES_ADD_FAILED:
+            return stateUtils.setAddFailed(state, action);
+        case RESET_DEVICES_ADD_FAILED:
+            return stateUtils.resetAddErrors(state);
+
         default:
             return state;
     }

@@ -112,3 +112,18 @@ export function generatePutRequestFromData(data) {
 
     return () => fetch(url, options);
 }
+
+/**
+ * Generate POST request from application/vnd.collection+json responses collection.item.data array's item.
+ * Returns function for executing fetch
+ */
+export function generatePostRequestFromData(data, url) {
+    const { body } = requestBodyAndUrl(data);
+    const options = {
+        ... fetchOptions,
+        method: "POST",
+        body
+    };
+
+    return () => fetch(url, options);
+}

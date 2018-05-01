@@ -11,6 +11,11 @@ export default class DataTableContainer extends React.Component {
         template: PropTypes.object,
         search: PropTypes.func,
         onAddButtonClick: PropTypes.func,
+        addButtonText: PropTypes.string,
+    }
+
+    static defaultProps = {
+        addButtonText: "Add new item",
     }
 
     state = {
@@ -19,7 +24,7 @@ export default class DataTableContainer extends React.Component {
     }
 
     render() {
-        const { items, links, queries, template, search } = this.props;
+        const { items, links, queries, template, search, addButtonText } = this.props;
         const { selectedRowIndex, filterDropDownOpen } = this.state;
         const rows = this.generateRows();
 
@@ -32,6 +37,7 @@ export default class DataTableContainer extends React.Component {
                 filterDropDownOpen,
                 queries,
                 onAddButtonClick: this.onAddButtonClick.bind(this),
+                addButtonText,
             }} />
         );
     }
