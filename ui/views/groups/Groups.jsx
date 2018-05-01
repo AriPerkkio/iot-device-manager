@@ -12,11 +12,11 @@ export default class Groups extends React.Component {
         return (
             <Container fluid>
                 <Row>
-                    <Col md={12} lg={8}>
+                    <Col sm={12} md={8}>
                         { this.renderTable() }
                     </Col>
 
-                    <Col md={12} lg={4}>
+                    <Col sm={12} md={4}>
                         { this.renderForm() }
                     </Col>
                 </Row>
@@ -25,7 +25,8 @@ export default class Groups extends React.Component {
     }
 
     renderTable() {
-        const { items, links, queries, template, getGroups, onRowSelect,
+        const { items, links, queries, template,
+            getGroups, onRowSelect, onTableAddButtonClick,
             isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
 
         if(isFetching) {
@@ -49,7 +50,9 @@ export default class Groups extends React.Component {
                     queries,
                     template,
                     search: getGroups,
-                    onRowSelect
+                    onRowSelect,
+                    onAddButtonClick: onTableAddButtonClick,
+                    addButtonText: "Add new group",
                 }} />
             );
         }
@@ -58,17 +61,22 @@ export default class Groups extends React.Component {
     }
 
     renderForm() {
-        const { selectedRow, selectedRowId, onSaveButtonClick,
-            isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
+        const { template, selectedRow, selectedRowId, onSaveButtonClick, showAddForm, onFormAddButtonClick,
+            isUpdating, hasUpdated, updateError, updateErrorMessage,
+            isAdding, hasAdded, addError, addErrorMessage } = this.props;
 
-        return selectedRow &&
+        return (selectedRow || showAddForm) &&
             <DataForm { ... {
                 dataRow: selectedRow,
                 index: selectedRowId,
                 onSaveButtonClick,
-                isLoading: isUpdating,
-                error: updateError,
-                errorMessage: updateErrorMessage
+                isLoading: (isUpdating || isAdding),
+                error: (updateError || addError),
+                errorMessage: updateErrorMessage || addErrorMessage,
+                template,
+                showAddForm,
+                onAddButtonClick: onFormAddButtonClick,
+                addButtonText: "Add group"
             }} />;
     }
 }

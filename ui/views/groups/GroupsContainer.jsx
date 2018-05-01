@@ -3,12 +3,14 @@ import Groups from './Groups';
 
 // State
 import { connect } from 'react-redux'
-import { generateGetGroups, generateModifyGroups, resetModifyErrors } from '../../reducers/groups/actions';
+import { generateGetGroups, generateModifyGroups, generateAddGroup,
+    resetModifyErrors, resetAddingErrors } from '../../reducers/groups/actions';
 
 export class GroupsContainer extends React.Component {
     state = {
         selectedRow: null,
-        selectedRowId: null
+        selectedRowId: null,
+        showAddForm: false,
     }
 
     constructor(props) {
@@ -17,18 +19,34 @@ export class GroupsContainer extends React.Component {
         const { dispatch } = props;
         this.getGroups = generateGetGroups(dispatch);
         this.modifyGroups = generateModifyGroups(dispatch);
+        this.addGroup = generateAddGroup(dispatch);
         this.resetModifyErrors = () => resetModifyErrors(dispatch);
+        this.resetAddingErrors = () => resetAddingErrors(dispatch);
     }
 
     componentDidMount() {
         this.getGroups();
     }
 
+    componentWillReceiveProps(newProps) {
+        const { isAdding: newIsAdding, addError } = newProps;
+        const { isAdding: prevIsAdding } = this.props;
+
+        if(addError === false && prevIsAdding === true && newIsAdding === false) {
+            this.setState({
+                showAddForm: false
+            })
+        }
+    }
+
     onRowSelect(selectedRow, selectedRowId) {
         this.resetModifyErrors();
+        this.resetAddingErrors();
+
         this.setState({
             selectedRow,
-            selectedRowId
+            selectedRowId,
+            showAddForm: false,
         });
     }
 
@@ -36,12 +54,23 @@ export class GroupsContainer extends React.Component {
         this.modifyGroups(data);
     }
 
+    onTableAddButtonClick() {
+        this.setState({
+            showAddForm: true,
+        });
+    }
+
+    onFormAddButtonClick(data, href) {
+        this.addGroup(data, href);
+    }
+
     render() {
         const { items, links, queries, template,
             isFetching, hasFetched, fetchingError, fetchingErrorMessage,
-            isUpdating, hasUpdated, updateError, updateErrorMessage } = this.props;
-        const { selectedRow, selectedRowId } = this.state;
-        const { getGroups, onRowSelect, onSaveButtonClick } = this;
+            isUpdating, hasUpdated, updateError, updateErrorMessage,
+            isAdding, hasAdded, addError, addErrorMessage } = this.props;
+        const { selectedRow, selectedRowId, showAddForm } = this.state;
+        const { getGroups, onRowSelect, onSaveButtonClick, onTableAddButtonClick, onFormAddButtonClick } = this;
 
         return (
             <Groups { ...{
@@ -61,7 +90,14 @@ export class GroupsContainer extends React.Component {
                 onRowSelect: onRowSelect.bind(this),
                 selectedRow,
                 selectedRowId,
-                onSaveButtonClick: onSaveButtonClick.bind(this)
+                onSaveButtonClick: onSaveButtonClick.bind(this),
+                onTableAddButtonClick: onTableAddButtonClick.bind(this),
+                onFormAddButtonClick: onFormAddButtonClick.bind(this),
+                showAddForm,
+                isAdding,
+                hasAdded,
+                addError,
+                addErrorMessage,
             }} />
         );
     }

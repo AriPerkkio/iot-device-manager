@@ -90,7 +90,7 @@ function requestBodyAndUrl(data) {
     const url = data.concat().pop().href;
 
     data.forEach(({ name, value }) =>
-        body[name] = value);
+        body[name] = value === "" ? null : value);
 
     return {
         url,

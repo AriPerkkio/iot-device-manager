@@ -18,6 +18,7 @@ export function modifyDevice(data) {
         .then(response => response.json())
 }
 
+// Add device from request body
 export function addDevice(data, href) {
     const request = generatePostRequestFromData(data, href);
 

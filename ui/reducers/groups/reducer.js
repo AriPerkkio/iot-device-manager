@@ -8,6 +8,10 @@ import {
     GROUPS_EDIT_SUCCESS,
     GROUPS_EDIT_FAILED,
     RESET_GROUPS_EDIT_FAILED,
+    GROUPS_ADD_START,
+    GROUPS_ADD_SUCCESS,
+    GROUPS_ADD_FAILED,
+    RESET_GROUPS_ADD_FAILED,
 } from './actions';
 
 const { initialStateWithUpdate } = stateUtils;
@@ -29,9 +33,17 @@ export default function reducer(state = initialStateWithUpdate, action) {
             return stateUtils.setEditSuccess(state, json);
         case GROUPS_EDIT_FAILED:
             return stateUtils.setEditFailed(state, action);
-
         case RESET_GROUPS_EDIT_FAILED:
             return stateUtils.resetEditErrors(state);
+
+        case GROUPS_ADD_START:
+            return stateUtils.setAddStart(state);
+        case GROUPS_ADD_SUCCESS:
+            return stateUtils.setAddSuccess(state, json);
+        case GROUPS_ADD_FAILED:
+            return stateUtils.setAddFailed(state, action);
+        case RESET_GROUPS_ADD_FAILED:
+            return stateUtils.resetAddErrors(state);
         default:
             return state;
     }
