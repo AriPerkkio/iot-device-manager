@@ -21,22 +21,18 @@ export default class Locations extends React.Component {
 
         if(isFetching) {
             return <LoadingIndicator />;
-        } else if (fetchingError) {
+        } else {
             return (
-                <ErrorAlert { ...{
-                    header: fetchingErrorMessage.split("::").shift(),
-                    message: fetchingErrorMessage.split("::").pop()
-                }} />
-            );
-        } else if(hasFetched) {
-            return (
-                <DataTable { ...{
-                    items,
-                    links,
-                    queries,
-                    template,
-                    search: getLocations
-                }} />
+                <div>
+                    {fetchingError && <ErrorAlert errorMessage={fetchingErrorMessage} /> }
+                    <DataTable { ...{
+                        items,
+                        links,
+                        queries,
+                        template,
+                        search: getLocations
+                    }} />
+                </div>
             );
         }
 

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const ERROR_SEPARATOR = "::";
+export const ERROR_SEPARATOR = "::";
 
 /**
  * Check fetch response for errors. Thrown error contains detailed description of error.
@@ -89,13 +89,19 @@ function requestBodyAndUrl(data) {
     const body = {};
     const url = data.concat().pop().href;
 
-    data.forEach(({ name, value }) =>
-        body[name] = value === "" ? null : value);
+    data.forEach(({ name, value, prompt }) =>
+        body[name] = value === "" ? null :
+            isJsonColumn(prompt) ? JSON.parse(value) : value);
 
     return {
         url,
         body: JSON.stringify(body)
     };
+}
+
+// Columns with JSON content should have JSON in prompt
+function isJsonColumn(prompt) {
+    return /json/i.test(prompt);
 }
 
 /**

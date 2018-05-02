@@ -123,7 +123,7 @@ export function generateGetGroups(dispatch) {
     }
 }
 
-export function generateModifyGroups(dispatch) {
+export function generateModifyGroup(dispatch) {
     return data => {
         dispatch(groupsEditStart(data));
         return modifyGroup(data)

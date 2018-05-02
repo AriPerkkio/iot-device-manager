@@ -38,12 +38,7 @@ export default class Groups extends React.Component {
         } else {
             return (
                 <div>
-                    {fetchingError &&
-                    <ErrorAlert { ...{
-                        header: fetchingErrorMessage.split("::").shift(),
-                        message: fetchingErrorMessage.split("::").pop()
-                    }} /> }
-
+                    {fetchingError && <ErrorAlert errorMessage={fetchingErrorMessage} /> }
                     <DataTable { ...{
                         items,
                         links,

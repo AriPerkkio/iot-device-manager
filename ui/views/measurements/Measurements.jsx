@@ -20,31 +20,19 @@ export default class Measurements extends React.Component {
             isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
 
         if(isFetching) {
+            return <LoadingIndicator />;
+        } else {
             return (
-                <ErrorAlert { ...{
-                    header: fetchingErrorMessage.split("::").shift(),
-                    message: fetchingErrorMessage.split("::").pop()
-                }} />
-            );
-        } else if (fetchingError) {
-            const header = fetchingErrorMessage.split("::").shift();
-            const message = fetchingErrorMessage.split("::").pop();
-
-            return (
-                <ErrorAlert { ...{
-                    header,
-                    message
-                }} />
-            );
-        } else if(hasFetched) {
-            return (
-                <DataTable { ...{
-                    items,
-                    links,
-                    queries,
-                    template,
-                    search: getMeasurements
-                }} />
+                <div>
+                    {fetchingError && <ErrorAlert errorMessage={fetchingErrorMessage} /> }
+                    <DataTable { ...{
+                        items,
+                        links,
+                        queries,
+                        template,
+                        search: getMeasurements
+                    }} />
+                </div>
             );
         }
 

@@ -1,45 +1,80 @@
 import React from 'react';
+import { Container, Row, Col } from 'reactstrap';
 import LoadingIndicator from 'react-loading-indicator';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
+import DataForm from '../../components/DataForm/DataFormContainer';
 import ErrorAlert from '../../components/ErrorAlert';
 
 export default class Configurations extends React.Component {
 
     render() {
         return (
-            <div id="configurations">
-                <h1>Configurations view</h1>
-                { this.renderTable() }
-            </div>
+            <Container fluid>
+                <Row>
+                    <Col sm={12} md={8}>
+                        { this.renderTable() }
+                    </Col>
+
+                    <Col sm={12} md={4}>
+                        { this.renderForm() }
+                    </Col>
+                </Row>
+            </Container>
         );
     }
 
     renderTable() {
-        const { items, links, queries, template, getConfigurations,
+        const { items, links, queries, template,
+            getConfigurations, onRowSelect, onTableAddButtonClick,
             isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
 
         if(isFetching) {
-            return <LoadingIndicator />;
-        } else if (fetchingError) {
             return (
-                <ErrorAlert { ...{
-                    header: fetchingErrorMessage.split("::").shift(),
-                    message: fetchingErrorMessage.split("::").pop()
-                }} />
+                <LoadingIndicator
+                    segmentWidth={10}
+                    segmentLength={10} />
             );
-        } else if(hasFetched) {
+        } else {
             return (
-                <DataTable { ...{
-                    items,
-                    links,
-                    queries,
-                    template,
-                    search: getConfigurations
-                }} />
+                <div>
+                    {fetchingError && <ErrorAlert errorMessage={fetchingErrorMessage} /> }
+                    <DataTable { ...{
+                        items,
+                        links,
+                        queries,
+                        template,
+                        search: getConfigurations,
+                        onRowSelect,
+                        onAddButtonClick: onTableAddButtonClick,
+                        addButtonText: "Add new configuration",
+                    }} />
+                </div>
             );
         }
 
         return null;
+    }
+
+    renderForm() {
+        const { template, selectedRow, selectedRowId, showAddForm,
+            onSaveButtonClick, onFormAddButtonClick, onDeleteButtonClick,
+            isUpdating, hasUpdated, updateError, updateErrorMessage,
+            isAdding, hasAdded, addError, addErrorMessage } = this.props;
+
+        return (selectedRow || showAddForm) &&
+            <DataForm { ... {
+                dataRow: selectedRow,
+                index: selectedRowId,
+                onSaveButtonClick,
+                onDeleteButtonClick,
+                isLoading: (isUpdating || isAdding),
+                error: (updateError || addError),
+                errorMessage: updateErrorMessage || addErrorMessage,
+                template,
+                showAddForm,
+                onAddButtonClick: onFormAddButtonClick,
+                addButtonText: "Add configuration"
+            }} />;
     }
 }

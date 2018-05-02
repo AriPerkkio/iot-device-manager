@@ -3,7 +3,7 @@ import Groups from './Groups';
 
 // State
 import { connect } from 'react-redux'
-import { generateGetGroups, generateModifyGroups, generateAddGroup, generateDeleteGroup,
+import { generateGetGroups, generateModifyGroup, generateAddGroup, generateDeleteGroup,
     resetModifyErrors, resetAddingErrors } from '../../reducers/groups/actions';
 
 export class GroupsContainer extends React.Component {
@@ -18,7 +18,7 @@ export class GroupsContainer extends React.Component {
 
         const { dispatch } = props;
         this.getGroups = generateGetGroups(dispatch);
-        this.modifyGroups = generateModifyGroups(dispatch);
+        this.modifyGroup = generateModifyGroup(dispatch);
         this.addGroup = generateAddGroup(dispatch);
         this.deleteGroup = generateDeleteGroup(dispatch);
         this.resetModifyErrors = () => resetModifyErrors(dispatch);
@@ -47,12 +47,12 @@ export class GroupsContainer extends React.Component {
         this.setState({
             selectedRow,
             selectedRowId,
-            showAddForm: false,
+            showAddForm: false
         });
     }
 
     onSaveButtonClick(data) {
-        this.modifyGroups(data);
+        this.modifyGroup(data);
     }
 
     onDeleteButtonClick(data) {

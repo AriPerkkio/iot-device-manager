@@ -97,11 +97,8 @@ export default class DataForm extends React.Component {
     renderError() {
         const { errorMessage } = this.props;
 
-        return (
-            <ErrorAlert { ...{
-                header: errorMessage.split("::").shift(),
-                message: errorMessage.split("::").pop()
-            }} />
+        return errorMessage && (
+            <ErrorAlert errorMessage={errorMessage} />
         );
     }
 }
