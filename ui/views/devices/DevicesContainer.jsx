@@ -57,6 +57,8 @@ export class DevicesContainer extends React.Component {
     onTableAddButtonClick() {
         this.setState({
             showAddForm: true,
+            selectedRow: null,
+            selectedRowId: null,
         });
     }
 

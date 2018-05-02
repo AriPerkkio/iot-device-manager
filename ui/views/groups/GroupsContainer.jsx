@@ -57,6 +57,8 @@ export class GroupsContainer extends React.Component {
     onTableAddButtonClick() {
         this.setState({
             showAddForm: true,
+            selectedRow: null,
+            selectedRowId: null,
         });
     }
 
