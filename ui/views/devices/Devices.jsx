@@ -62,7 +62,8 @@ export default class Devices extends React.Component {
     }
 
     renderForm() {
-        const { template, selectedRow, selectedRowId, onSaveButtonClick, showAddForm, onFormAddButtonClick,
+        const { template, selectedRow, selectedRowId, showAddForm,
+            onSaveButtonClick, onDeleteButtonClick, onFormAddButtonClick,
             isUpdating, hasUpdated, updateError, updateErrorMessage,
             isAdding, hasAdded, addError, addErrorMessage } = this.props;
 
@@ -77,6 +78,7 @@ export default class Devices extends React.Component {
                 template,
                 showAddForm,
                 onAddButtonClick: onFormAddButtonClick,
+                onDeleteButtonClick,
                 addButtonText: "Add device"
             }} />;
     }

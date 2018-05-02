@@ -127,3 +127,25 @@ export function generatePostRequestFromData(data, url) {
 
     return () => fetch(url, options);
 }
+
+/**
+ * Generate DELETE request from application/vnd.collection+json responses collection.item.data array's item.
+ * Returns function for executing fetch
+ */
+export function generateDeleteRequestFromData(data) {
+    const { url } = requestBodyAndUrl(data);
+    const options = {
+        ... fetchOptions,
+        method: "DELETE"
+    };
+
+    return () => fetch(url, options);
+}
+
+export function parseIdFromResponse(response) {
+    const { url } = response;
+
+    return (url || "")
+        .split("/")
+        .pop();
+}

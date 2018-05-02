@@ -1,4 +1,4 @@
-import { fetchDevices, modifyDevice, addDevice } from "../../api/devices";
+import { fetchDevices, modifyDevice, addDevice, deleteDevice } from "../../api/devices";
 
 export const DEVICES_LOAD_START = 'DEVICES_LOAD_START';
 export const DEVICES_LOAD_SUCCESS = 'DEVICES_LOAD_SUCCESS';
@@ -13,6 +13,10 @@ export const DEVICES_ADD_START = 'DEVICES_ADD_START';
 export const DEVICES_ADD_SUCCESS = 'DEVICES_ADD_SUCCESS';
 export const DEVICES_ADD_FAILED = 'DEVICES_ADD_FAILED';
 export const RESET_DEVICES_ADD_FAILED = "RESET_DEVICES_ADD_FAILED";
+
+export const DEVICES_DELETE_START = "DEVICES_DELETE_START";
+export const DEVICES_DELETE_SUCCESS = "DEVICES_DELETE_SUCCESS";
+export const DEVICES_DELETE_FAILED =  "DEVICES_DELETE_FAILED";
 
 function devicesLoadStart(filters) {
     return {
@@ -89,6 +93,27 @@ function resetDevicesAddFailed() {
     }
 }
 
+function devicesDeleteStart(data) {
+    return {
+        type: DEVICES_DELETE_START,
+        data
+    }
+}
+
+function devicesDeleteSuccess(json) {
+    return {
+        type: DEVICES_DELETE_SUCCESS,
+        json
+    }
+}
+
+function devicesDeleteFailed(error) {
+    return {
+        type: DEVICES_DELETE_FAILED,
+        error
+    }
+}
+
 export function generateGetDevices(dispatch) {
     return filters => {
         dispatch(devicesLoadStart(filters))
@@ -113,6 +138,15 @@ export function generateAddDevice(dispatch) {
         return addDevice(data, url)
             .then(json => dispatch(devicesAddSuccess(json)))
             .catch(error => dispatch(devicesAddFailed(error)))
+    }
+}
+
+export function generateDeleteDevice(dispatch) {
+    return data => {
+        dispatch(devicesDeleteStart(data));
+        return deleteDevice(data)
+            .then(id => dispatch(devicesDeleteSuccess(id)))
+            .catch(error => dispatch(devicesDeleteFailed(error)))
     }
 }
 

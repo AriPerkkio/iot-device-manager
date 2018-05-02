@@ -1,4 +1,5 @@
-import { fetchOptions, handleErrors, queryParameters, generatePutRequestFromData, generatePostRequestFromData } from './common';
+import { fetchOptions, handleErrors, queryParameters,
+    generatePutRequestFromData, generatePostRequestFromData, generateDeleteRequestFromData, parseIdFromResponse } from './common';
 
 // Fetch devices using given filters
 export function fetchDevices(filters) {
@@ -25,4 +26,13 @@ export function addDevice(data, href) {
     return request()
         .then(handleErrors)
         .then(response => response.json())
+}
+
+// Delete device by id
+export function deleteDevice(data) {
+    const request = generateDeleteRequestFromData(data);
+
+    return request()
+        .then(handleErrors)
+        .then(parseIdFromResponse)
 }

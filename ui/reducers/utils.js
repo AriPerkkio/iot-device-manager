@@ -28,6 +28,23 @@ function parseLinks(collection) {
     return links;
 }
 
+/**
+ * Filters links belonging to given id from state's links object
+ */
+function filterLinksById(statesLinks, id) {
+    const links = {};
+    const linkRegexp = new RegExp(id);
+
+
+    _.forEach(statesLinks, link => {
+        if(!linkRegexp.test(link.rel)) {
+            links[link.rel] = link;
+        }
+    });
+
+    return links;
+}
+
 // Common initial state for reducers handling API queries. Includes only attributes supported by all reducers
 export const initialState = {
     // API responses' payload. See documentation of application/vnd.collection+json
@@ -47,6 +64,12 @@ export const initialState = {
     hasAdded: false,
     addError: false,
     addErrorMessage: "",
+
+    // DELETE methods
+    isDeleting: false,
+    hasDeleted: false,
+    deleteError: false,
+    deleteErrorMessage: "",
 };
 
 // Initial state for reducers supporting item modification. (All except location and measurements)
@@ -198,5 +221,35 @@ export function resetAddErrors(state) {
         ...state,
         addError: false,
         addErrorMessage: ""
+    }
+}
+
+export function setDeleteStart(state) {
+    return {
+        ...state,
+        isDeleting: true,
+        hasDeleted: false,
+        deleteError: false
+    }
+}
+
+export function setDeleteSuccess(state, id) {
+    const items = { ...state.items };
+    delete items[id];
+    const links = filterLinksById(state.links, id);
+
+    return {
+        ...state,
+        links,
+        items,
+    }
+}
+
+export function setDeleteFailed(state, { error }) {
+    return {
+        ...state,
+        isDeleting: false,
+        deleteError: true,
+        deleteErrorMessage: error.message
     }
 }

@@ -12,6 +12,9 @@ import {
     DEVICES_ADD_SUCCESS,
     DEVICES_ADD_FAILED,
     RESET_DEVICES_ADD_FAILED,
+    DEVICES_DELETE_START,
+    DEVICES_DELETE_SUCCESS,
+    DEVICES_DELETE_FAILED,
 } from './actions';
 
 const { initialStateWithUpdate } = stateUtils;
@@ -44,6 +47,13 @@ export default function reducer(state = initialStateWithUpdate, action) {
             return stateUtils.setAddFailed(state, action);
         case RESET_DEVICES_ADD_FAILED:
             return stateUtils.resetAddErrors(state);
+
+        case DEVICES_DELETE_START:
+            return stateUtils.setDeleteStart(state);
+        case DEVICES_DELETE_SUCCESS:
+            return stateUtils.setDeleteSuccess(state, json);
+        case DEVICES_DELETE_FAILED:
+            return stateUtils.setDeleteFailed(state, action);
 
         default:
             return state;

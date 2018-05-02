@@ -3,7 +3,7 @@ import Devices from './Devices';
 
 // State
 import { connect } from 'react-redux'
-import { generateGetDevices, generateModifyDevice, generateAddDevice,
+import { generateGetDevices, generateModifyDevice, generateAddDevice, generateDeleteDevice,
     resetModifyErrors, resetAddingErrors } from '../../reducers/devices/actions';
 
 export class DevicesContainer extends React.Component {
@@ -20,6 +20,7 @@ export class DevicesContainer extends React.Component {
         this.getDevices = generateGetDevices(dispatch);
         this.modifyDevice = generateModifyDevice(dispatch);
         this.addDevice = generateAddDevice(dispatch);
+        this.deleteDevice = generateDeleteDevice(dispatch);
         this.resetModifyErrors = () => resetModifyErrors(dispatch);
         this.resetAddingErrors = () => resetAddingErrors(dispatch);
     }
@@ -54,6 +55,15 @@ export class DevicesContainer extends React.Component {
         this.modifyDevice(data);
     }
 
+    onDeleteButtonClick(data) {
+        this.deleteDevice(data);
+
+        this.setState({
+            selectedRow: null,
+            selectedRowId: null,
+        });
+    }
+
     onTableAddButtonClick() {
         this.setState({
             showAddForm: true,
@@ -72,7 +82,8 @@ export class DevicesContainer extends React.Component {
             isUpdating, hasUpdated, updateError, updateErrorMessage,
             isAdding, hasAdded, addError, addErrorMessage } = this.props;
         const { selectedRow, selectedRowId, showAddForm } = this.state;
-        const { getDevices, onRowSelect, onSaveButtonClick, onTableAddButtonClick, onFormAddButtonClick } = this;
+        const { getDevices, onRowSelect,
+            onSaveButtonClick, onDeleteButtonClick, onTableAddButtonClick, onFormAddButtonClick } = this;
 
         return (
             <Devices { ...{
@@ -93,6 +104,7 @@ export class DevicesContainer extends React.Component {
                 selectedRow,
                 selectedRowId,
                 onSaveButtonClick: onSaveButtonClick.bind(this),
+                onDeleteButtonClick: onDeleteButtonClick.bind(this),
                 onTableAddButtonClick: onTableAddButtonClick.bind(this),
                 onFormAddButtonClick: onFormAddButtonClick.bind(this),
                 showAddForm,
