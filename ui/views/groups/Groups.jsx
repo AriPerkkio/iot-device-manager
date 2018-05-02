@@ -61,7 +61,8 @@ export default class Groups extends React.Component {
     }
 
     renderForm() {
-        const { template, selectedRow, selectedRowId, onSaveButtonClick, showAddForm, onFormAddButtonClick,
+        const { template, selectedRow, selectedRowId, showAddForm,
+            onSaveButtonClick, onFormAddButtonClick, onDeleteButtonClick,
             isUpdating, hasUpdated, updateError, updateErrorMessage,
             isAdding, hasAdded, addError, addErrorMessage } = this.props;
 
@@ -70,6 +71,7 @@ export default class Groups extends React.Component {
                 dataRow: selectedRow,
                 index: selectedRowId,
                 onSaveButtonClick,
+                onDeleteButtonClick,
                 isLoading: (isUpdating || isAdding),
                 error: (updateError || addError),
                 errorMessage: updateErrorMessage || addErrorMessage,

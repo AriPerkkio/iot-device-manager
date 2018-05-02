@@ -1,4 +1,4 @@
-import { fetchOptions, handleErrors, queryParameters, generatePutRequestFromData, generatePostRequestFromData } from './common';
+import { fetchOptions, handleErrors, queryParameters, generatePutRequestFromData, generatePostRequestFromData, generateDeleteRequestFromData, parseIdFromResponse } from './common';
 
 // Fetch device groups using given filters
 export function fetchGroups(filters) {
@@ -25,4 +25,13 @@ export function addGroup(data, href) {
     return request()
         .then(handleErrors)
         .then(response => response.json())
+}
+
+// Delete group by id
+export function deleteGroup(data) {
+    const request = generateDeleteRequestFromData(data);
+
+    return request()
+        .then(handleErrors)
+        .then(parseIdFromResponse)
 }

@@ -1,4 +1,4 @@
-import { fetchGroups, modifyGroup, addGroup } from "../../api/groups";
+import { fetchGroups, modifyGroup, addGroup, deleteGroup } from "../../api/groups";
 
 export const GROUPS_LOAD_START = 'GROUPS_LOAD_START';
 export const GROUPS_LOAD_SUCCESS = 'GROUPS_LOAD_SUCCESS';
@@ -13,6 +13,10 @@ export const GROUPS_ADD_START = 'GROUPS_ADD_START';
 export const GROUPS_ADD_SUCCESS = 'GROUPS_ADD_SUCCESS';
 export const GROUPS_ADD_FAILED = 'GROUPS_ADD_FAILED';
 export const RESET_GROUPS_ADD_FAILED = 'RESET_GROUPS_ADD_FAILED';
+
+export const GROUPS_DELETE_START = "GROUPS_DELETE_START";
+export const GROUPS_DELETE_SUCCESS = "GROUPS_DELETE_SUCCESS";
+export const GROUPS_DELETE_FAILED =  "GROUPS_DELETE_FAILED";
 
 function groupsLoadStart(filters) {
     return {
@@ -89,6 +93,27 @@ function resetGroupsAddFailed() {
     }
 }
 
+function groupsDeleteStart(data) {
+    return {
+        type: GROUPS_DELETE_START,
+        data
+    }
+}
+
+function groupsDeleteSuccess(json) {
+    return {
+        type: GROUPS_DELETE_SUCCESS,
+        json
+    }
+}
+
+function groupsDeleteFailed(error) {
+    return {
+        type: GROUPS_DELETE_FAILED,
+        error
+    }
+}
+
 export function generateGetGroups(dispatch) {
     return filters => {
         dispatch(groupsLoadStart(filters))
@@ -113,6 +138,15 @@ export function generateAddGroup(dispatch) {
         return addGroup(data, url)
             .then(json => dispatch(groupsAddSuccess(json)))
             .catch(error => dispatch(groupsAddFailed(error)))
+    }
+}
+
+export function generateDeleteGroup(dispatch) {
+    return data => {
+        dispatch(groupsDeleteStart(data));
+        return deleteGroup(data)
+            .then(id => dispatch(groupsDeleteSuccess(id)))
+            .catch(error => dispatch(groupsDeleteFailed(error)))
     }
 }
 

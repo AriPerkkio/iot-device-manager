@@ -3,7 +3,7 @@ import Groups from './Groups';
 
 // State
 import { connect } from 'react-redux'
-import { generateGetGroups, generateModifyGroups, generateAddGroup,
+import { generateGetGroups, generateModifyGroups, generateAddGroup, generateDeleteGroup,
     resetModifyErrors, resetAddingErrors } from '../../reducers/groups/actions';
 
 export class GroupsContainer extends React.Component {
@@ -20,6 +20,7 @@ export class GroupsContainer extends React.Component {
         this.getGroups = generateGetGroups(dispatch);
         this.modifyGroups = generateModifyGroups(dispatch);
         this.addGroup = generateAddGroup(dispatch);
+        this.deleteGroup = generateDeleteGroup(dispatch);
         this.resetModifyErrors = () => resetModifyErrors(dispatch);
         this.resetAddingErrors = () => resetAddingErrors(dispatch);
     }
@@ -54,6 +55,15 @@ export class GroupsContainer extends React.Component {
         this.modifyGroups(data);
     }
 
+    onDeleteButtonClick(data) {
+        this.deleteGroup(data);
+
+        this.setState({
+            selectedRow: null,
+            selectedRowId: null,
+        });
+    }
+
     onTableAddButtonClick() {
         this.setState({
             showAddForm: true,
@@ -72,7 +82,8 @@ export class GroupsContainer extends React.Component {
             isUpdating, hasUpdated, updateError, updateErrorMessage,
             isAdding, hasAdded, addError, addErrorMessage } = this.props;
         const { selectedRow, selectedRowId, showAddForm } = this.state;
-        const { getGroups, onRowSelect, onSaveButtonClick, onTableAddButtonClick, onFormAddButtonClick } = this;
+        const { getGroups, onRowSelect,
+            onSaveButtonClick, onDeleteButtonClick, onTableAddButtonClick, onFormAddButtonClick } = this;
 
         return (
             <Groups { ...{
@@ -93,6 +104,7 @@ export class GroupsContainer extends React.Component {
                 selectedRow,
                 selectedRowId,
                 onSaveButtonClick: onSaveButtonClick.bind(this),
+                onDeleteButtonClick: onDeleteButtonClick.bind(this),
                 onTableAddButtonClick: onTableAddButtonClick.bind(this),
                 onFormAddButtonClick: onFormAddButtonClick.bind(this),
                 showAddForm,

@@ -12,6 +12,9 @@ import {
     GROUPS_ADD_SUCCESS,
     GROUPS_ADD_FAILED,
     RESET_GROUPS_ADD_FAILED,
+    GROUPS_DELETE_START,
+    GROUPS_DELETE_SUCCESS,
+    GROUPS_DELETE_FAILED,
 } from './actions';
 
 const { initialStateWithUpdate } = stateUtils;
@@ -44,6 +47,14 @@ export default function reducer(state = initialStateWithUpdate, action) {
             return stateUtils.setAddFailed(state, action);
         case RESET_GROUPS_ADD_FAILED:
             return stateUtils.resetAddErrors(state);
+
+        case GROUPS_DELETE_START:
+            return stateUtils.setDeleteStart(state);
+        case GROUPS_DELETE_SUCCESS:
+            return stateUtils.setDeleteSuccess(state, json);
+        case GROUPS_DELETE_FAILED:
+            return stateUtils.setDeleteFailed(state, action);
+
         default:
             return state;
     }
