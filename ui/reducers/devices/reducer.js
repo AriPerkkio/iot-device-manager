@@ -17,9 +17,39 @@ import {
     DEVICES_DELETE_FAILED,
 } from './actions';
 
-const { initialStateWithUpdate } = stateUtils;
+const initialState = {
+    ...stateUtils.initialStateWithUpdate,
 
-export default function reducer(state = initialStateWithUpdate, action) {
+    // Initial template with href used in cases when API has no records of devices.
+    // First GET query will overwrite this and keep us updated with lates API changes.
+    template: {
+        href: "/api/devices",
+        data: [
+            {
+                name: "name",
+                prompt: "Device name",
+                value: ""
+            },
+            {
+                name: "deviceTypeId",
+                prompt: "Device Type Identifier",
+                value: ""
+            },
+            {
+                name: "deviceGroupId",
+                prompt: "Device Group Identifier",
+                value: ""
+            },
+            {
+                name: "configurationId",
+                prompt: "Configuration Identifier",
+                value: ""
+            }
+        ]
+    }
+}
+
+export default function reducer(state = initialState, action) {
     const { type, json } = action;
 
     switch(type) {

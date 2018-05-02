@@ -35,25 +35,26 @@ export default class Groups extends React.Component {
                     segmentWidth={10}
                     segmentLength={10} />
             );
-        } else if (fetchingError) {
+        } else {
             return (
-                <ErrorAlert { ...{
-                    header: fetchingErrorMessage.split("::").shift(),
-                    message: fetchingErrorMessage.split("::").pop()
-                }} />
-            );
-        } else if(hasFetched) {
-            return (
-                <DataTable { ...{
-                    items,
-                    links,
-                    queries,
-                    template,
-                    search: getGroups,
-                    onRowSelect,
-                    onAddButtonClick: onTableAddButtonClick,
-                    addButtonText: "Add new group",
-                }} />
+                <div>
+                    {fetchingError &&
+                    <ErrorAlert { ...{
+                        header: fetchingErrorMessage.split("::").shift(),
+                        message: fetchingErrorMessage.split("::").pop()
+                    }} /> }
+
+                    <DataTable { ...{
+                        items,
+                        links,
+                        queries,
+                        template,
+                        search: getGroups,
+                        onRowSelect,
+                        onAddButtonClick: onTableAddButtonClick,
+                        addButtonText: "Add new group",
+                    }} />
+                </div>
             );
         }
 

@@ -182,7 +182,8 @@ export function setAddStart(state) {
         ...state,
         isAdding: true,
         hasAdded: false,
-        addError: false
+        addError: false,
+        fetchingError: false,
     }
 }
 

@@ -7,7 +7,7 @@ import Column from './Column';
 
 export default class DataTable extends React.Component {
     static propTypes = {
-        rows: PropTypes.array.isRequired,
+        rows: PropTypes.array,
         onRowSelect: PropTypes.func,
         selectedRowIndex: PropTypes.number
     }
@@ -28,7 +28,7 @@ export default class DataTable extends React.Component {
         const { rows } = this.props;
         const firstRow = rows.concat().shift();
 
-        return (
+        return firstRow && (
             <thead className="thead-light">
                 <tr>
                     {firstRow.map(({column}, key) =>
@@ -63,7 +63,7 @@ export default class DataTable extends React.Component {
 
     renderFooter() {
         const { rows, onAddButtonClick, addButtonText } = this.props;
-        const columnCount = rows.concat().pop().length;
+        const columnCount = (rows.concat().pop() || {}).length;
 
         return (
             <tfoot>

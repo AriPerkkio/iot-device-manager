@@ -17,9 +17,29 @@ import {
     GROUPS_DELETE_FAILED,
 } from './actions';
 
-const { initialStateWithUpdate } = stateUtils;
+const initialState = {
+    ...stateUtils.initialStateWithUpdate,
 
-export default function reducer(state = initialStateWithUpdate, action) {
+    // Initial template with href used in cases when API has no records of groups.
+    // First GET query will overwrite this and keep us updated with lates API changes.
+    template: {
+        href: "/api/device-groups",
+        data: [
+            {
+                name: "name",
+                prompt: "Group name",
+                value: ""
+            },
+            {
+                name: "description",
+                prompt: "Description",
+                value: ""
+            }
+        ]
+    }
+};
+
+export default function reducer(state = initialState, action) {
     const { type, json } = action;
 
     switch(type) {
