@@ -71,13 +71,16 @@ export default class DataTable extends React.Component {
                     <td colSpan={columnCount}>
                         <div>
                             { this.renderFilterButton() }
+
                             <Input type="text" placeholder="Search"/>
+
+                            { addButtonText &&
                             <Button
                                 color="success"
                                 className="border"
                                 onClick={onAddButtonClick}>
                                 {addButtonText}
-                            </Button>
+                            </Button> }
                         </div>
                     </td>
                 </tr>

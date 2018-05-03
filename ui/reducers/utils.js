@@ -5,9 +5,23 @@ function parseItems(collection) {
     const items = {}
 
     collection.items.forEach(item => {
-        const id = (item.data
+        let id = (item.data
             .filter(({name}) => name === "id")
             .shift() || {}).value;
+
+        // Resources such as location updates and measurements do not have ID.
+        // Construct unique ID from device ID and timestamp
+        if(id == null) {
+            const deviceId = (item.data
+                .filter(({name}) => name === "deviceId")
+                .shift() || {}).value;
+
+            const time = (item.data
+                .filter(({name}) => name === "time")
+                .shift() || {}).value;
+
+            id = deviceId + " - " + time;
+        }
 
         items[id] = item;
     })

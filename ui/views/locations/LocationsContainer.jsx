@@ -4,10 +4,14 @@ import Locations from './Locations';
 
 // State
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux';
-import { generateGetLocations } from '../../reducers/locations/actions';
+import { generateGetLocations, generateDeleteLocation } from '../../reducers/locations/actions';
 
 export class LocationsContainer extends React.Component {
+    state = {
+        selectedRow: null,
+        selectedRowId: null,
+        showMap: false,
+    }
 
     constructor(props) {
         super(props);
@@ -15,15 +19,35 @@ export class LocationsContainer extends React.Component {
         const { dispatch } = props;
 
         this.getLocations = generateGetLocations(dispatch);
+        this.deleteLocation = generateDeleteLocation(dispatch);
     }
 
     componentDidMount() {
         this.getLocations();
     }
 
+    onRowSelect(selectedRow, selectedRowId) {
+        this.setState({
+            selectedRow,
+            selectedRowId,
+            showMap: true
+        });
+    }
+
+
+    onDeleteButtonClick(data) {
+        this.deleteLocation(data);
+
+        this.setState({
+            selectedRow: null,
+            selectedRowId: null,
+        });
+    }
+
     render() {
         const { items, links, queries, template, isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
-        const { getLocations } = this;
+        const { selectedRow, selectedRowId, showMap } = this.state;
+        const { getLocations, onDeleteButtonClick, onRowSelect } = this;
 
         return (
             <Locations { ...{
@@ -35,7 +59,12 @@ export class LocationsContainer extends React.Component {
                 hasFetched,
                 fetchingError,
                 fetchingErrorMessage,
-                getLocations
+                selectedRow,
+                selectedRowId,
+                showMap,
+                getLocations,
+                onDeleteButtonClick: onDeleteButtonClick.bind(this),
+                onRowSelect: onRowSelect.bind(this),
             }} />
         );
     }

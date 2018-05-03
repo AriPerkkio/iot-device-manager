@@ -4,10 +4,14 @@ import Measurements from './Measurements';
 
 // State
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux';
-import { generateGetMeasurements } from '../../reducers/measurements/actions';
+import { generateGetMeasurements, generateDeleteMeasurement } from '../../reducers/measurements/actions';
 
 export class MeasurementsContainer extends React.Component {
+    state = {
+        selectedRow: null,
+        selectedRowId: null,
+        showContent: false,
+    }
 
     constructor(props) {
         super(props);
@@ -15,15 +19,34 @@ export class MeasurementsContainer extends React.Component {
         const { dispatch } = props;
 
         this.getMeasurements = generateGetMeasurements(dispatch);
+        this.deleteMeasurement = generateDeleteMeasurement(dispatch);
     }
 
     componentDidMount() {
         this.getMeasurements();
     }
 
+    onRowSelect(selectedRow, selectedRowId) {
+        this.setState({
+            selectedRow,
+            selectedRowId,
+            showContent: true
+        });
+    }
+
+    onDeleteButtonClick(data) {
+        this.deleteMeasurement(data);
+
+        this.setState({
+            selectedRow: null,
+            selectedRowId: null,
+        });
+    }
+
     render() {
         const { items, links, queries, template, isFetching, hasFetched, fetchingError, fetchingErrorMessage } = this.props;
-        const { getMeasurements } = this;
+        const { selectedRow, selectedRowId, showContent } = this.state;
+        const { getMeasurements, onDeleteButtonClick, onRowSelect } = this;
 
         return (
             <Measurements { ...{
@@ -35,7 +58,12 @@ export class MeasurementsContainer extends React.Component {
                 hasFetched,
                 fetchingError,
                 fetchingErrorMessage,
-                getMeasurements
+                selectedRow,
+                selectedRowId,
+                showContent,
+                getMeasurements,
+                onDeleteButtonClick: onDeleteButtonClick.bind(this),
+                onRowSelect: onRowSelect.bind(this),
             }} />
         );
     }

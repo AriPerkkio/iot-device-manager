@@ -14,10 +14,6 @@ export default class DataTableContainer extends React.Component {
         addButtonText: PropTypes.string,
     }
 
-    static defaultProps = {
-        addButtonText: "Add new item",
-    }
-
     state = {
         selectedRowIndex: null,
         filterDropDownOpen: false,
