@@ -7,7 +7,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import web.domain.response.ErrorCode;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ExceptionHandlingUtils {
+
+    private static final Pattern CONSTAINT_VIOLATION_REGEXP = Pattern.compile("FOREIGN KEY \\(`(.+?)`\\)");
 
     /**
      * Manages exception handling for repository access. Converts different types of Exceptions into ExceptionWrapper
@@ -33,9 +38,15 @@ public class ExceptionHandlingUtils {
             errorCode = ErrorCode.PARAMETER_CONFLICT;
 
             if(e.getCause() instanceof ConstraintViolationException) {
-                message = e.getCause().getCause().getLocalizedMessage();
-            }
+                ConstraintViolationException cve = (ConstraintViolationException) e.getCause();
+                String parsedError = parseConstraintViolationException(cve);
 
+                if(parsedError == null) {
+                    message = cve.getCause().getLocalizedMessage();
+                } else {
+                    message = String.format("Constraint error on %s", parsedError);
+                }
+            }
         } else if(e instanceof DataAccessException || e instanceof HibernateError) {
             message = "Database error occurred";
 
@@ -45,6 +56,27 @@ public class ExceptionHandlingUtils {
 
         throw new ExceptionWrapper(title, message, errorCode);
     }
+
+    /**
+     * Parse foreign key from constraint validation exception. Try-catch due to unstable implementation
+     *
+     * @param e
+     *      Exception thrown
+     * @return
+     *      Parsed string containing foreign key
+     */
+    private static String parseConstraintViolationException(ConstraintViolationException e) {
+            try {
+                String sqlError = e.getCause().getLocalizedMessage();
+
+                final Matcher matcher = CONSTAINT_VIOLATION_REGEXP.matcher(sqlError);
+                matcher.find();
+
+                return matcher.group(1);
+            } catch (Exception ex) {
+                return null;
+            }
+        }
 
     /**
      * Throws NotFoundException with fixed prefix message
