@@ -13,9 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static web.mapper.MapperUtils.buildHref;
-import static web.mapper.MapperUtils.formatTime;
-import static web.mapper.MapperUtils.getOptionalValue;
+import static web.mapper.MapperUtils.*;
 
 public class MeasurementMapper {
 
@@ -50,6 +48,9 @@ public class MeasurementMapper {
         List<Item> items = new ArrayList<>();
         List<Link> links = new ArrayList<>();
 
+        // Add profile link
+        links.add(getProfileLink(measurements));
+
         measurements.forEach(measurement -> {
             try {
                 items.add(mapToItem(measurement));
@@ -61,7 +62,6 @@ public class MeasurementMapper {
             } catch(Exception e) {
                 throw new ExceptionWrapper("Internal error", "Measurement mapping failed", ErrorCode.INTERNAL_ERROR);
             }
-
         });
 
         return Collection.create(

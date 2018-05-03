@@ -13,6 +13,7 @@ import java.util.List;
 
 import static web.mapper.MapperUtils.buildHref;
 import static web.mapper.MapperUtils.getOptionalValue;
+import static web.mapper.MapperUtils.getProfileLink;
 
 public class DeviceTypeMapper {
     private static final String DEVICE_TYPES_URI = "/api/device-types";
@@ -44,6 +45,9 @@ public class DeviceTypeMapper {
     public static Collection mapToCollection(java.util.Collection<DeviceType> deviceTypes) {
         List<Item> items = new ArrayList<>();
         List<Link> links = new ArrayList<>();
+
+        // Add profile link
+        links.add(getProfileLink(deviceTypes));
 
         deviceTypes.forEach(type -> {
             items.add(mapToItem(type));

@@ -13,6 +13,7 @@ import java.util.List;
 
 import static web.mapper.MapperUtils.buildHref;
 import static web.mapper.MapperUtils.getOptionalValue;
+import static web.mapper.MapperUtils.getProfileLink;
 
 
 public class DeviceMapper {
@@ -45,6 +46,9 @@ public class DeviceMapper {
     public static Collection mapToCollection(java.util.Collection<Device> devices) {
         List<Item> items = new ArrayList<>();
         List<Link> links = new ArrayList<>();
+
+        // Add profile link
+        links.add(getProfileLink(devices));
 
         devices.forEach(device -> {
             items.add(mapToItem(device));

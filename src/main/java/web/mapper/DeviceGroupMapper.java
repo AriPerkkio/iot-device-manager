@@ -13,6 +13,7 @@ import java.util.List;
 
 import static web.mapper.MapperUtils.buildHref;
 import static web.mapper.MapperUtils.getOptionalValue;
+import static web.mapper.MapperUtils.getProfileLink;
 
 public class DeviceGroupMapper {
     private static final String DEVICE_GROUPS_URI = "/api/device-groups";
@@ -44,6 +45,9 @@ public class DeviceGroupMapper {
     public static Collection mapToCollection(java.util.Collection<DeviceGroup> deviceGroups) {
         List<Item> items = new ArrayList<>();
         List<Link> links = new ArrayList<>();
+
+        // Add profile link
+        links.add(getProfileLink(deviceGroups));
 
         deviceGroups.forEach(group -> {
             items.add(mapToItem(group));

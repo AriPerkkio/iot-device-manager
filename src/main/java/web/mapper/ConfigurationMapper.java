@@ -15,6 +15,7 @@ import java.util.List;
 
 import static web.mapper.MapperUtils.buildHref;
 import static web.mapper.MapperUtils.getOptionalValue;
+import static web.mapper.MapperUtils.getProfileLink;
 
 public class ConfigurationMapper {
     private static final String CONFIGURATIONS_URI = "/api/configurations";
@@ -46,6 +47,9 @@ public class ConfigurationMapper {
     public static Collection mapToCollection(java.util.Collection<Configuration> configurations) {
         List<Item> items = new ArrayList<>();
         List<Link> links = new ArrayList<>();
+
+        // Add profile link
+        links.add(getProfileLink(configurations));
 
         configurations.forEach(configuration -> {
             try {

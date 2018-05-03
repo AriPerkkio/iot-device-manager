@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static web.mapper.MapperUtils.buildHref;
+import static web.mapper.MapperUtils.getProfileLink;
 
 public class DeviceIconMapper {
     private static final String DEVICE_ICONS_URI = "/api/device-icons";
@@ -43,6 +44,9 @@ public class DeviceIconMapper {
     public static Collection mapToCollection(java.util.Collection<DeviceIcon> deviceIcons) {
         List<Item> items = new ArrayList<>();
         List<Link> links = new ArrayList<>();
+
+        // Add profile link
+        links.add(getProfileLink(deviceIcons));
 
         deviceIcons.forEach(icon -> {
             items.add(mapToItem(icon));

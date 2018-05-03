@@ -13,6 +13,7 @@ import java.util.List;
 
 import static web.mapper.MapperUtils.buildHref;
 import static web.mapper.MapperUtils.formatTime;
+import static web.mapper.MapperUtils.getProfileLink;
 
 public class LocationMapper {
 
@@ -46,6 +47,9 @@ public class LocationMapper {
     public static Collection mapToCollection(java.util.Collection<Location> locations) {
         List<Item> items = new ArrayList<>();
         List<Link> links = new ArrayList<>();
+
+        // Add profile link
+        links.add(getProfileLink(locations));
 
         locations.forEach(location -> {
             items.add(mapToItem(location));
