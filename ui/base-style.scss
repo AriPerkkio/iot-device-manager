@@ -1,6 +1,22 @@
-html, body {
+@import "node_modules/bootstrap/scss/bootstrap";
+
+html, body, #app, #app>div {
     height: 100%;
     width: 100%;
+}
+
+nav {
+    margin: 0 -15px;
+}
+
+#app>div {
+    display: flex;
+    flex-direction: column;
+
+    div.row {
+        flex: auto;
+        display: flex;
+    }
 }
 
 div.login-wrapper {
@@ -30,4 +46,35 @@ div.login-wrapper {
     position: absolute;
     top: 30%;
     left: 30%;
+}
+
+#maps-container {
+    padding: 20px 10px;
+    height: 100%;
+}
+
+#maps {
+    height: 100%;
+    border: 2px solid lightgrey;
+}
+
+@include media-breakpoint-down(sm) {
+    div.row {
+        flex-direction: column;
+        > div {
+            flex-direction: column;
+            display: flex;
+        }
+    }
+    .map-column {
+        flex: 1;
+    }
+    #maps-container {
+        display: flex;
+        flex-direction: column;
+        flex: auto;
+    }
+    #maps {
+        flex: 1;
+    }
 }

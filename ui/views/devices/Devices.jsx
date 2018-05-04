@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col } from 'reactstrap';
+import { Row, Col } from 'reactstrap';
 import LoadingIndicator from 'react-loading-indicator';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
@@ -10,17 +10,15 @@ export default class Devices extends React.Component {
 
     render() {
         return (
-            <Container fluid>
-                <Row>
-                    <Col md={12} lg={8}>
-                        { this.renderTable() }
-                    </Col>
+            <Row>
+                <Col md={12} lg={8}>
+                    { this.renderTable() }
+                </Col>
 
-                    <Col md={12} lg={4}>
-                        { this.renderForm() }
-                    </Col>
-                </Row>
-            </Container>
+                <Col md={12} lg={4}>
+                    { this.renderForm() }
+                </Col>
+            </Row>
         );
     }
 

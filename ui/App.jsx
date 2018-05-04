@@ -1,4 +1,5 @@
 import React from 'react';
+import { Container } from 'reactstrap';
 
 // State
 import { Provider } from 'react-redux';
@@ -26,7 +27,7 @@ export default class App extends React.Component {
         return (
             <Provider store={store}>
                 <ConnectedRouter history={history}>
-                    <div>
+                    <Container fluid>
                         <Header />
                         <Route exact path="/" component={Home}/>
                         <Route path="/devices" component={Devices}/>
@@ -35,7 +36,7 @@ export default class App extends React.Component {
                         <Route path="/configurations" component={Configurations}/>
                         <Route path="/location-updates" component={Locations}/>
                         <Route path="/measurements" component={Measurements}/>
-                    </div>
+                    </Container>
                 </ConnectedRouter>
             </Provider>
         );

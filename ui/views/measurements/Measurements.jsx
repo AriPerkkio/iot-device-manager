@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col } from 'reactstrap';
+import { Row, Col } from 'reactstrap';
 import LoadingIndicator from 'react-loading-indicator';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
@@ -9,19 +9,17 @@ export default class Measurements extends React.Component {
 
     render() {
         return (
-            <Container fluid>
-                <Row>
-                    <Col md={6} lg={4}>
-                        { this.renderTable() }
-                    </Col>
+            <Row>
+                <Col md={6} lg={4}>
+                    { this.renderTable() }
+                </Col>
 
-                    <Col md={6} lg={8}>
-                        <pre>
-                            {JSON.stringify(this.props.selectedRow, null, 2)}
-                        </pre>
-                    </Col>
-                </Row>
-            </Container>
+                <Col md={6} lg={8}>
+                    <pre>
+                        {JSON.stringify(this.props.selectedRow, null, 2)}
+                    </pre>
+                </Col>
+            </Row>
         );
     }
 

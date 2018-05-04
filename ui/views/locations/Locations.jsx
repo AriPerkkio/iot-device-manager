@@ -1,27 +1,24 @@
 import React from 'react';
-import { Container, Row, Col } from 'reactstrap';
+import { Row, Col } from 'reactstrap';
 import LoadingIndicator from 'react-loading-indicator';
 
 import DataTable from '../../components/DataTable/DataTableContainer';
 import ErrorAlert from '../../components/ErrorAlert';
+import Maps from '../../components/Maps/MapsContainer';
 
 export default class Locations extends React.Component {
 
     render() {
         return (
-            <Container fluid>
-                <Row>
-                    <Col md={6} lg={4}>
-                        { this.renderTable() }
-                    </Col>
+            <Row>
+                <Col md={6} lg={4}>
+                    { this.renderTable() }
+                </Col>
 
-                    <Col md={6} lg={8}>
-                        <pre>
-                            {JSON.stringify(this.props.selectedRow, null, 2)}
-                        </pre>
-                    </Col>
-                </Row>
-            </Container>
+                <Col md={6} lg={8} className="map-column">
+                    { this.renderMap() }
+                </Col>
+            </Row>
         );
     }
 
@@ -53,5 +50,16 @@ export default class Locations extends React.Component {
         }
 
         return null;
+    }
+
+    renderMap() {
+        const { selectedRow, items } = this.props;
+
+        return (
+            <Maps { ...{
+                items,
+                selectedRow
+            }} />
+        );
     }
 }
