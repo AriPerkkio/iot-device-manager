@@ -59,22 +59,26 @@ div.login-wrapper {
 }
 
 @include media-breakpoint-down(sm) {
-    div.row {
+    div.locations-row {
         flex-direction: column;
+
         > div {
             flex-direction: column;
             display: flex;
         }
-    }
-    .map-column {
-        flex: 1;
-    }
-    #maps-container {
-        display: flex;
-        flex-direction: column;
-        flex: auto;
-    }
-    #maps {
-        flex: 1;
+
+        .map-column {
+            flex: 1;
+        }
+
+        #maps-container {
+            display: flex;
+            flex-direction: column;
+            flex: auto;
+        }
+
+        #maps {
+            flex: 1;
+        }
     }
 }

@@ -10,7 +10,7 @@ export default class Locations extends React.Component {
 
     render() {
         return (
-            <Row>
+            <Row className="locations-row">
                 <Col md={6} lg={4}>
                     { this.renderTable() }
                 </Col>
